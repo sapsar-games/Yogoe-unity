@@ -33,6 +33,9 @@ namespace Yoegoe.Cooking
             PreCharm != CookingCharmType.Recycle && PreCharm != CookingCharmType.Double;
         /// <summary>나가리 버튼: 사전 부적 없이 시작한 판 + 나가리 부적을 가지고 있을 때만 (쓰면 1개 소모).</summary>
         public bool ShowNagari => Running && PreCharm == CookingCharmType.None && HasNagariCharm;
+        /// <summary>손님에게 요리를 건넨 뒤엔 그 판에서 부적(나가리)을 쓸 수 없다 — 버튼에 X.</summary>
+        public bool CharmsLocked => GuestOrder != null && GuestOrder.Fulfilled;
+        public bool CanUseNagari => ShowNagari && !CharmsLocked;
         static bool HasNagariCharm =>
             Yoegoe.Economy.GameEconomy.Instance != null
             && Yoegoe.Economy.GameEconomy.Instance.GetCharmCount(CookingCharmType.Cancel) > 0;
@@ -52,6 +55,8 @@ namespace Yoegoe.Cooking
 
         /// <summary>선호 공양물 조합이 가능할 때 나타나는 주문 요괴. 없으면 null.</summary>
         public CookingGuestOrder GuestOrder { get; private set; }
+        /// <summary>테스트용 — 손님 주문을 직접 꽂는다.</summary>
+        public void SetGuestOrderForTest(CookingGuestOrder order) => GuestOrder = order;
         /// <summary>제자리 조리 중(익는 중·김·식음).</summary>
         public IReadOnlyList<CookingCookJob> ActiveCooks => cooks;
         public int PerfectCollectCount { get; private set; }
@@ -567,7 +572,7 @@ namespace Yoegoe.Cooking
 
         public void CancelNagari()
         {
-            if (!ShowNagari || Finished) return;
+            if (!CanUseNagari || Finished) return;
             if (!Yoegoe.Economy.GameEconomy.Instance.TrySpendCharm(CookingCharmType.Cancel)) return;
             // 결과 취소 + 재료 전량 반환
             Results.Clear();

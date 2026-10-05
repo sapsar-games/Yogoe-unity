@@ -350,7 +350,9 @@ public class GongyangganScreen : MonoBehaviour
             {
                 string how = guest.Perfect ? "완벽하게 " : "";
                 sb.AppendLine($"· {guest.DisplayName}에게 {guest.OfferingName}을(를) {how}대접했어요");
-                sb.AppendLine($"· 기력 +{guest.StaminaGain} · 친밀도 +{guest.IntimacyGain:0.#}");
+                sb.AppendLine(guest.RevivedFromFaint
+                    ? $"· 기절에서 깨어났어요 · 기력 +{guest.StaminaGain}"
+                    : $"· 기력 +{guest.StaminaGain} · 친밀도 +{guest.IntimacyGain:0.#}");
             }
             else if (guest.Failed)
                 sb.AppendLine($"· {guest.DisplayName}이(가) 아쉬워하며 돌아갔어요 — 실망…");
@@ -442,7 +444,16 @@ public class GongyangganScreen : MonoBehaviour
             {
                 var label = nagariButton.GetComponentInChildren<Text>(true);
                 int held = GameEconomy.Instance != null ? GameEconomy.Instance.GetCharmCount(CookingCharmType.Cancel) : 0;
-                if (label != null) label.text = $"나가리 ×{held}";
+                if (label != null && nagariLabelHeld != held)
+                {
+                    nagariLabelHeld = held;
+                    label.text = $"나가리 ×{held}";
+                }
+                // 손님에게 요리를 건넨 뒤엔 사용 불가 — 버튼 위에 X
+                bool locked = session.CharmsLocked;
+                nagariButton.interactable = !locked;
+                var x = EnsureNagariLockMark(label != null ? label.font : null);
+                if (x != null && x.activeSelf != locked) x.SetActive(locked);
             }
         }
         if (extendButton != null)
@@ -609,11 +620,39 @@ public class GongyangganScreen : MonoBehaviour
         session?.TryBeginPath(x, y);
     }
 
+    int nagariLabelHeld = -1;
+    GameObject nagariLockMark;
+
+    /// <summary>나가리 버튼 위 X 표시 (동적 콘텐츠 — 처음 필요할 때 한 번 만든다).</summary>
+    GameObject EnsureNagariLockMark(Font labelFont)
+    {
+        if (nagariLockMark != null || nagariButton == null) return nagariLockMark;
+        var go = new GameObject("LockedX", typeof(RectTransform));
+        go.transform.SetParent(nagariButton.transform, false);
+        var rt = (RectTransform)go.transform;
+        rt.anchorMin = Vector2.zero;
+        rt.anchorMax = Vector2.one;
+        rt.offsetMin = rt.offsetMax = Vector2.zero;
+        var t = go.AddComponent<Text>();
+        t.font = labelFont != null ? labelFont : font;
+        t.text = "X";
+        t.fontStyle = FontStyle.Bold;
+        t.fontSize = 64;
+        t.alignment = TextAnchor.MiddleCenter;
+        t.color = new Color(0.9f, 0.2f, 0.2f, 0.95f);
+        t.raycastTarget = false;
+        go.SetActive(false);
+        nagariLockMark = go;
+        return go;
+    }
+
     static string GuestStatusLine(CookingSession s)
     {
         var g = s?.GuestOrder;
         if (g == null) return "";
         if (g.Failed) return $"{g.DisplayName}: 실망…";
+        if (g.Fulfilled && g.RevivedFromFaint)
+            return $"{g.DisplayName}: 깨어났어! 기력 +{g.StaminaGain}";
         if (g.Fulfilled)
             return g.Perfect
                 ? $"{g.DisplayName}: 최고야! 친밀도·기력 ×{CookingGuestOrder.PerfectStaminaMul}"

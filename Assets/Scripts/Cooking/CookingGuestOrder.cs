@@ -8,6 +8,7 @@ namespace Yoegoe.Cooking
     /// <summary>
     /// 공양간 주문 요괴: 선호 공양물을 지금 판에서 지을 수 있을 때만 등장.
     /// 퍼펙트(김) → 친밀도·기력 ×3 · 인벤 미지급 / 식음 → 친밀도 동일·기력 ×2 · 인벤 미지급 / 미제공 → 실망.
+    /// 기절한 요괴도 손님으로 온다 — 받으면 친밀도 없이 그 기력만큼 회복하며 바로 깨어난다(물의 '기력 1' 단계를 건너뜀).
     /// </summary>
     public sealed class CookingGuestOrder
     {
@@ -28,6 +29,8 @@ namespace Yoegoe.Cooking
         public bool Perfect { get; private set; }
         public int StaminaGain { get; private set; }
         public float IntimacyGain { get; private set; }
+        /// <summary>기절한 요괴가 받아서 깨어났는지 (친밀도 없음).</summary>
+        public bool RevivedFromFaint { get; private set; }
 
         public CookingGuestOrder(CharacterAgent yokai, string characterId, string displayName,
             string offeringId, string offeringName)
@@ -170,7 +173,15 @@ namespace Yoegoe.Cooking
 
             if (Yokai != null && Yokai.Data != null)
             {
-                Yokai.ReceiveOffering(stam, inti, OfferingKind.Preferred);
+                if (Yokai.Stats.State == ActionState.Fainted)
+                {
+                    // 기절: 기력만 회복하며 깨어남 (기절을 깨우는 경로는 물과 같다 — 친밀도 0)
+                    RevivedFromFaint = true;
+                    IntimacyGain = 0f;
+                    Yokai.ReceiveOffering(stam, 0f, OfferingKind.Water);
+                }
+                else
+                    Yokai.ReceiveOffering(stam, inti, OfferingKind.Preferred);
                 if (!string.IsNullOrEmpty(OfferingId))
                     Yokai.Stats.RevealPreference(OfferingId);
             }
@@ -192,6 +203,7 @@ namespace Yoegoe.Cooking
         public string RewardHint =>
             Failed ? OfferingName + "을(를) 못 먹었어"
             : !Fulfilled ? OfferingName + "?"
+            : RevivedFromFaint ? $"기력 +{StaminaGain} — 깨어났어"
             : Perfect ? $"친밀도·기력 ×{PerfectStaminaMul}"
             : $"친밀도 ×{CoolIntimacyMul} · 기력 ×{CoolStaminaMul}";
     }
