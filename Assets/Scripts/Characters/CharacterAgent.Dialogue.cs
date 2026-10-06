@@ -120,7 +120,7 @@ namespace Yoegoe.Characters
             {
                 renderer.sortingOrder = 1001;
                 Bounds bounds = renderer.bounds;
-                bubbleBg.transform.localScale = new Vector3(bounds.size.x + BubblePadX, bounds.size.y + BubblePadY, 1f);
+                bubbleBg.transform.localScale = new Vector3(bounds.size.x + BubblePadX * UiTextScale.Bubble, bounds.size.y + BubblePadY * UiTextScale.Bubble, 1f);
             }
 
             monologueShowing = true;
@@ -141,7 +141,7 @@ namespace Yoegoe.Characters
             var renderer = bubbleTextMesh.GetComponent<MeshRenderer>();
             renderer.sortingOrder = 1001; // 상태 점(1000)보다 위
             Bounds bounds = renderer.bounds;
-            bubbleBg.transform.localScale = new Vector3(bounds.size.x + BubblePadX, bounds.size.y + BubblePadY, 1f);
+            bubbleBg.transform.localScale = new Vector3(bounds.size.x + BubblePadX * UiTextScale.Bubble, bounds.size.y + BubblePadY * UiTextScale.Bubble, 1f);
 
             monologueShowing = true;
             monologueTimer = MonologueDisplaySeconds;
@@ -260,7 +260,7 @@ namespace Yoegoe.Characters
             {
                 renderer.sortingOrder = 1001;
                 Bounds bounds = renderer.bounds;
-                bubbleBg.transform.localScale = new Vector3(bounds.size.x + BubblePadX, bounds.size.y + BubblePadY, 1f);
+                bubbleBg.transform.localScale = new Vector3(bounds.size.x + BubblePadX * UiTextScale.Bubble, bounds.size.y + BubblePadY * UiTextScale.Bubble, 1f);
             }
             monologueShowing = true;
             monologueTimer = duration;
