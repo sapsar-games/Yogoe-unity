@@ -56,10 +56,11 @@
     },
     {
       "id": "saengsunjjim",
-      "name": "생선찜",
-      "kind": "Food",
+      "name": "낙지호롱",
+      "kind": "Offering",
       "ingredients": [
         "Water",
+        "Seafood",
         "Seafood"
       ]
     },
@@ -128,10 +129,11 @@
     },
     {
       "id": "juak",
-      "name": "누룽지",
-      "kind": "Food",
+      "name": "주악",
+      "kind": "Offering",
       "ingredients": [
         "Rice",
+        "Fruit",
         "Oil"
       ]
     },
@@ -219,7 +221,7 @@
     },
     {
       "id": "saengsunjorim",
-      "name": "생선조림",
+      "name": "낙지볶음",
       "kind": "Food",
       "ingredients": [
         "Chili",
@@ -318,7 +320,7 @@
     },
     {
       "id": "donggeurangttaeng",
-      "name": "동그랑떙",
+      "name": "동그랑땡",
       "kind": "Food",
       "ingredients": [
         "Boar",
@@ -619,6 +621,160 @@
       "ingredients": [
         "Herb",
         "Namul"
+      ]
+    },
+    {
+      "id": "kimbap",
+      "name": "김밥",
+      "kind": "Food",
+      "ingredients": [
+        "Rice",
+        "Seafood"
+      ]
+    },
+    {
+      "id": "yulmucha",
+      "name": "율무차",
+      "kind": "Food",
+      "ingredients": [
+        "Grain",
+        "Herb"
+      ]
+    },
+    {
+      "id": "gejang",
+      "name": "게장",
+      "kind": "Food",
+      "ingredients": [
+        "Grain",
+        "Seafood"
+      ]
+    },
+    {
+      "id": "miyeokguk",
+      "name": "미역국",
+      "kind": "Offering",
+      "ingredients": [
+        "Seafood",
+        "Rice",
+        "Boar"
+      ]
+    },
+    {
+      "id": "bugeo",
+      "name": "북어",
+      "kind": "Food",
+      "ingredients": [
+        "Seafood",
+        "Seafood"
+      ]
+    },
+    {
+      "id": "jeonbokjuk",
+      "name": "전복죽",
+      "kind": "Offering",
+      "ingredients": [
+        "Seafood",
+        "Rice",
+        "Water"
+      ]
+    },
+    {
+      "id": "guljeon",
+      "name": "굴전",
+      "kind": "Offering",
+      "ingredients": [
+        "Seafood",
+        "Egg",
+        "Oil"
+      ]
+    },
+    {
+      "id": "dubu",
+      "name": "두부",
+      "kind": "Food",
+      "ingredients": [
+        "Grain",
+        "Grain"
+      ]
+    },
+    {
+      "id": "memilmuk",
+      "name": "메밀묵",
+      "kind": "Offering",
+      "ingredients": [
+        "Grain",
+        "Grain",
+        "Water"
+      ]
+    },
+    {
+      "id": "jangjorim",
+      "name": "장조림",
+      "kind": "Offering",
+      "ingredients": [
+        "Grain",
+        "Boar",
+        "Egg"
+      ]
+    },
+    {
+      "id": "dubukimchi",
+      "name": "두부김치",
+      "kind": "Offering",
+      "ingredients": [
+        "Grain",
+        "Namul",
+        "Chili"
+      ]
+    },
+    {
+      "id": "haemulpajeon",
+      "name": "해물파전",
+      "kind": "Offering",
+      "ingredients": [
+        "Namul",
+        "Seafood",
+        "Oil"
+      ]
+    },
+    {
+      "id": "jesagwail",
+      "name": "제사과일",
+      "kind": "Offering",
+      "ingredients": [
+        "Fruit",
+        "Fruit",
+        "Fruit"
+      ]
+    },
+    {
+      "id": "jesanamul",
+      "name": "제사나물",
+      "kind": "Offering",
+      "ingredients": [
+        "Namul",
+        "Namul",
+        "Namul"
+      ]
+    },
+    {
+      "id": "jeonghwasu",
+      "name": "정화수",
+      "kind": "Offering",
+      "ingredients": [
+        "Water",
+        "Water",
+        "Water"
+      ]
+    },
+    {
+      "id": "nurungji",
+      "name": "누룽지",
+      "kind": "Food",
+      "ingredients": [
+        "Rice",
+        "Oil"
       ]
     }
   ]
