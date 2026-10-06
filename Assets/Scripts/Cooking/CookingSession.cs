@@ -122,8 +122,8 @@ namespace Yoegoe.Cooking
         static float ResolveLimit(CookingCharmType charm) => charm switch
         {
             CookingCharmType.PlusFive => BaseSeconds + 5f,
-            CookingCharmType.Recycle => BaseSeconds - 4f,
-            CookingCharmType.Double => 7f,
+            CookingCharmType.Recycle => 12f,
+            CookingCharmType.Double => 10f,
             _ => BaseSeconds
         };
 

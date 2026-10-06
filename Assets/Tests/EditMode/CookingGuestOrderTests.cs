@@ -32,7 +32,7 @@ namespace Yoegoe.Tests.EditMode
         }
 
         [Test]
-        public void Reward_PerfectIsTriple_CoolSameIntimacyDoubleStamina()
+        public void Reward_PerfectIsDouble_CoolNormalIntimacyDoubleStamina()
         {
             var o = OfferingCatalog.Find("baekseolgi");
             if (o == null)
@@ -46,13 +46,12 @@ namespace Yoegoe.Tests.EditMode
             float baseInti = o.ResolveIntimacyGain(true);
 
             CookingGuestOrder.ComputeReward(o, perfect: true, out int ps, out float pi);
-            Assert.AreEqual(baseStam * 3, ps);
-            Assert.AreEqual(baseInti * 3f, pi, 0.001f);
+            Assert.AreEqual(baseStam * 2, ps);
+            Assert.AreEqual(baseInti * 2f, pi, 0.001f);
 
             CookingGuestOrder.ComputeReward(o, perfect: false, out int cs, out float ci);
             Assert.AreEqual(baseStam * 2, cs);
-            Assert.AreEqual(baseInti * 3f, ci, 0.001f); // 친밀도는 퍼펙트와 같음
-            Assert.AreEqual(pi, ci, 0.001f);
+            Assert.AreEqual(baseInti, ci, 0.001f); // 친밀도는 평소대로
         }
 
         [Test]

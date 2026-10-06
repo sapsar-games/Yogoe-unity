@@ -7,16 +7,16 @@ namespace Yoegoe.Cooking
 {
     /// <summary>
     /// 공양간 주문 요괴: 선호 공양물을 지금 판에서 지을 수 있을 때만 등장.
-    /// 퍼펙트(김) → 친밀도·기력 ×3 · 인벤 미지급 / 식음 → 친밀도 동일·기력 ×2 · 인벤 미지급 / 미제공 → 실망.
+    /// 퍼펙트(김) → 친밀도·기력 ×2 · 인벤 미지급 / 식음 → 친밀도 평소대로·기력 ×2 · 인벤 미지급 / 미제공 → 실망.
     /// 기절한 요괴도 손님으로 온다 — 받으면 친밀도 없이 그 기력만큼 회복하며 바로 깨어난다(물의 '기력 1' 단계를 건너뜀).
     /// </summary>
     public sealed class CookingGuestOrder
     {
-        public const int PerfectStaminaMul = 3;
-        public const int PerfectIntimacyMul = 3;
+        public const int PerfectStaminaMul = 2;
+        public const int PerfectIntimacyMul = 2;
         public const int CoolStaminaMul = 2;
-        /// <summary>식음도 친밀도는 퍼펙트와 같음(×3).</summary>
-        public const int CoolIntimacyMul = PerfectIntimacyMul;
+        /// <summary>식음은 친밀도 평소대로(×1).</summary>
+        public const int CoolIntimacyMul = 1;
 
         public CharacterAgent Yokai { get; }
         public string CharacterId { get; }
@@ -137,7 +137,7 @@ namespace Yoegoe.Cooking
             }
         }
 
-        /// <summary>선호 공양물 기본 수치에 배율 적용. 퍼펙트=기력·친밀 ×3, 식음=친밀 ×3·기력 ×2.</summary>
+        /// <summary>선호 공양물 기본 수치에 배율 적용. 퍼펙트=기력·친밀 ×2, 식음=친밀 ×1·기력 ×2.</summary>
         public static void ComputeReward(OfferingData offering, bool perfect, out int stamina, out float intimacy)
         {
             int baseStam = offering != null ? offering.ResolveStaminaGain(true) : 3;
@@ -205,6 +205,6 @@ namespace Yoegoe.Cooking
             : !Fulfilled ? OfferingName + "?"
             : RevivedFromFaint ? $"기력 +{StaminaGain} — 깨어났어"
             : Perfect ? $"친밀도·기력 ×{PerfectStaminaMul}"
-            : $"친밀도 ×{CoolIntimacyMul} · 기력 ×{CoolStaminaMul}";
+            : $"기력 ×{CoolStaminaMul}";
     }
 }

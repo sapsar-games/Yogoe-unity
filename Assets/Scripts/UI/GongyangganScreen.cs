@@ -656,7 +656,7 @@ public class GongyangganScreen : MonoBehaviour
         if (g.Fulfilled)
             return g.Perfect
                 ? $"{g.DisplayName}: 최고야! 친밀도·기력 ×{CookingGuestOrder.PerfectStaminaMul}"
-                : $"{g.DisplayName}: 고마워! 친밀도 ×{CookingGuestOrder.CoolIntimacyMul} · 기력 ×{CookingGuestOrder.CoolStaminaMul}";
+                : $"{g.DisplayName}: 고마워! 기력 ×{CookingGuestOrder.CoolStaminaMul}";
         return $"{g.DisplayName}: {g.WaitLine} ({g.OfferingName})";
     }
 
