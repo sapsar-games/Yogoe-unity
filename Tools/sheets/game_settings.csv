@@ -14,6 +14,10 @@ spiritPiecesOffering,2,혼령에게 공양물을 주면 받는 기억 조각 (�
 spiritIntervalMinutes,20,나루터 · 혼령이 오는 간격(분). 줄이 다 차 있으면 시간이 멈춤
 spiritQueueMax,5,나루터 · 줄 최대 인원
 spiritStayMinutes,180,나루터 · 혼령이 기다리는 시간(분). 지나면 떠남
+uiTextScale,1,글자 · 화면(HUD·팝업) 글자 기준 배율 — 플레이어 설정(작게~아주 크게)이 여기에 곱해짐
+worldTextScale,1,글자 · 맵 글자(기물 이름표·보관 숫자) 기준 배율
+bubbleTextScale,1,글자 · 요괴 말풍선 기준 배율
+bubbleMaxChars,12,"글자 · 요괴 말풍선 한 줄 최대 글자 수 (넘으면 줄바꿈, 최대 3줄)"
 cookBaseSeconds,15,요리판 · 부적 없는 판 제한시간(초) — 부적 판은 charms 탭 seconds
 cookAdExtendSeconds,15,요리판 · 광고 연장 시간(초)
 cookFoodSeconds,1.5,요리판 · 음식이 익는 시간(초)

@@ -156,6 +156,7 @@ namespace Yoegoe.UI
         {
             EnsureHudShell();
             EnsureYutTokenPlusButton();
+            EnsureSettingsButton();
             WireRuntimeListeners();
             RefreshCurrencies();
             RefreshUpgradeButton();
@@ -178,6 +179,43 @@ namespace Yoegoe.UI
         /// 윷 토큰 칩 옆 [+] 버튼 — Prefab에 이미 있으면 그대로 쓰고, 예전 Prefab에도
         /// 이름으로 찾아 붙여서 항상 나타나게 한다.
         /// </summary>
+        const string SettingsButtonName = "SettingsButton";
+        const float SettingsButtonWidth = 104f;
+
+        /// <summary>
+        /// 상단 오른쪽 [설정] — 상점 버튼을 복제해 같은 모양으로 만들고, 상점 버튼은 그 왼쪽으로 민다.
+        /// 프리팹에 없어도(구운 HUD) 매번 Start 에서 찾거나 만든다.
+        /// </summary>
+        void EnsureSettingsButton()
+        {
+            if (shopButton == null) return;
+            var parent = shopButton.transform.parent;
+            var existing = parent.Find(SettingsButtonName);
+            Button btn;
+            if (existing != null) btn = existing.GetComponent<Button>();
+            else
+            {
+                var go = Instantiate(shopButton.gameObject, parent);
+                go.name = SettingsButtonName;
+                btn = go.GetComponent<Button>();
+                var rt = (RectTransform)go.transform;
+                var shopRt = (RectTransform)shopButton.transform;
+                rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(1f, 1f);
+                rt.sizeDelta = new Vector2(SettingsButtonWidth, shopRt.sizeDelta.y);
+                rt.anchoredPosition = shopRt.anchoredPosition;
+                var label = go.GetComponentInChildren<Text>(true);
+                if (label != null) label.text = "설정";
+                // 상점 버튼은 설정 버튼 왼쪽으로
+                shopRt.anchoredPosition = shopRt.anchoredPosition + new Vector2(-(SettingsButtonWidth + 12f), 0f);
+            }
+            if (btn == null) return;
+            btn.onClick.RemoveAllListeners();
+            btn.onClick.AddListener(() =>
+            {
+                if (SettingsPopup.Instance != null) SettingsPopup.Instance.Open();
+            });
+        }
+
         void EnsureYutTokenPlusButton()
         {
             if (yutTokenPlusButton == null)

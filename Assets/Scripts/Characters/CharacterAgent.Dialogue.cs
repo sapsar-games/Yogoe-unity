@@ -111,6 +111,7 @@ namespace Yoegoe.Characters
             showingFaintedEllipsis = true;
             EnsureBubble();
             bubbleTextMesh.text = FaintedBubbleText;
+            ApplyBubbleScale();
             bubbleTextMesh.gameObject.SetActive(true);
             bubbleBg.gameObject.SetActive(true);
 
@@ -131,6 +132,7 @@ namespace Yoegoe.Characters
         {
             EnsureBubble();
             bubbleTextMesh.text = WrapBubbleText(PickMonologueLine());
+            ApplyBubbleScale();
             bubbleTextMesh.gameObject.SetActive(true);
             bubbleBg.gameObject.SetActive(true);
 
@@ -250,6 +252,7 @@ namespace Yoegoe.Characters
         {
             EnsureBubble();
             bubbleTextMesh.text = WrapBubbleText(line);
+            ApplyBubbleScale();
             bubbleTextMesh.gameObject.SetActive(true);
             bubbleBg.gameObject.SetActive(true);
             var renderer = bubbleTextMesh.GetComponent<MeshRenderer>();
@@ -295,11 +298,19 @@ namespace Yoegoe.Characters
         }
 
         // 말풍선 크기 — 글자 크기 · 여백 · 한 줄 최대 글자 수 (긴 대사가 한 줄로 늘어나 말풍선이 커지지 않게)
+        // 배율·한 줄 글자 수 = 시트 game_settings(bubbleTextScale · bubbleMaxChars) × 설정 화면 글자 크기 (UiTextScale)
         const float BubbleCharacterSize = 0.038f;
         const float BubblePadX = 0.2f;
         const float BubblePadY = 0.12f;
-        const int BubbleMaxCharsPerLine = 12;
+        static int BubbleMaxCharsPerLine => UiTextScale.BubbleMaxChars;
         const int BubbleMaxLines = 3;
+
+        /// <summary>말풍선 글자 배율 적용 — 배경은 이 크기에 맞춰 그리므로 UiTextScaler 가 아니라 여기서 직접.</summary>
+        void ApplyBubbleScale()
+        {
+            if (bubbleTextMesh != null)
+                bubbleTextMesh.characterSize = BubbleCharacterSize * UiTextScale.Bubble;
+        }
 
         /// <summary>한 줄이 BubbleMaxCharsPerLine 을 넘으면 띄어쓰기 자리에서 나눈다 (띄어쓰기가 없으면 글자 수로).</summary>
         public static string WrapBubbleText(string text)

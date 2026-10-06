@@ -105,6 +105,15 @@ namespace Yoegoe.Bootstrap
             gift.font = cfg.hudFont;
             giftGO.SetActive(true);
 
+            var settingsGO = new GameObject("SettingsPopup");
+            settingsGO.SetActive(false);
+            var settings = settingsGO.AddComponent<SettingsPopup>();
+            settings.font = cfg.hudFont;
+            settingsGO.SetActive(true);
+
+            if (Object.FindAnyObjectByType<UiTextScaler>() == null)
+                new GameObject("UiTextScaler").AddComponent<UiTextScaler>();
+
             var dualGO = new GameObject("DualActionPopup");
             dualGO.SetActive(false);
             var dual = dualGO.AddComponent<DualActionPopup>();

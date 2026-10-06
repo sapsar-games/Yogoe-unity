@@ -61,6 +61,22 @@
       "value": 180.0
     },
     {
+      "key": "uiTextScale",
+      "value": 1.0
+    },
+    {
+      "key": "worldTextScale",
+      "value": 1.0
+    },
+    {
+      "key": "bubbleTextScale",
+      "value": 1.0
+    },
+    {
+      "key": "bubbleMaxChars",
+      "value": 12.0
+    },
+    {
       "key": "cookBaseSeconds",
       "value": 15.0
     },
