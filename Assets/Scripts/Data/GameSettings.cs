@@ -29,6 +29,39 @@ namespace Yoegoe.Data
             { "guestCoolIntimacyMul", 1f },
             { "spiritPiecesFood", 1f },
             { "spiritPiecesOffering", 2f },
+            { "cookBaseSeconds", 15f },
+            { "cookAdExtendSeconds", 15f },
+            { "cookFoodSeconds", 1.5f },
+            { "cookOfferingSeconds", 2.1f },
+            { "cookSteamSeconds", 0.5f },
+            { "staminaDrainMinutes", 10f },
+            { "faintHours", 18f },
+            { "requestIntervalMinMinutes", 3f },
+            { "requestIntervalMaxMinutes", 5f },
+            { "requestShowSeconds", 60f },
+            { "goldenBuffMinutes", 5f },
+            { "goldenSpeedMul", 2f },
+            { "shopOfferingPrice", 10f },
+            { "shopHyangPrice", 20f },
+            { "shopRerollMeritMinutes", 5f },
+            { "yutTokenMax", 5f },
+            { "yutTokenRegenMinutes", 30f },
+            { "yutTokenBuyCost", 10f },
+            { "yutTokenBuyAmount", 5f },
+            { "chestOfferingWeight", 50f },
+            { "chestAdTicketWeight", 30f },
+            { "chestHyangWeight", 5f },
+            { "chestYeopjeonWeight", 15f },
+            { "chestYeopjeonAmount", 3f },
+            { "giftChance", 0.2f },
+            { "giftPityMisses", 4f },
+            { "startMerit", 1000f },
+            { "startYeopjeon", 100f },
+            { "startHyang", 2f },
+            { "startWater", 0f },
+            { "startYutToken", 5f },
+            { "startMaterialEach", 5f },
+            { "startIntimacy", 50f },
         };
 
         static Dictionary<string, float> values;
@@ -49,6 +82,53 @@ namespace Yoegoe.Data
         public static float GuestCoolIntimacyMul => Get("guestCoolIntimacyMul");
         public static int SpiritPiecesFood => Int("spiritPiecesFood");
         public static int SpiritPiecesOffering => Int("spiritPiecesOffering");
+
+        // 요리판
+        public static float CookBaseSeconds => Get("cookBaseSeconds");
+        public static float CookAdExtendSeconds => Get("cookAdExtendSeconds");
+        public static float CookFoodSeconds => Get("cookFoodSeconds");
+        public static float CookOfferingSeconds => Get("cookOfferingSeconds");
+        public static float CookSteamSeconds => Get("cookSteamSeconds");
+        // 기력 · 행동
+        /// <summary>일하는 동안 초당 기력 소모 (= 1 / (staminaDrainMinutes × 60)).</summary>
+        public static float StaminaDrainPerSecond => 1f / Mathf.Max(1f, Get("staminaDrainMinutes") * 60f);
+        public static float FaintThresholdSeconds => Get("faintHours") * 3600f;
+        public static float RequestIntervalMinSeconds => Get("requestIntervalMinMinutes") * 60f;
+        public static float RequestIntervalMaxSeconds => Mathf.Max(RequestIntervalMinSeconds, Get("requestIntervalMaxMinutes") * 60f);
+        public static float RequestShowSeconds => Get("requestShowSeconds");
+        // 황금 요리
+        public static float GoldenBuffSeconds => Get("goldenBuffMinutes") * 60f;
+        public static float GoldenSpeedMul => Get("goldenSpeedMul");
+        // 상점 · 윷
+        public static int ShopOfferingPrice => Int("shopOfferingPrice");
+        public static int ShopHyangPrice => Int("shopHyangPrice");
+        public static float ShopRerollMeritMinutes => Get("shopRerollMeritMinutes");
+        public static int YutTokenMax => Mathf.Max(1, Int("yutTokenMax"));
+        public static float YutTokenRegenMinutes => Mathf.Max(1f, Get("yutTokenRegenMinutes"));
+        public static int YutTokenBuyCost => Int("yutTokenBuyCost");
+        public static int YutTokenBuyAmount => Int("yutTokenBuyAmount");
+        public static float ChestOfferingWeight => Get("chestOfferingWeight");
+        public static float ChestAdTicketWeight => Get("chestAdTicketWeight");
+        public static float ChestHyangWeight => Get("chestHyangWeight");
+        public static float ChestYeopjeonWeight => Get("chestYeopjeonWeight");
+        public static int ChestYeopjeonAmount => Int("chestYeopjeonAmount");
+        public static float GiftChance => Get("giftChance");
+        public static int GiftPityMisses => Int("giftPityMisses");
+        // 새 게임 시작
+        public static int StartMaterialEach => Int("startMaterialEach");
+
+        /// <summary>시작 상태 에셋 사본에 시트 값을 덮어쓴다 (새 게임에만 쓰인다).</summary>
+        public static void ApplyStart(StartingStateSettings s)
+        {
+            if (s == null) return;
+            s.startingMerit = Int("startMerit");
+            s.startingYeopjeon = Int("startYeopjeon");
+            s.startingHyang = Int("startHyang");
+            s.startingWater = Int("startWater");
+            s.startingYutToken = Int("startYutToken");
+            s.yutTokenMax = YutTokenMax;
+            s.startingIntimacy = Get("startIntimacy");
+        }
 
         public static float Get(string key)
         {

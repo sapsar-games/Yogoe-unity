@@ -9,9 +9,10 @@ namespace Yoegoe.Characters
     /// <summary>10장 음식 요구. CharacterAgent가 소유.</summary>
     public class CharacterRequestState
     {
-        public const float OfferingDurationSeconds = 60f;
-        public const float RequestIntervalMin = 3f * 60f;
-        public const float RequestIntervalMax = 5f * 60f;
+        // 시트 game_settings
+        public static float OfferingDurationSeconds => GameSettings.RequestShowSeconds;
+        public static float RequestIntervalMin => GameSettings.RequestIntervalMinSeconds;
+        public static float RequestIntervalMax => GameSettings.RequestIntervalMaxSeconds;
         /// <summary>기력 구간에 처음 들어왔을 때(소환·로드 포함) 첫 체크까지.</summary>
         public const float EnterBandCheckMin = 0f;
         public const float EnterBandCheckMax = 10f;

@@ -47,6 +47,138 @@
     {
       "key": "spiritPiecesOffering",
       "value": 2.0
+    },
+    {
+      "key": "cookBaseSeconds",
+      "value": 15.0
+    },
+    {
+      "key": "cookAdExtendSeconds",
+      "value": 15.0
+    },
+    {
+      "key": "cookFoodSeconds",
+      "value": 1.5
+    },
+    {
+      "key": "cookOfferingSeconds",
+      "value": 2.1
+    },
+    {
+      "key": "cookSteamSeconds",
+      "value": 0.5
+    },
+    {
+      "key": "staminaDrainMinutes",
+      "value": 10.0
+    },
+    {
+      "key": "faintHours",
+      "value": 18.0
+    },
+    {
+      "key": "requestIntervalMinMinutes",
+      "value": 3.0
+    },
+    {
+      "key": "requestIntervalMaxMinutes",
+      "value": 5.0
+    },
+    {
+      "key": "requestShowSeconds",
+      "value": 60.0
+    },
+    {
+      "key": "goldenBuffMinutes",
+      "value": 5.0
+    },
+    {
+      "key": "goldenSpeedMul",
+      "value": 2.0
+    },
+    {
+      "key": "shopOfferingPrice",
+      "value": 10.0
+    },
+    {
+      "key": "shopHyangPrice",
+      "value": 20.0
+    },
+    {
+      "key": "shopRerollMeritMinutes",
+      "value": 5.0
+    },
+    {
+      "key": "yutTokenMax",
+      "value": 5.0
+    },
+    {
+      "key": "yutTokenRegenMinutes",
+      "value": 30.0
+    },
+    {
+      "key": "yutTokenBuyCost",
+      "value": 10.0
+    },
+    {
+      "key": "yutTokenBuyAmount",
+      "value": 5.0
+    },
+    {
+      "key": "chestOfferingWeight",
+      "value": 50.0
+    },
+    {
+      "key": "chestAdTicketWeight",
+      "value": 30.0
+    },
+    {
+      "key": "chestHyangWeight",
+      "value": 5.0
+    },
+    {
+      "key": "chestYeopjeonWeight",
+      "value": 15.0
+    },
+    {
+      "key": "chestYeopjeonAmount",
+      "value": 3.0
+    },
+    {
+      "key": "giftChance",
+      "value": 0.2
+    },
+    {
+      "key": "giftPityMisses",
+      "value": 4.0
+    },
+    {
+      "key": "startMerit",
+      "value": 1000.0
+    },
+    {
+      "key": "startYeopjeon",
+      "value": 100.0
+    },
+    {
+      "key": "startHyang",
+      "value": 2.0
+    },
+    {
+      "key": "startWater",
+      "value": 0.0
+    },
+    {
+      "key": "startYutToken",
+      "value": 5.0
+    },
+    {
+      "key": "startMaterialEach",
+      "value": 5.0
+    },
+    {
+      "key": "startIntimacy",
+      "value": 50.0
     }
   ]
 }

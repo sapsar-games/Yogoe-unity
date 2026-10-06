@@ -11,3 +11,36 @@ guestCoolStaminaMul,2,주문 요괴 · 식은 뒤 기력 = 공양물 기력 × �
 guestCoolIntimacyMul,1,주문 요괴 · 식은 뒤 친밀도 = 선호 친밀도 × 이 값 → 친밀도 +5
 spiritPiecesFood,1,혼령에게 음식을 주면 받는 기억 조각 (나루터)
 spiritPiecesOffering,2,혼령에게 공양물을 주면 받는 기억 조각 (나루터)
+cookBaseSeconds,15,요리판 · 부적 없는 판 제한시간(초) — 부적 판은 charms 탭 seconds
+cookAdExtendSeconds,15,요리판 · 광고 연장 시간(초)
+cookFoodSeconds,1.5,요리판 · 음식이 익는 시간(초)
+cookOfferingSeconds,2.1,요리판 · 공양물이 익는 시간(초)
+cookSteamSeconds,0.5,요리판 · 김 오르는 시간(초) — 이때 꺼내면 2개
+staminaDrainMinutes,10,일하는 동안 기력 1이 닳는 시간(분)
+faintHours,18,기력 0으로 놀다가 기절하기까지(시간)
+requestIntervalMinMinutes,3,음식 요구 · 다음 요구까지 최소(분)
+requestIntervalMaxMinutes,5,음식 요구 · 다음 요구까지 최대(분)
+requestShowSeconds,60,음식 요구 · 말풍선이 떠 있는 시간(초)
+goldenBuffMinutes,5,황금 요리 효과 시간(분)
+goldenSpeedMul,2,황금 요리 효과 · 이동·생산 배수
+shopOfferingPrice,10,상점 · 공양물 가격(엽전)
+shopHyangPrice,20,상점 · 향 가격(엽전)
+shopRerollMeritMinutes,5,상점 · 진열 리셋 비용 = 떡절구 분당 공덕 × 이 값
+yutTokenMax,5,윷 토큰 최대
+yutTokenRegenMinutes,30,윷 토큰 1개 충전 시간(분)
+yutTokenBuyCost,10,윷 토큰 사기 · 엽전
+yutTokenBuyAmount,5,윷 토큰 사기 · 받는 토큰 수
+chestOfferingWeight,50,윷 보물상자 · 공양물 확률(비율)
+chestAdTicketWeight,30,윷 보물상자 · 광고보상권 확률(비율)
+chestHyangWeight,5,윷 보물상자 · 향 확률(비율)
+chestYeopjeonWeight,15,윷 보물상자 · 엽전 확률(비율)
+chestYeopjeonAmount,3,윷 보물상자 · 엽전이 나오면 몇 개
+giftChance,0.2,선물꾸러미 확률 (0.2 = 20%)
+giftPityMisses,4,선물꾸러미 · 이만큼 연속 빈손이면 다음은 확정
+startMerit,1000,새 게임 · 시작 공덕
+startYeopjeon,100,새 게임 · 시작 엽전
+startHyang,2,새 게임 · 시작 향
+startWater,0,새 게임 · 시작 물
+startYutToken,5,새 게임 · 시작 윷 토큰
+startMaterialEach,5,새 게임 · 재료 종류마다 시작 개수
+startIntimacy,50,새 게임 · 시작 요괴(옥토끼·삼족오) 친밀도

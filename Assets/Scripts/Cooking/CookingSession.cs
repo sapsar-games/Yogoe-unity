@@ -11,8 +11,9 @@ namespace Yoegoe.Cooking
     {
         public const int GridSize = 5;
         public const int EmptyCellCount = 5;
-        public const float BaseSeconds = 15f;
-        public const float AdExtendSeconds = 15f;
+        /// <summary>부적 없는 판 제한시간 · 광고 연장 — 시트 game_settings.</summary>
+        public static float BaseSeconds => GameSettings.CookBaseSeconds;
+        public static float AdExtendSeconds => GameSettings.CookAdExtendSeconds;
         /// <summary>판에 올라가는 재료 최대 개수(25칸 − 빈칸 5). 이보다 적으면 시작 전 확인 팝업.</summary>
         public const int FullBoardMaterials = GridSize * GridSize - EmptyCellCount;
         /// <summary>이보다 적으면 어떤 레시피도 못 만들어 시작 불가.</summary>

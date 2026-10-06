@@ -143,7 +143,8 @@ namespace Yoegoe.Economy
 
         // ---------------- 윷 토큰 ----------------
         /// <summary>기획 2·10장: 30분마다 1개 충전, 최대치에서는 카운트다운 없음(대기 없이 그대로 유지).</summary>
-        public static readonly TimeSpan YutTokenRegenInterval = TimeSpan.FromMinutes(30);
+        /// <summary>윷 토큰 1개 충전 시간 — 시트 game_settings.</summary>
+        public static TimeSpan YutTokenRegenInterval => TimeSpan.FromMinutes(Yoegoe.Data.GameSettings.YutTokenRegenMinutes);
 
         public int YutTokenMax { get; private set; } = 5;
         public int YutToken { get; private set; }
@@ -339,7 +340,7 @@ namespace Yoegoe.Economy
                 }
             }
 
-            SeedStartingMaterials(5);
+            SeedStartingMaterials(Yoegoe.Data.GameSettings.StartMaterialEach);
             CharmCounts.Clear();
             OnCharmsChanged?.Invoke();
 

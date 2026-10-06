@@ -52,13 +52,13 @@ namespace Yoegoe.Economy
                 return true;
             }
 
-            if (MissStreak >= 4)
+            if (MissStreak >= Yoegoe.Data.GameSettings.GiftPityMisses)
             {
                 MissStreak = 0;
                 return true;
             }
 
-            if (Random.value < 0.2f)
+            if (Random.value < Yoegoe.Data.GameSettings.GiftChance)
             {
                 MissStreak = 0;
                 return true;
