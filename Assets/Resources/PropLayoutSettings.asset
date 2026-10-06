@@ -22,9 +22,6 @@ MonoBehaviour:
   - data: {fileID: 11400000, guid: ba9161d81ea341fe971bc0440876feed, type: 2}
     prefab: {fileID: 100004, guid: b5dbf5616ebc5b59b80f7909553bd701, type: 3}
     position: {x: 2, y: 0.8, z: 0}
-  - data: {fileID: 11400000, guid: f238d1f1c3424c949b9380624def619c, type: 2}
-    prefab: {fileID: 100004, guid: b227bd7ca11c56258468b9eadc78fca7, type: 3}
-    position: {x: -1.9, y: -1.3, z: 0}
   - data: {fileID: 11400000, guid: 347b96b5781f468e8e9593fe9d8032f6, type: 2}
     prefab: {fileID: 100004, guid: 8dd64d38927e58d7bc8ca89eea06c4a2, type: 3}
     position: {x: 1.6, y: -1.4, z: 0}

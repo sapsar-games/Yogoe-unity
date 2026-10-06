@@ -87,9 +87,7 @@ namespace Yoegoe.Tests.EditMode
             Assert.AreEqual(15f, well.cycleMinutes, 0.001f); // v1.2: 모든 기물 15분에 1개 · 보관 15
             Assert.AreEqual(15, well.baseCapacity);
 
-            Assert.IsTrue(PropCatalog.TryGet("갯바위", out var rock));
-            Assert.AreEqual(PropResourceType.Yeopjeon, rock.ResourceType);
-            Assert.AreEqual(1, rock.baseCapacity);
+            Assert.IsFalse(PropCatalog.TryGet("갯바위", out _)); // v1.2 삭제
 
             Assert.IsTrue(PropCatalog.TryGet("화덕", out var oven));
             Assert.IsFalse(oven.upgradable);
@@ -191,15 +189,6 @@ namespace Yoegoe.Tests.EditMode
             Assert.IsFalse(prop.HasGoldenPending);
         }
 
-        [Test]
-        public void Rock_FullStorage_HaltsProduction()
-        {
-            MakeProp(PropResourceType.Yeopjeon, 60f, 1);
-            // 1개(60분) + 판정 사이클(60분) 이후엔 멈춘다
-            float worked = prop.ProduceWhileStaying(10 * 3600f, 0f, false);
-            Assert.IsTrue(prop.IsStorageHalted);
-            Assert.AreEqual(2 * 3600f, worked, 0.01f);
-        }
 
         [Test]
         public void MeritPile_StopsAtCapacityMinutes()

@@ -5,7 +5,7 @@
   props             propId, displayName, resourceType, cycleMinutes, baseCapacity, meritPerMinute, levelGrowth,
                     meritCapacityMinutes, intimacyBonus, ownerMultiplier, upgradable, upgradeBaseCost,
                     upgradeCostMultiplier, note
-                    resourceType: Merit(공덕) · Water(물) · Yeopjeon(엽전) · Hunt(사냥 재료) · Gather(채집 재료) · None
+                    resourceType: Merit(공덕) · Water(물) · Hunt(사냥 재료) · Gather(채집 재료) · None
   prop_drop_tables  table, ingredient, name, weight, note     (weight: 확률 %, ingredient: 재료 id)
                     table = Hunt / Gather (지금 게임의 활터·약초밭 표, GoldenRice / GoldenHoney 가능)
                           또는 destinations 탭의 목적지 id (v1.2 — 보내기 팝업이 생기면 게임이 쓴다)
@@ -56,7 +56,7 @@ DROP_HEADERS = ["table", "ingredient", "name", "weight", "note"]
 SETTING_HEADERS = ["key", "value", "note"]
 DEST_HEADERS = ["id", "prop", "name", "rarity", "minIntimacy", "goldenChance", "note"]
 
-RESOURCE_TYPES = ["Merit", "Water", "Yeopjeon", "Hunt", "Gather", "None"]
+RESOURCE_TYPES = ["Merit", "Water", "Hunt", "Gather", "None"]
 DROP_TABLES = ["Hunt", "Gather"]
 SETTING_KEYS = {"purchaseBaseCost": 300.0, "purchaseCostGrowth": 1.35}
 FLOAT_COLS = ["cycleMinutes", "meritPerMinute", "levelGrowth", "meritCapacityMinutes", "ownerMultiplier",
@@ -169,7 +169,7 @@ def rows_to_json(props: list[dict], drops: list[dict], settings: list[dict],
                 errors.append(f"{where}: {col} 는 TRUE/FALSE ('{r.get(col)}')")
                 b = False
             entry[col] = b
-        if rtype in ("Water", "Yeopjeon", "Hunt", "Gather"):
+        if rtype in ("Water", "Hunt", "Gather"):
             if entry["cycleMinutes"] <= 0:
                 errors.append(f"{where}: 자원 기물은 cycleMinutes > 0 필요")
             if entry["baseCapacity"] <= 0:

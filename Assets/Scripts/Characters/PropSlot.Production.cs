@@ -91,7 +91,6 @@ namespace Yoegoe.Characters
             switch (type)
             {
                 case PropResourceType.Water: GameEconomy.Instance.AddWater(n); break;
-                case PropResourceType.Yeopjeon: GameEconomy.Instance.AddYeopjeon(n); break;
                 default:
                     foreach (var code in pendingIngredients)
                     {

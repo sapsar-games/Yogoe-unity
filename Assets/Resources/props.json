@@ -31,21 +31,6 @@
       "upgradable": true
     },
     {
-      "propId": "갯바위",
-      "displayName": "갯바위",
-      "resourceType": "Yeopjeon",
-      "cycleMinutes": 60.0,
-      "meritPerMinute": 0.0,
-      "levelGrowth": 1.0,
-      "meritCapacityMinutes": 0.0,
-      "ownerMultiplier": 1.0,
-      "upgradeBaseCost": 500.0,
-      "upgradeCostMultiplier": 1.15,
-      "baseCapacity": 1,
-      "intimacyBonus": false,
-      "upgradable": true
-    },
-    {
       "propId": "활터",
       "displayName": "사냥터",
       "resourceType": "Hunt",

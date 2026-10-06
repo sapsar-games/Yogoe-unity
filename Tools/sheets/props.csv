@@ -1,7 +1,6 @@
 propId,displayName,resourceType,cycleMinutes,baseCapacity,meritPerMinute,levelGrowth,meritCapacityMinutes,intimacyBonus,ownerMultiplier,upgradable,upgradeBaseCost,upgradeCostMultiplier,note
 떡절구,떡절구,Merit,0,0,100,1.1,30,FALSE,1,TRUE,500,1.15,
 옹달샘,옹달샘,Water,15,15,0,1,0,FALSE,1,TRUE,500,1.15,v1.2: 15분에 1개 · 보관 15
-갯바위,갯바위,Yeopjeon,60,1,0,1,0,FALSE,1,TRUE,500,1.15,v1.2 삭제 예정 — 나루터 작업 때 맵에서 제거
 활터,사냥터,Hunt,15,15,0,1,0,FALSE,1,TRUE,500,1.15,v1.2: 사냥터 · 15분에 1개 · 보관 15
 약초밭,채집터,Gather,15,15,0,1,0,FALSE,1,TRUE,500,1.15,v1.2: 채집터 · 15분에 1개 · 보관 15
 화덕,화덕,None,0,0,0,1,0,FALSE,1,FALSE,500,1.15,

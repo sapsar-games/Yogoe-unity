@@ -77,7 +77,7 @@ _LINES: dict[str, list[str]] = {
     ],
     "props": [
         "※ 기물별 산출",
-        "- resourceType: Merit(공덕) / Water(물) / Yeopjeon(엽전) / Hunt(사냥 재료) / Gather(채집 재료) / None(없음)",
+        "- resourceType: Merit(공덕) / Water(물) / Hunt(사냥 재료) / Gather(채집 재료) / None(없음)",
         "- 자원 기물: cycleMinutes = 1개 만드는 주기(분, 레벨 무관) / baseCapacity = Lv1 보관 (10레벨마다 +1)",
         "- 공덕 기물: 분당 meritPerMinute × levelGrowth^(레벨−1) / meritCapacityMinutes분치 쌓이면 만창",
         "- intimacyBonus(친밀도 보정), upgradable(레벨업 가능) = TRUE / FALSE",
