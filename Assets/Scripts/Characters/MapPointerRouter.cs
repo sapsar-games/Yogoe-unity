@@ -34,6 +34,9 @@ namespace Yoegoe.Characters
         /// </summary>
         public static event System.Action<CharacterAgent, string> CharacterDetailRequested;
 
+        /// <summary>먹이기 창 요청 (v1.3) — 그릇 말풍선 탭, 노는 요괴 탭. UI(FeedPopup)가 구독한다.</summary>
+        public static event System.Action<CharacterAgent> FeedRequested;
+
         /// <summary>
         /// 잠긴 기물 탭·자물쇠 위 앉히기 시도 → 구매 팝업 요청.
         /// 두 번째 인자는 건설 후 앉힐 요괴(탭이면 null). UI(PropPurchasePopup→ConfirmPopup)가 구독한다.
@@ -483,11 +486,12 @@ namespace Yoegoe.Characters
             if (pendingMonologueTap != null && pendingMonologueTap != agent)
                 FlushPendingMonologueTap();
 
-            // 공양물 요구 말풍선 탭 → 즉시 상세(강조)
+            // 그릇 말풍선(배고픔) 탭 → 바로 먹이기 창 (v1.3)
             if (agent.HasOfferingRequest)
             {
                 CancelPendingMonologueTap();
-                OpenCharacterDetail(agent);
+                agent.SayCatalogLine(e => e.hungryLines);
+                FeedRequested?.Invoke(agent);
                 return;
             }
 
@@ -509,10 +513,13 @@ namespace Yoegoe.Characters
             if (agent == null) return;
             if (agent.HasOfferingRequest)
             {
-                OpenCharacterDetail(agent);
+                FeedRequested?.Invoke(agent);
                 return;
             }
             agent.OnTapped();
+            // 노는(일하지 않는) 요괴를 누르면 혼잣말 + 먹이기 창 (v1.3). 일하는 중은 일 대사만, 기절은 "..."만.
+            if (agent.Stats.State != ActionState.Staying && agent.Stats.State != ActionState.Fainted)
+                FeedRequested?.Invoke(agent);
         }
 
         void CancelPendingMonologueTap()

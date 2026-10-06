@@ -190,6 +190,10 @@ namespace Yoegoe.Characters
             return world.x >= b.min.x && world.x <= b.max.x && world.y >= b.min.y && world.y <= b.max.y;
         }
 
+        /// <summary>시트 character_lines 대사 한 줄 (먹이기 창·음식 요구 등 밖에서 부를 때).</summary>
+        public bool SayCatalogLine(System.Func<CharacterCatalog.Entry, string[]> select, string d = null) =>
+            TrySayCatalogLine(select, d);
+
         /// <summary>시트 character_lines 에서 고른 한 줄을 말한다. {d} 는 d 로 바꾼다. 대사가 없으면 false.</summary>
         bool TrySayCatalogLine(System.Func<CharacterCatalog.Entry, string[]> select, string d = null)
         {

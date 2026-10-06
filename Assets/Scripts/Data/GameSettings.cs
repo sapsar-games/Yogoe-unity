@@ -22,7 +22,7 @@ namespace Yoegoe.Data
             { "offeringIntimacy", 1f },
             { "preferredIntimacy", 5f },
             { "foodRequestMargin", 10f },
-            { "requestFulfillBonus", 4f },
+            { "requestFulfillBonus", 0f },
             { "guestPerfectStaminaMul", 2f },
             { "guestPerfectIntimacyMul", 2f },
             { "guestCoolStaminaMul", 2f },
