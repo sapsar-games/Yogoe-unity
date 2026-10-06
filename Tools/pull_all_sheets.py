@@ -17,8 +17,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 # (이름, 명령) — 순서 중요: recipes → characters(선호 공양물 id 검증)
 STEPS = [
+    # 재료 이름이 먼저 — recipes 탭은 그 이름으로 검증한다
+    ("ingredients · 재료 이름·설명", ["Tools/export_ingredients.py"]),
     ("recipes · 레시피 조합·요리 설명", ["Tools/export_recipes.py"]),
-    ("ingredients · 재료 설명", ["Tools/export_ingredients.py"]),
     ("characters · 캐릭터·선호·대사", ["Tools/export_characters.py"]),
     ("props · 기물 산출·재료 확률", ["Tools/export_props.py"]),
     ("attendance · 출석·윷점 64괘", ["Tools/export_attendance.py"]),

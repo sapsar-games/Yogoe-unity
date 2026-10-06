@@ -11,15 +11,32 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 RECIPES_JSON = ROOT / "Assets" / "Resources" / "recipes.json"
 
-# CookingIngredientId 순서 (enum 이름, 한글 이름)
-INGREDIENTS = [
+INGREDIENTS_JSON = ROOT / "Assets" / "Resources" / "ingredients.json"
+
+# CookingIngredientId 순서 (enum 이름, 기본 한글 이름). 실제 이름은 시트 ingredients 탭 name → ingredients.json.
+DEFAULT_INGREDIENTS = [
     ("Water", "물"), ("Chili", "고추"), ("Rice", "쌀"), ("RedBean", "팥"), ("Fruit", "과실"),
     ("Namul", "산나물"), ("Herb", "약재"), ("Honey", "꿀"), ("Boar", "멧돼지고기"), ("Bird", "새고기"),
     ("Fish", "물고기"), ("Egg", "새알"), ("Oil", "기름"),
 ]
-ING_KO = dict(INGREDIENTS)
+
+
+def ingredient_names() -> dict[str, str]:
+    """id → 지금 이름 (ingredients.json 의 name, 없으면 기본 이름)."""
+    names = dict(DEFAULT_INGREDIENTS)
+    if INGREDIENTS_JSON.exists():
+        for e in json.loads(INGREDIENTS_JSON.read_text(encoding="utf-8")).get("ingredients", []):
+            if e.get("id") in names and e.get("name"):
+                names[e["id"]] = e["name"]
+    return names
+
+
+ING_KO = ingredient_names()
+INGREDIENTS = list(ING_KO.items())
 ING_ORDER = [i for i, _ in INGREDIENTS]
-KO_TO_ING = {ko: i for i, ko in INGREDIENTS}
+# 레시피 시트는 지금 이름으로 쓴다. 이름을 바꾼 직전 이름(기본 이름)도 받아 준다.
+KO_TO_ING = {ko: i for i, ko in DEFAULT_INGREDIENTS}
+KO_TO_ING.update({ko: i for i, ko in INGREDIENTS})
 
 KIND_KO = {"Food": "음식", "Offering": "공양물"}
 KO_TO_KIND = {v: k for k, v in KIND_KO.items()}

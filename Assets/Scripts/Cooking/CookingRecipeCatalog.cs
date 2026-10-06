@@ -214,7 +214,11 @@ namespace Yoegoe.Cooking
             return sb.ToString();
         }
 
-        public static string DisplayName(CookingIngredientId id) => id switch
+        /// <summary>재료 이름 — 시트 ingredients 탭 name 우선, 없으면 기본 이름.</summary>
+        public static string DisplayName(CookingIngredientId id) =>
+            CodexDescriptions.IngredientName(id.ToString()) ?? DefaultDisplayName(id);
+
+        static string DefaultDisplayName(CookingIngredientId id) => id switch
         {
             CookingIngredientId.Water => "물",
             CookingIngredientId.Chili => "고추",
