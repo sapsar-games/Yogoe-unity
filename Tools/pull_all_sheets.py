@@ -25,6 +25,7 @@ STEPS = [
     ("attendance · 출석·윷점 64괘", ["Tools/export_attendance.py"]),
     ("yut_bubbles · 윷 말풍선", ["Tools/export_yut_bubbles.py"]),
     ("charms · 완주 부적 확률", ["Tools/export_charms.py"]),
+    ("game_settings · 전역 수치", ["Tools/export_settings.py"]),
 ]
 
 

@@ -39,15 +39,16 @@ namespace Yoegoe.Data
         {
             if (staminaGain > 0) return staminaGain;
             if (kind == OfferingKind.Water) return 3;
-            if (kind == OfferingKind.Food) return 8;
-            return 3; // 공양물·선호
+            // 음식·공양물 기력은 시트 game_settings (v1.3: 음식 +10 · 공양물 +15, 선호도 같음)
+            if (kind == OfferingKind.Food) return GameSettings.FoodStamina;
+            return GameSettings.OfferingStamina;
         }
 
         public float ResolveIntimacyGain(bool isPreferred)
         {
             if (kind == OfferingKind.Water || kind == OfferingKind.Food) return 0f;
-            if (isPreferred) return intimacyGain > 0f ? intimacyGain : 5f;
-            return intimacyGain > 0f ? intimacyGain : 2f;
+            if (isPreferred) return intimacyGain > 0f ? intimacyGain : GameSettings.PreferredIntimacy;
+            return intimacyGain > 0f ? intimacyGain : GameSettings.OfferingIntimacy;
         }
     }
 }

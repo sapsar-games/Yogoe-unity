@@ -17,10 +17,10 @@ namespace Yoegoe.Characters
         public const float EnterBandCheckMax = 10f;
         /// <summary>
         /// 기력 ≤ 최대 − 이 값 이면 요구 후보.
-        /// 음식 1회 회복(+8) 기준 — 예전 +25 잔재가 아님.
+        /// v1.3: 10 (음식 1회 회복 +10 기준).
         /// 고라니 소환(1/25)도 바로 후보.
         /// </summary>
-        public const float StaminaRequestMargin = 8f;
+        public static float StaminaRequestMargin => GameSettings.FoodRequestMargin; // 시트 game_settings (v1.3: 10)
 
         public static event System.Action<string> GiftBundleAwarded;
 
@@ -156,8 +156,8 @@ namespace Yoegoe.Characters
 
             if (matches)
             {
-                // 음식 요구 완료: +12 · 친밀도 없음
-                staminaGain = 12;
+                // 음식 요구 완료: 음식 기력 + 보너스(시트 game_settings) · 친밀도 없음
+                staminaGain = GameSettings.FoodStamina + GameSettings.RequestFulfillBonus;
                 intimacyGain = 0f;
                 fulfilledRequest = true;
                 ClearOfferingRequest();

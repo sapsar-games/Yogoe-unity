@@ -1,0 +1,13 @@
+key,value,note
+foodStamina,10,음식 한 그릇 기력
+offeringStamina,15,공양물 기력 (선호 공양물도 같음)
+offeringIntimacy,1,공양물 친밀도
+preferredIntimacy,5,선호 공양물 친밀도
+foodRequestMargin,10,기력이 (최대 기력 − 이 값) 이하면 음식 요구
+requestFulfillBonus,4,음식 요구를 채우면 음식 기력에 더하는 값 (v1.3 그릇 말풍선으로 바뀌면 없어짐) → 요구 채우면 기력 +14
+guestPerfectStaminaMul,2,주문 요괴 · 김 오를 때 기력 = 공양물 기력 × 이 값 → 기력 +30
+guestPerfectIntimacyMul,2,주문 요괴 · 김 오를 때 친밀도 = 선호 친밀도 × 이 값 → 친밀도 +10
+guestCoolStaminaMul,2,주문 요괴 · 식은 뒤 기력 = 공양물 기력 × 이 값 → 기력 +30
+guestCoolIntimacyMul,1,주문 요괴 · 식은 뒤 친밀도 = 선호 친밀도 × 이 값 → 친밀도 +5
+spiritPiecesFood,1,혼령에게 음식을 주면 받는 기억 조각 (나루터)
+spiritPiecesOffering,2,혼령에게 공양물을 주면 받는 기억 조각 (나루터)

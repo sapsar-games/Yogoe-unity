@@ -52,6 +52,28 @@ namespace Yoegoe.Tests.EditMode
             CookingGuestOrder.ComputeReward(o, perfect: false, out int cs, out float ci);
             Assert.AreEqual(baseStam * 2, cs);
             Assert.AreEqual(baseInti, ci, 0.001f); // 친밀도는 평소대로
+
+            // v1.3 기획서 값 (game_settings 기본): 김 친밀도 +10 · 기력 +30 / 식음 친밀도 +5 · 기력 +30
+            Assert.AreEqual(30, ps);
+            Assert.AreEqual(10f, pi, 0.001f);
+            Assert.AreEqual(30, cs);
+            Assert.AreEqual(5f, ci, 0.001f);
+        }
+
+        [Test]
+        public void GameSettings_SheetOverridesDefaults_UnknownKeysIgnored()
+        {
+            try
+            {
+                GameSettings.LoadFromJson("{\"settings\":[{\"key\":\"foodStamina\",\"value\":12},{\"key\":\"nope\",\"value\":99}]}");
+                Assert.AreEqual(12, GameSettings.FoodStamina);
+                Assert.AreEqual(15, GameSettings.OfferingStamina); // 빠진 key = 기본값
+                Assert.AreEqual(0f, GameSettings.Get("nope"));
+            }
+            finally
+            {
+                GameSettings.LoadFromJson(UnityEngine.Resources.Load<UnityEngine.TextAsset>(GameSettings.ResourcePath)?.text);
+            }
         }
 
         [Test]

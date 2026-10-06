@@ -655,8 +655,8 @@ public class GongyangganScreen : MonoBehaviour
             return $"{g.DisplayName}: 깨어났어! 기력 +{g.StaminaGain}";
         if (g.Fulfilled)
             return g.Perfect
-                ? $"{g.DisplayName}: 최고야! 친밀도·기력 ×{CookingGuestOrder.PerfectStaminaMul}"
-                : $"{g.DisplayName}: 고마워! 기력 ×{CookingGuestOrder.CoolStaminaMul}";
+                ? $"{g.DisplayName}: 최고야! 친밀도 +{g.IntimacyGain:0.#} · 기력 +{g.StaminaGain}"
+                : $"{g.DisplayName}: 고마워! 친밀도 +{g.IntimacyGain:0.#} · 기력 +{g.StaminaGain}";
         return $"{g.DisplayName}: {g.WaitLine} ({g.OfferingName})";
     }
 

@@ -1,0 +1,52 @@
+{
+  "settings": [
+    {
+      "key": "foodStamina",
+      "value": 10.0
+    },
+    {
+      "key": "offeringStamina",
+      "value": 15.0
+    },
+    {
+      "key": "offeringIntimacy",
+      "value": 1.0
+    },
+    {
+      "key": "preferredIntimacy",
+      "value": 5.0
+    },
+    {
+      "key": "foodRequestMargin",
+      "value": 10.0
+    },
+    {
+      "key": "requestFulfillBonus",
+      "value": 4.0
+    },
+    {
+      "key": "guestPerfectStaminaMul",
+      "value": 2.0
+    },
+    {
+      "key": "guestPerfectIntimacyMul",
+      "value": 2.0
+    },
+    {
+      "key": "guestCoolStaminaMul",
+      "value": 2.0
+    },
+    {
+      "key": "guestCoolIntimacyMul",
+      "value": 1.0
+    },
+    {
+      "key": "spiritPiecesFood",
+      "value": 1.0
+    },
+    {
+      "key": "spiritPiecesOffering",
+      "value": 2.0
+    }
+  ]
+}

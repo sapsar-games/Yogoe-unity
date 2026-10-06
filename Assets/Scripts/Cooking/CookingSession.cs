@@ -472,17 +472,16 @@ namespace Yoegoe.Cooking
                 && !GuestOrder.Fulfilled && !GuestOrder.Failed
                 && GuestOrder.Matches(recipe);
 
+            int baseQty = PreCharm == CookingCharmType.Double ? 2 : 1;
+            int qty = baseQty * (perfect ? 2 : 1);
             if (deliveredToGuest)
             {
-                // 주문 배달: 인벤 미지급(퍼펙트여도 음식 ×2 없음). 친밀도·기력만 배율 적용.
+                // 주문 배달 (v1.3): 완성품 하나가 요괴에게 가고 나머지는 창고로 (김 2개 → 1개 창고).
                 GuestOrder.Deliver(perfect);
+                qty -= 1;
             }
-            else
-            {
-                int baseQty = PreCharm == CookingCharmType.Double ? 2 : 1;
-                int qty = baseQty * (perfect ? 2 : 1);
+            if (qty > 0)
                 AddResult(recipe, qty, job.Golden);
-            }
 
             if (CookingCodex.Discover(recipe.Id) && !NewlyDiscovered.Contains(recipe.Id))
                 NewlyDiscovered.Add(recipe.Id);

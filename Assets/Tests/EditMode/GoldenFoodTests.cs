@@ -75,7 +75,7 @@ namespace Yoegoe.Tests.EditMode
             var r = agent.TryFeed(g, eco);
             Assert.IsTrue(r.Success);
             Assert.IsTrue(r.GoldenBuff);
-            Assert.AreEqual(8, r.StaminaGain);
+            Assert.AreEqual(10, r.StaminaGain); // v1.3 음식 +10
             Assert.IsTrue(agent.IsGolden);
             Assert.AreEqual(2f, agent.SpeedMultiplier);
             Assert.That(agent.GoldenSecondsLeft, Is.InRange(299f, 300.5f));

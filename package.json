@@ -27,6 +27,9 @@
     "charms": "python3 Tools/export_charms.py",
     "charms:csv": "python3 Tools/export_charms.py --csv",
     "charms:push": "python3 Tools/export_charms.py --push",
+    "settings": "python3 Tools/export_settings.py",
+    "settings:csv": "python3 Tools/export_settings.py --csv",
+    "settings:push": "python3 Tools/export_settings.py --push",
     "sheets": "python3 Tools/pull_all_sheets.py",
     "sheets:describe": "python3 Tools/sheet_descriptions.py --apply"
   }

@@ -60,9 +60,9 @@ namespace Yoegoe.Tests.EditMode
             eco.AddOffering(food, 2);
             var r = agent.TryFeed(food, eco);
             Assert.IsTrue(r.Success);
-            Assert.AreEqual(8, r.StaminaGain);
+            Assert.AreEqual(10, r.StaminaGain); // v1.3 음식 +10 (game_settings)
             Assert.AreEqual(0f, r.IntimacyGain);
-            Assert.AreEqual(48f, agent.Stats.Stamina, 0.001f);
+            Assert.AreEqual(50f, agent.Stats.Stamina, 0.001f);
             Assert.AreEqual(1, eco.GetOfferingCount(food));
         }
 
@@ -104,7 +104,7 @@ namespace Yoegoe.Tests.EditMode
 
             var r = agent.TryFeed(offering, eco);
             Assert.IsTrue(r.Success);
-            Assert.AreEqual(52f, agent.Stats.Intimacy, 0.001f);
+            Assert.AreEqual(51f, agent.Stats.Intimacy, 0.001f); // v1.3 공양물 친밀도 +1
             Assert.AreEqual(75f, agent.Stats.Stamina, 0.001f);
         }
 
