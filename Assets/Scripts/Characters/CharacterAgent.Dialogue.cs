@@ -74,7 +74,9 @@ namespace Yoegoe.Characters
         {
             if (!monologueShowing || bubbleTextMesh == null) return;
             float spriteTop = spriteRenderer != null ? spriteRenderer.bounds.extents.y : 0.3f;
-            Vector3 bubblePos = transform.position + Vector3.up * (spriteTop + 0.55f);
+            // 말풍선 아랫변을 머리 위에 고정 — 여러 줄이 돼도 아래로 늘어나 머리를 가리지 않게
+            float halfH = bubbleBg != null ? bubbleBg.transform.localScale.y * 0.5f : 0.25f;
+            Vector3 bubblePos = transform.position + Vector3.up * (spriteTop + 0.3f + halfH);
             bubbleTextMesh.transform.position = bubblePos;
             if (bubbleBg != null) bubbleBg.transform.position = bubblePos;
         }
@@ -117,7 +119,7 @@ namespace Yoegoe.Characters
             {
                 renderer.sortingOrder = 1001;
                 Bounds bounds = renderer.bounds;
-                bubbleBg.transform.localScale = new Vector3(bounds.size.x + 0.3f, bounds.size.y + 0.18f, 1f);
+                bubbleBg.transform.localScale = new Vector3(bounds.size.x + BubblePadX, bounds.size.y + BubblePadY, 1f);
             }
 
             monologueShowing = true;
@@ -128,7 +130,7 @@ namespace Yoegoe.Characters
         private void ShowMonologue()
         {
             EnsureBubble();
-            bubbleTextMesh.text = PickMonologueLine();
+            bubbleTextMesh.text = WrapBubbleText(PickMonologueLine());
             bubbleTextMesh.gameObject.SetActive(true);
             bubbleBg.gameObject.SetActive(true);
 
@@ -137,7 +139,7 @@ namespace Yoegoe.Characters
             var renderer = bubbleTextMesh.GetComponent<MeshRenderer>();
             renderer.sortingOrder = 1001; // 상태 점(1000)보다 위
             Bounds bounds = renderer.bounds;
-            bubbleBg.transform.localScale = new Vector3(bounds.size.x + 0.3f, bounds.size.y + 0.18f, 1f);
+            bubbleBg.transform.localScale = new Vector3(bounds.size.x + BubblePadX, bounds.size.y + BubblePadY, 1f);
 
             monologueShowing = true;
             monologueTimer = MonologueDisplaySeconds;
@@ -247,7 +249,7 @@ namespace Yoegoe.Characters
         IEnumerator TempSpeechRoutine(string line, float duration, bool hideAtEnd)
         {
             EnsureBubble();
-            bubbleTextMesh.text = line;
+            bubbleTextMesh.text = WrapBubbleText(line);
             bubbleTextMesh.gameObject.SetActive(true);
             bubbleBg.gameObject.SetActive(true);
             var renderer = bubbleTextMesh.GetComponent<MeshRenderer>();
@@ -255,7 +257,7 @@ namespace Yoegoe.Characters
             {
                 renderer.sortingOrder = 1001;
                 Bounds bounds = renderer.bounds;
-                bubbleBg.transform.localScale = new Vector3(bounds.size.x + 0.3f, bounds.size.y + 0.18f, 1f);
+                bubbleBg.transform.localScale = new Vector3(bounds.size.x + BubblePadX, bounds.size.y + BubblePadY, 1f);
             }
             monologueShowing = true;
             monologueTimer = duration;
@@ -266,7 +268,9 @@ namespace Yoegoe.Characters
                 if (bubbleTextMesh != null)
                 {
                     float spriteTop = spriteRenderer != null ? spriteRenderer.bounds.extents.y : 0.3f;
-                    Vector3 bubblePos = transform.position + Vector3.up * (spriteTop + 0.55f);
+                    // 말풍선 아랫변을 머리 위에 고정 — 여러 줄이 돼도 아래로 늘어나 머리를 가리지 않게
+            float halfH = bubbleBg != null ? bubbleBg.transform.localScale.y * 0.5f : 0.25f;
+            Vector3 bubblePos = transform.position + Vector3.up * (spriteTop + 0.3f + halfH);
                     bubbleTextMesh.transform.position = bubblePos;
                     if (bubbleBg != null) bubbleBg.transform.position = bubblePos;
                 }
@@ -290,6 +294,47 @@ namespace Yoegoe.Characters
             return sharedBubbleSprite;
         }
 
+        // 말풍선 크기 — 글자 크기 · 여백 · 한 줄 최대 글자 수 (긴 대사가 한 줄로 늘어나 말풍선이 커지지 않게)
+        const float BubbleCharacterSize = 0.038f;
+        const float BubblePadX = 0.2f;
+        const float BubblePadY = 0.12f;
+        const int BubbleMaxCharsPerLine = 12;
+        const int BubbleMaxLines = 3;
+
+        /// <summary>한 줄이 BubbleMaxCharsPerLine 을 넘으면 띄어쓰기 자리에서 나눈다 (띄어쓰기가 없으면 글자 수로).</summary>
+        public static string WrapBubbleText(string text)
+        {
+            if (string.IsNullOrEmpty(text) || text.Length <= BubbleMaxCharsPerLine || text.Contains("\n")) return text;
+            int lines = Mathf.Min(BubbleMaxLines, Mathf.CeilToInt(text.Length / (float)BubbleMaxCharsPerLine));
+            int target = Mathf.CeilToInt(text.Length / (float)lines);
+            var sb = new System.Text.StringBuilder(text.Length + lines);
+            int start = 0;
+            for (int l = 1; l < lines && start < text.Length; l++)
+            {
+                int ideal = start + target;
+                if (ideal >= text.Length) break;
+                // ideal 에서 가장 가까운 띄어쓰기
+                int cut = -1;
+                for (int d = 0; d <= target / 2 && cut < 0; d++)
+                {
+                    if (ideal - d > start && text[ideal - d] == ' ') cut = ideal - d;
+                    else if (ideal + d < text.Length && text[ideal + d] == ' ') cut = ideal + d;
+                }
+                if (cut < 0)
+                {
+                    sb.Append(text, start, ideal - start).Append('\n');
+                    start = ideal;
+                }
+                else
+                {
+                    sb.Append(text, start, cut - start).Append('\n');
+                    start = cut + 1;
+                }
+            }
+            sb.Append(text, start, text.Length - start);
+            return sb.ToString();
+        }
+
         private void EnsureBubble()
         {
             if (bubbleTextMesh != null) return;
@@ -303,7 +348,7 @@ namespace Yoegoe.Characters
 
             var textGo = new GameObject(gameObject.name + "_Bubble");
             bubbleTextMesh = textGo.AddComponent<TextMesh>();
-            bubbleTextMesh.characterSize = 0.045f;
+            bubbleTextMesh.characterSize = BubbleCharacterSize;
             bubbleTextMesh.fontSize = UiFonts.Size(48);
             bubbleTextMesh.anchor = TextAnchor.MiddleCenter;
             bubbleTextMesh.alignment = TextAlignment.Center;
