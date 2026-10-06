@@ -37,7 +37,8 @@ namespace Yoegoe.Tests.EditMode
             scaler.ApplyNow();
             Assert.AreEqual(20, t.fontSize, "보통 · 시트 1 이면 그대로");
 
-            UiTextScale.Level = 3; // 아주 크게 1.3 — Changed 로 바로 적용
+            UiTextScale.Level = 3; // 아주 크게 1.3 (게임에선 Changed 로 바로 — EditMode 는 Awake 가 안 불려 직접)
+            scaler.ApplyNow();
             Assert.AreEqual(26, t.fontSize);
 
             t.fontSize = 30; // 코드가 크기를 바꿈 → 새 원래 크기
@@ -45,6 +46,7 @@ namespace Yoegoe.Tests.EditMode
             Assert.AreEqual(39, t.fontSize);
 
             UiTextScale.Level = UiTextScale.DefaultLevel;
+            scaler.ApplyNow();
             Assert.AreEqual(30, t.fontSize, "보통으로 돌리면 원래 크기");
         }
     }
