@@ -94,6 +94,10 @@ namespace Yoegoe.Characters
             if (!CanTapMonologue) return;
             // 인사·요구 감사 같은 임시 대사 중엔 끝까지 보여 준다 (뒤에 선물꾸러미 등이 이어질 수 있음)
             if (tempSpeechRoutine != null) return;
+            // 일하는 중 탭 → 그 기물의 일 대사 (v1.2 시연). 없으면 혼잣말.
+            if (Stats.State == ActionState.Staying && currentProp != null
+                && TrySayCatalogLine(e => e.WorkLinesFor(currentProp.ResourceType)))
+                return;
             if (Data == null || Data.monologueLines == null || Data.monologueLines.Length == 0) return;
             // 떠 있으면 다음 대사로 바뀌고 10초 다시 (6-4)
             ShowMonologue();
@@ -182,7 +186,18 @@ namespace Yoegoe.Characters
             return world.x >= b.min.x && world.x <= b.max.x && world.y >= b.min.y && world.y <= b.max.y;
         }
 
-        /// <summary>요구 완료 등 짧은 대사.</summary>
+        /// <summary>시트 character_lines 에서 고른 한 줄을 말한다. {d} 는 d 로 바꾼다. 대사가 없으면 false.</summary>
+        bool TrySayCatalogLine(System.Func<CharacterCatalog.Entry, string[]> select, string d = null)
+        {
+            if (Data == null || select == null) return false;
+            if (!CharacterCatalog.TryGet(Data.id, out var entry) || entry == null) return false;
+            string line = CharacterCatalog.PickLine(select(entry), null);
+            if (string.IsNullOrEmpty(line)) return false;
+            if (d != null) line = line.Replace("{d}", d);
+            ShowTempSpeech(line);
+            return true;
+        }
+
         /// <summary>delay초 뒤 한 줄 말한다 (접속 인사 등 여러 요괴가 순서대로 말할 때).</summary>
         public void SayAfter(float delay, string line)
         {

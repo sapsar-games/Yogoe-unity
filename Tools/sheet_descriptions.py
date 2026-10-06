@@ -73,6 +73,11 @@ _LINES: dict[str, list[str]] = {
         "    request_gift = 선물꾸러미 줄 때",
         "    golden_find = 황금 재료 수거 ({item} 자리에 황금쌀/황금꿀)",
         "    greeting = 접속 인사 (앱을 켜거나 5분 넘게 비웠다 돌아왔을 때, 놀고 있던 요괴)",
+        "    go_hunt · go_gather · go_spring · go_altar = 사냥터·채집터·옹달샘·제단에 보낼(앉힐) 때",
+        "    work_hunt · work_gather · work_spring · work_altar = 일하는 중에 눌렀을 때",
+        "    full = 보관함이 차서 옮겨 갈 때 ({d} 자리에 옮겨 갈 기물) / full_idle = 찼는데 갈 곳이 없어 놀 때",
+        "    tired = 일하다 기력이 다 닳았을 때",
+        "    home · hungry · fed · gold · offer = 불러들일 때 · 배고플 때 · 음식 · 황금 요리 · 공양물 받을 때 (아직 게임에서 안 씀)",
         "- 수정 후: npm run characters",
     ],
     "props": [

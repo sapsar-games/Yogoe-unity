@@ -52,7 +52,11 @@ namespace Yoegoe.Characters
             lastPosition = transform.position;
 
             if (dropProp != null && dropProp.CanSitNow(this) && TrySitOnProp(dropProp))
+            {
+                // 보낼 때 대사 (v1.2 시연) — 기물 종류별
+                TrySayCatalogLine(e => e.GoLinesFor(dropProp.ResourceType));
                 return;
+            }
 
             if (dropProp != null)
             {

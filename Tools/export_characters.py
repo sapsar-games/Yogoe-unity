@@ -54,6 +54,12 @@ LINE_TYPES = {
     "request_gift": "requestGiftLines",
     "golden_find": "goldenFindLines",
     "greeting": "greetingLines",
+    # v1.2 시연 대사 세트
+    "go_hunt": "goHuntLines", "go_gather": "goGatherLines", "go_spring": "goSpringLines", "go_altar": "goAltarLines",
+    "work_hunt": "workHuntLines", "work_gather": "workGatherLines", "work_spring": "workSpringLines",
+    "work_altar": "workAltarLines",
+    "full": "fullLines", "full_idle": "fullIdleLines", "tired": "tiredLines", "home": "homeLines",
+    "hungry": "hungryLines", "fed": "fedLines", "gold": "goldLines", "offer": "offerLines",
 }
 
 

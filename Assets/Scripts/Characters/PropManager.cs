@@ -34,7 +34,8 @@ namespace Yoegoe.Characters
         /// 비어있고, 직전 기물이 아니고, 다른 요괴의 엔딩 기물이 아니고, 만창이 아닌(가서 일할 수 있는) 것 중 랜덤.
         /// 후보가 없으면 null (호출측에서 30초 방황 후 재추첨).
         /// </summary>
-        public PropSlot GetRandomAvailableProp(CharacterAgent requester, PropSlot exclude)
+        public PropSlot GetRandomAvailableProp(CharacterAgent requester, PropSlot exclude,
+            System.Func<PropSlot, bool> filter = null)
         {
             var candidates = new List<PropSlot>();
             for (int i = 0; i < allProps.Count; i++)
@@ -48,6 +49,7 @@ namespace Yoegoe.Characters
                 if (p.IsStorageHalted) continue; // 가도 일을 못 함
                 if (!p.AcceptsWorkers) continue; // 화덕 등 — 요리 전용, 일할 곳 아님
                 if (!p.CanBeUsedBy(requester)) continue;
+                if (filter != null && !filter(p)) continue;
                 candidates.Add(p);
             }
 

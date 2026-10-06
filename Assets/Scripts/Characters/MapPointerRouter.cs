@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Yoegoe.Core;
+using Yoegoe.Data;
 using Yoegoe.Debugging;
 using Yoegoe.Economy;
 using Yoegoe.UI;
@@ -15,7 +16,8 @@ namespace Yoegoe.Characters
     /// 캐릭터: 길게 누르기(또는 임계 이동) → 들어올림 드래그.
     /// 맵: 임계 이동 후 패닝. 두 손가락 핀치·마우스 휠 → 줌.
     /// 캐릭터 탭: 더블탭이면 상세, 단일탭(더블탭 창 만료 후)이면 혼잣말.
-    /// 기물: 탭 → 수거, 길게 누르기 → 개별 업그레이드 팝업. 기물 위에 앉은 요괴는 요괴가 우선.
+    /// 기물: 탭 → 수거(쌓인 게 없거나 2초 안에 다시 탭하면 기물 창 = 업그레이드 팝업, v1.2 시연),
+    /// 길게 누르기 → 개별 업그레이드 팝업. 기물 위에 앉은 요괴는 요괴가 우선.
     ///
     /// 설계 원칙(반복된 회귀 버그를 겪고 정리함): "무엇을 눌렀는지"는 press 시점에 딱 한 번만
     /// 정한다(<see cref="PressTarget"/>). Hold·Release는 그 판정을 다시 계산하지 않고 그대로
@@ -68,6 +70,9 @@ namespace Yoegoe.Characters
         [Tooltip("보관 라벨(***·숫자) 탭 여유(월드). 라벨 탭도 본체 탭과 같은 수거.")]
         public float pileLabelTapPadding = 0.18f;
 
+        [Tooltip("수거한 뒤 이 시간 안에 같은 기물을 다시 탭하면 기물 창(업그레이드 팝업)을 연다 (v1.2 시연 2초).")]
+        public float propReopenSeconds = 2f;
+
         [Tooltip("자물쇠(미건립) 탭 여유. 0이면 bounds 안만 — 초가집처럼 작고 캐릭터와 겹치면 구매가 잘 안 됨.")]
         public float lockTapRadius = 0.28f;
 
@@ -88,6 +93,10 @@ namespace Yoegoe.Characters
         private CharacterAgent pressCharacter;
         private CharacterAgent dragCharacter;
         private PropSlot pressProp;
+
+        /// <summary>마지막으로 탭 수거한 기물과 시각 — 2초 안에 다시 탭하면 기물 창.</summary>
+        private PropSlot lastCollectedProp;
+        private float lastCollectedTime = -999f;
 
         /// <summary>첫 탭 후 더블탭 대기 중인 캐릭터. 창이 지나면 혼잣말.</summary>
         private CharacterAgent pendingMonologueTap;
@@ -383,10 +392,10 @@ namespace Yoegoe.Characters
                         break;
 
                     case PressTarget.Prop:
-                        // 기물 본체·보관 라벨 탭 → 쌓인 자원 수거
+                        // 기물 본체·보관 라벨 탭 → 쌓인 자원 수거.
+                        // 쌓인 게 없거나, 방금(2초 안) 수거한 기물을 다시 탭하면 기물 창 (v1.2 시연).
                         CancelPendingMonologueTap();
-                        if (pressProp.HasPendingCollectible && pressProp.TryCollect())
-                            Yoegoe.Save.GameSaveBridge.RequestSave();
+                        HandlePropTap(pressProp);
                         break;
 
                     case PressTarget.Willow:
@@ -425,6 +434,25 @@ namespace Yoegoe.Characters
             dragCharacter = null;
             pressProp = null;
             pressConsumed = false;
+        }
+
+        void HandlePropTap(PropSlot prop)
+        {
+            if (prop == null) return;
+            bool reopen = prop == lastCollectedProp
+                          && Time.unscaledTime - lastCollectedTime <= propReopenSeconds;
+            if (!reopen && prop.HasPendingCollectible && prop.TryCollect())
+            {
+                lastCollectedProp = prop;
+                lastCollectedTime = Time.unscaledTime;
+                Yoegoe.Save.GameSaveBridge.RequestSave();
+                return;
+            }
+            lastCollectedProp = null;
+            // 떡절구(공덕)는 v1.2에서 '지금 그대로' — 탭은 수거만, 기물 창은 길게 누르기로.
+            if (prop.ResourceType == PropResourceType.Merit) return;
+            if (PropEconomy.CanUpgrade(prop))
+                PropUpgradeRequested?.Invoke(prop);
         }
 
         /// <summary>

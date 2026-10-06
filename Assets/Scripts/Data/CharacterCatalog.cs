@@ -38,6 +38,39 @@ namespace Yoegoe.Data
             /// <summary>접속 인사 — 앱을 켜거나 오래 비웠다 돌아왔을 때 놀고 있던 요괴. 비면 기본 대사.</summary>
             public string[] greetingLines;
 
+            // v1.2 시연 대사 세트 (시트 character_lines type) — 비면 대사 없이 넘어간다.
+            /// <summary>기물로 보낼 때 (go_hunt · go_gather · go_spring · go_altar).</summary>
+            public string[] goHuntLines, goGatherLines, goSpringLines, goAltarLines;
+            /// <summary>일하는 중 탭 (work_hunt · work_gather · work_spring · work_altar).</summary>
+            public string[] workHuntLines, workGatherLines, workSpringLines, workAltarLines;
+            /// <summary>보관함이 차서 다른 기물로 옮겨 갈 때. {d} = 옮겨 갈 곳.</summary>
+            public string[] fullLines;
+            /// <summary>보관함이 찼는데 갈 곳이 없을 때.</summary>
+            public string[] fullIdleLines;
+            /// <summary>일하다 기력이 0이 됐을 때.</summary>
+            public string[] tiredLines;
+            /// <summary>불러들일 때 · 배고플 때 · 음식 · 황금 요리 · 공양물 받았을 때 (아직 쓰는 곳 없음 — 기획 데이터).</summary>
+            public string[] homeLines, hungryLines, fedLines, goldLines, offerLines;
+
+            /// <summary>기물 종류별 보내기/일하기 대사. 사냥=Hunt, 채집=Gather, 옹달샘=Water, 제단=Merit.</summary>
+            public string[] GoLinesFor(PropResourceType t) => t switch
+            {
+                PropResourceType.Hunt => goHuntLines,
+                PropResourceType.Gather => goGatherLines,
+                PropResourceType.Water => goSpringLines,
+                PropResourceType.Merit => goAltarLines,
+                _ => null
+            };
+
+            public string[] WorkLinesFor(PropResourceType t) => t switch
+            {
+                PropResourceType.Hunt => workHuntLines,
+                PropResourceType.Gather => workGatherLines,
+                PropResourceType.Water => workSpringLines,
+                PropResourceType.Merit => workAltarLines,
+                _ => null
+            };
+
             public bool TryParseId(out CharacterId characterId)
                 => Enum.TryParse(id, ignoreCase: true, out characterId);
         }
