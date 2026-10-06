@@ -1,8 +1,14 @@
 {
   "sheet_id": "1d3c7nN8cZjKQUBBetL5B7q6U2hwUBRvwWtL5ys4nrRs",
   "tab": "yut_bubbles",
-  "locales": ["ko", "en", "zh", "ja"],
+  "locales": [
+    "ko",
+    "en",
+    "zh",
+    "ja"
+  ],
   "fallback_locale": "ko",
   "write_url": "https://script.google.com/macros/s/AKfycbx7qT4jbMm9geO3_KVjYFpoI8NRSFFTcWIsOkUsxtwEMtzF43iRlFdguw-4IfTVfQv1/exec",
-  "write_token": ""
+  "write_token": "",
+  "dialogue_sheet_id": "1QVFw6EskFhmgYQAl77gZnZ1bOZY_BVOg9RxT8x3iikw"
 }

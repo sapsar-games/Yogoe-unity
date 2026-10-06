@@ -185,14 +185,16 @@ def main() -> int:
     from export_characters import load_config
     from export_yut_bubbles import fetch_sheet_csv
     from import_yut_bubbles_csv import _post_json
+    from sheets_config import sheet_id_for
 
     config = load_config()
-    sid, url = config.get("sheet_id"), config.get("write_url")
-    if not sid or not url:
+    url = config.get("write_url")
+    if not config.get("sheet_id") or not url:
         print("config 에 sheet_id / write_url 필요", file=sys.stderr)
         return 1
 
     for tab, desc in DESCRIPTIONS.items():
+        sid = sheet_id_for(config, tab)
         rows = list(csv.reader(io.StringIO(fetch_sheet_csv(sid, tab))))
         while rows and rows[0] and rows[0][0].startswith(MARK):
             rows.pop(0)  # 기존 설명 교체

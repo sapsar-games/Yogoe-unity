@@ -26,6 +26,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from export_characters import load_config, push_tab, read_csv_text, write_csv  # noqa: E402
 from export_yut_bubbles import fetch_sheet_csv  # noqa: E402
+from sheets_config import sheet_id_for  # noqa: E402
 from recipes_data import (OLD_INGREDIENT_IDS, ING_KO, ING_ORDER, KIND_INGREDIENTS, KIND_KO, KO_TO_ING, KO_TO_KIND,  # noqa: E402
                           RECIPES_JSON, ROOT, load_recipes)
 
@@ -145,7 +146,7 @@ def main() -> int:
         if not config.get("sheet_id"):
             print("config 에 sheet_id 가 없습니다.", file=sys.stderr)
             return 1
-        text = fetch_sheet_csv(config["sheet_id"], TAB)
+        text = fetch_sheet_csv(sheet_id_for(config, TAB), TAB)
     data, errors = rows_to_json(read_csv_text(text, ["kind", "id"], TAB))
     if errors:
         print("시트 오류 — recipes.json 을 쓰지 않았습니다:", file=sys.stderr)

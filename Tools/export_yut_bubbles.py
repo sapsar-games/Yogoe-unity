@@ -251,7 +251,7 @@ def main() -> int:
     args = parser.parse_args()
 
     config = load_config()
-    sheet_id = args.sheet_id or config.get("sheet_id") or ""
+    sheet_id = args.sheet_id or config.get("dialogue_sheet_id") or config.get("sheet_id") or ""
     tab = args.tab or config.get("tab") or DEFAULT_TAB
     locales = list(config.get("locales") or DEFAULT_LOCALES)
     fallback = config.get("fallback_locale") or DEFAULT_FALLBACK

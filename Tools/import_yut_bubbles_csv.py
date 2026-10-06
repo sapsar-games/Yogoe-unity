@@ -366,14 +366,14 @@ def main() -> int:
                 locales,
                 rows,
                 token,
-                spreadsheet_id=(config.get("sheet_id") or "").strip(),
+                spreadsheet_id=(config.get("dialogue_sheet_id") or config.get("sheet_id") or "").strip(),
             )
         except RuntimeError as e:
             print(str(e), file=sys.stderr)
             return 1
         print(
             f"Pushed to '{result.get('spreadsheetName', '?')}' "
-            f"({result.get('spreadsheetId', config.get('sheet_id'))}) "
+            f"({result.get('spreadsheetId')}) "
             f"tab '{result.get('tab', tab)}' "
             f"({result.get('rows', len(rows))} rows × {result.get('columns', '?')} cols)"
         )

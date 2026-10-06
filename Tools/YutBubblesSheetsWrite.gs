@@ -24,12 +24,14 @@
  * b) Apps Script → 프로젝트 설정(⚙) → 스크립트 속성 → 속성 추가
  *    - 이름: GITHUB_TOKEN   값: a) 의 토큰
  * c) 저장 후 시트를 새로고침하면 메뉴 「한폭요괴」가 생긴다. 처음 누를 때 권한 승인.
+ *    밸런스 시트 · 대사 시트 둘 다에 같은 코드를 붙이고 a)~b)를 각각 한다 (어느 쪽에서 눌러도 두 시트를 함께 반영).
  * 누르면 GitHub Actions 'Sheets → Deploy' 가 시트 검사 → 커밋 → 빌드 → 배포하고, deploy_status 탭에 결과를 적는다.
  */
 
 var GITHUB_REPO = 'sapsar-games/Yogoe-unity';
 var DEPLOY_WORKFLOW = 'sheets-deploy.yml';
 
+/** 밸런스 시트 (deploy_status 탭이 여기에 있다). 대사 시트에 붙인 스크립트도 기록은 여기에 쓴다. */
 var SPREADSHEET_ID = '1d3c7nN8cZjKQUBBetL5B7q6U2hwUBRvwWtL5ys4nrRs';
 
 function onOpen() {
@@ -74,16 +76,28 @@ function requestDeploy() {
   }
 }
 
-/** 메뉴: deploy_status 탭으로 이동. */
+/** 메뉴: deploy_status 탭으로 이동 (대사 시트에서는 밸런스 시트 링크를 보여 준다). */
 function showDeployStatus() {
-  const sheet = SpreadsheetApp.getActive().getSheetByName('deploy_status');
+  const active = SpreadsheetApp.getActive();
+  if (active.getId() !== SPREADSHEET_ID) {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const st = ss.getSheetByName('deploy_status');
+    const url = ss.getUrl() + (st ? '#gid=' + st.getSheetId() : '');
+    const html = HtmlService.createHtmlOutput(
+      '<p style="font-family:sans-serif">반영 기록은 밸런스 시트의 deploy_status 탭에 있어요.</p>' +
+      '<p style="font-family:sans-serif"><a href="' + url + '" target="_blank">deploy_status 열기</a></p>')
+      .setWidth(320).setHeight(110);
+    SpreadsheetApp.getUi().showModalDialog(html, '반영 기록');
+    return;
+  }
+  const sheet = active.getSheetByName('deploy_status');
   if (!sheet) { SpreadsheetApp.getUi().alert('아직 반영 기록이 없어요.'); return; }
-  SpreadsheetApp.getActive().setActiveSheet(sheet);
+  active.setActiveSheet(sheet);
 }
 
 /** deploy_status 탭 기록 줄 바로 위(헤더 아래)에 한 줄 끼워 넣기 — 형식은 Tools/report_deploy_status.py 와 같다. */
 function writeDeployStatus_(result, detail, link) {
-  const ss = SpreadsheetApp.getActive();
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   var sheet = ss.getSheetByName('deploy_status');
   if (!sheet) {
     sheet = ss.insertSheet('deploy_status');
