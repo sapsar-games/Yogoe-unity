@@ -3,7 +3,7 @@
 
 시트 = 윷 말풍선 시트(Tools/yut_bubbles_sheets.config.json 의 sheet_id)의 탭 1개:
   ingredients  id, name, description, note
-               한 줄 = 재료 1개 (재료 13 + 황금쌀·황금꿀). 게임에 들어가는 건 description 뿐.
+               한 줄 = 재료 1개 (재료 13 + 황금쌀·황금꿀 + v1.2 황금 재료 6종). 게임에 들어가는 건 description 뿐.
                id·name 은 코드와 연결된 참고용 — 바꾸지 마세요. (요리 설명은 recipes 탭 description)
 
 사용법:
@@ -31,6 +31,9 @@ JSON_PATH = ROOT / "Assets" / "Resources" / "ingredients.json"
 CSV_PATH = ROOT / "Tools" / "sheets" / "ingredients.csv"
 # 재료 칸 = CookingIngredientId 순서 + 특수 수집품 (CodexScreen 재료 칸 순서와 같다)
 CELLS = INGREDIENTS + [("GoldenRice", "황금쌀"), ("GoldenHoney", "황금꿀")]
+# v1.2 황금 재료 6종 — 시트에 먼저 들어온 id. 게임 쪽 황금 개편 전까지는 설명만 보관한다.
+CELLS += [("GoldenNamul", "황금 산나물"), ("GoldenHerb", "황금 약재"), ("GoldenChili", "황금 고추"),
+          ("GoldenFish", "황금 해산물"), ("GoldenBird", "황금 새고기"), ("GoldenEgg", "황금 새알")]
 
 
 def rows_to_json(rows: list[dict]) -> tuple[dict, list[str]]:

@@ -66,13 +66,33 @@
       "description": ""
     },
     {
-      "id": "GoldenRice",
-      "name": "황금쌀",
+      "id": "GoldenChili",
+      "name": "황금 고추",
       "description": ""
     },
     {
-      "id": "GoldenHoney",
-      "name": "황금꿀",
+      "id": "GoldenNamul",
+      "name": "황금 산나물",
+      "description": ""
+    },
+    {
+      "id": "GoldenHerb",
+      "name": "황금 약재",
+      "description": ""
+    },
+    {
+      "id": "GoldenBird",
+      "name": "황금 새고기",
+      "description": ""
+    },
+    {
+      "id": "GoldenFish",
+      "name": "황금 해산물",
+      "description": ""
+    },
+    {
+      "id": "GoldenEgg",
+      "name": "황금 새알",
       "description": ""
     }
   ]
