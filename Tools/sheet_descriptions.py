@@ -21,9 +21,12 @@ MARK = "※"
 
 _LINES: dict[str, list[str]] = {
     "charms": [
-        "※ 윷 말 완주 보상 부적 확률",
+        "※ 요리 부적 — 완주 보상 확률 · 제한시간 · 광고 연장",
         "- 한 줄 = 부적 1종. 말 1개가 완주할 때 weight 비율로 1개가 나옴 (전부 1이면 6종 균등, 0 = 안 나옴)",
         "- 예: 몰빵 weight 0.5, 나머지 1 → 몰빵 9%, 나머지 각 18%",
+        "- seconds = 그 부적을 끼고 시작한 판의 제한시간(초). 부적 없는 판은 15초",
+        "- adExtend = 시간이 끝났을 때 '광고 보고 15초 더' 가능 (TRUE/FALSE)",
+        "- 나가리는 판 중간에 쓰는 부적이라 seconds·adExtend 칸은 비워 두기",
         "- 나가리도 소모품 — 가진 개수만큼만 요리 중 쓸 수 있음",
         "- id 는 코드와 연결되니 바꾸지 마세요",
         "- 수정 후: npm run charms (또는 npm run sheets)",
@@ -78,14 +81,27 @@ _LINES: dict[str, list[str]] = {
         "- 자원 기물: cycleMinutes = 1개 만드는 주기(분, 레벨 무관) / baseCapacity = Lv1 보관 (10레벨마다 +1)",
         "- 공덕 기물: 분당 meritPerMinute × levelGrowth^(레벨−1) / meritCapacityMinutes분치 쌓이면 만창",
         "- intimacyBonus(친밀도 보정), upgradable(레벨업 가능) = TRUE / FALSE",
+        "- propId 는 기물 에셋과 연결 — 바꾸지 마세요 (활터 = 사냥터, 약초밭 = 채집터. 보이는 이름은 displayName)",
+        "- 에셋이 아직 없는 기물(북제단·남제단)은 값만 저장되고, 기물이 맵에 생기면 적용",
         "- 수정 후: npm run props",
     ],
     "prop_drop_tables": [
-        "※ 활터(Hunt) · 약초밭(Gather) 재료 확률",
-        "- weight = 확률 % (표마다 합 100 권장)",
+        "※ 재료 확률 표",
+        "- table = destinations 탭의 목적지 id (v1.2 — 사냥터·채집터 보내기 팝업이 생기면 사용)",
+        "         Hunt / Gather = 지금 게임의 사냥터·채집터 표 (보내기 팝업이 생기면 지울 예정)",
+        "- weight = 확률 % (표마다 합 100 권장). 목적지 표에는 황금 재료를 넣지 말고 destinations 탭 goldenChance 로",
         "- ingredient: Rice 쌀 / Namul 산나물 / Fruit 과실 / Chili 고추 / Herb 약재 / Grain 잡곡",
         "              Egg 새알 / Oil 기름 / Seafood 해산물 / Boar 멧돼지고기 / Bird 새고기 / Honey 꿀",
         "              GoldenRice 황금쌀 / GoldenHoney 황금꿀",
+        "- 수정 후: npm run props",
+    ],
+    "destinations": [
+        "※ 사냥터·채집터 목적지 (v1.2)",
+        "- 한 줄 = 목적지 1곳. 나오는 재료와 확률은 prop_drop_tables 탭 (table = 이 id)",
+        "- prop: Hunt(사냥터) / Gather(채집터)",
+        "- rarity = 희귀도 표시(하·중·상), minIntimacy = 들어갈 수 있는 친밀도 (모자라면 '거기는 가기 싫어')",
+        "- goldenChance = 재료가 하나 나올 때 황금 버전으로 바뀔 확률 % (0 = 안 나옴)",
+        "- id 는 영문 — prop_drop_tables 와 연결되니 바꿀 땐 둘 다",
         "- 수정 후: npm run props",
     ],
     "prop_settings": [

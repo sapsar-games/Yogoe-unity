@@ -29,8 +29,10 @@ namespace Yoegoe.Cooking
         public bool Finished { get; private set; }
         public CookingCharmType PreCharm { get; private set; }
         public bool AllowDiagonal => PreCharm == CookingCharmType.Diagonal;
-        public bool AllowAdExtend =>
-            PreCharm != CookingCharmType.Recycle && PreCharm != CookingCharmType.Double;
+        /// <summary>광고 연장 가능 — 시트 charms 탭 adExtend (비면 회수·몰빵만 불가).</summary>
+        public bool AllowAdExtend => PreCharm == CookingCharmType.None
+            || CharmDropRates.AdExtendOr(PreCharm,
+                PreCharm != CookingCharmType.Recycle && PreCharm != CookingCharmType.Double);
         /// <summary>나가리 버튼: 사전 부적 없이 시작한 판 + 나가리 부적을 가지고 있을 때만 (쓰면 1개 소모).</summary>
         public bool ShowNagari => Running && PreCharm == CookingCharmType.None && HasNagariCharm;
         /// <summary>손님에게 요리를 건넨 뒤엔 그 판에서 부적(나가리)을 쓸 수 없다 — 버튼에 X.</summary>
@@ -119,7 +121,11 @@ namespace Yoegoe.Cooking
             Changed?.Invoke();
         }
 
-        static float ResolveLimit(CookingCharmType charm) => charm switch
+        /// <summary>제한시간 — 시트 charms 탭 seconds (비면 아래 기본값).</summary>
+        static float ResolveLimit(CookingCharmType charm) =>
+            charm == CookingCharmType.None ? BaseSeconds : CharmDropRates.SecondsOr(charm, DefaultLimit(charm));
+
+        static float DefaultLimit(CookingCharmType charm) => charm switch
         {
             CookingCharmType.PlusFive => BaseSeconds + 5f,
             CookingCharmType.Recycle => 12f,

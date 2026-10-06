@@ -19,14 +19,14 @@
       "propId": "옹달샘",
       "displayName": "옹달샘",
       "resourceType": "Water",
-      "cycleMinutes": 30.0,
+      "cycleMinutes": 15.0,
       "meritPerMinute": 0.0,
       "levelGrowth": 1.0,
       "meritCapacityMinutes": 0.0,
       "ownerMultiplier": 1.0,
       "upgradeBaseCost": 500.0,
       "upgradeCostMultiplier": 1.15,
-      "baseCapacity": 6,
+      "baseCapacity": 15,
       "intimacyBonus": false,
       "upgradable": true
     },
@@ -47,31 +47,31 @@
     },
     {
       "propId": "활터",
-      "displayName": "활터",
+      "displayName": "사냥터",
       "resourceType": "Hunt",
-      "cycleMinutes": 20.0,
+      "cycleMinutes": 15.0,
       "meritPerMinute": 0.0,
       "levelGrowth": 1.0,
       "meritCapacityMinutes": 0.0,
       "ownerMultiplier": 1.0,
       "upgradeBaseCost": 500.0,
       "upgradeCostMultiplier": 1.15,
-      "baseCapacity": 9,
+      "baseCapacity": 15,
       "intimacyBonus": false,
       "upgradable": true
     },
     {
       "propId": "약초밭",
-      "displayName": "약초밭",
+      "displayName": "채집터",
       "resourceType": "Gather",
-      "cycleMinutes": 20.0,
+      "cycleMinutes": 15.0,
       "meritPerMinute": 0.0,
       "levelGrowth": 1.0,
       "meritCapacityMinutes": 0.0,
       "ownerMultiplier": 1.0,
       "upgradeBaseCost": 500.0,
       "upgradeCostMultiplier": 1.15,
-      "baseCapacity": 9,
+      "baseCapacity": 15,
       "intimacyBonus": false,
       "upgradable": true
     },
@@ -89,9 +89,147 @@
       "baseCapacity": 0,
       "intimacyBonus": false,
       "upgradable": false
+    },
+    {
+      "propId": "북제단",
+      "displayName": "북제단",
+      "resourceType": "Merit",
+      "cycleMinutes": 0.0,
+      "meritPerMinute": 100.0,
+      "levelGrowth": 1.1,
+      "meritCapacityMinutes": 180.0,
+      "ownerMultiplier": 1.0,
+      "upgradeBaseCost": 500.0,
+      "upgradeCostMultiplier": 1.15,
+      "baseCapacity": 0,
+      "intimacyBonus": false,
+      "upgradable": true
+    },
+    {
+      "propId": "남제단",
+      "displayName": "남제단",
+      "resourceType": "Merit",
+      "cycleMinutes": 0.0,
+      "meritPerMinute": 100.0,
+      "levelGrowth": 1.1,
+      "meritCapacityMinutes": 180.0,
+      "ownerMultiplier": 1.0,
+      "upgradeBaseCost": 500.0,
+      "upgradeCostMultiplier": 1.15,
+      "baseCapacity": 0,
+      "intimacyBonus": false,
+      "upgradable": true
     }
   ],
   "dropTables": [
+    {
+      "table": "FirstField",
+      "ingredient": "Rice",
+      "name": "쌀",
+      "weight": 35.0
+    },
+    {
+      "table": "FirstField",
+      "ingredient": "Chili",
+      "name": "고추",
+      "weight": 35.0
+    },
+    {
+      "table": "FirstField",
+      "ingredient": "Oil",
+      "name": "기름",
+      "weight": 30.0
+    },
+    {
+      "table": "ScarecrowPaddy",
+      "ingredient": "Rice",
+      "name": "쌀",
+      "weight": 55.0
+    },
+    {
+      "table": "ScarecrowPaddy",
+      "ingredient": "Grain",
+      "name": "잡곡",
+      "weight": 30.0
+    },
+    {
+      "table": "ScarecrowPaddy",
+      "ingredient": "Oil",
+      "name": "기름",
+      "weight": 15.0
+    },
+    {
+      "table": "HerbCliff",
+      "ingredient": "Namul",
+      "name": "산나물",
+      "weight": 60.0
+    },
+    {
+      "table": "HerbCliff",
+      "ingredient": "Herb",
+      "name": "약재",
+      "weight": 30.0
+    },
+    {
+      "table": "HerbCliff",
+      "ingredient": "Chili",
+      "name": "고추",
+      "weight": 10.0
+    },
+    {
+      "table": "BoarHill",
+      "ingredient": "Boar",
+      "name": "멧돼지고기",
+      "weight": 80.0
+    },
+    {
+      "table": "BoarHill",
+      "ingredient": "Bird",
+      "name": "새고기",
+      "weight": 15.0
+    },
+    {
+      "table": "BoarHill",
+      "ingredient": "Egg",
+      "name": "새알",
+      "weight": 5.0
+    },
+    {
+      "table": "BeeForest",
+      "ingredient": "Honey",
+      "name": "꿀",
+      "weight": 60.0
+    },
+    {
+      "table": "BeeForest",
+      "ingredient": "Fruit",
+      "name": "과실",
+      "weight": 30.0
+    },
+    {
+      "table": "BeeForest",
+      "ingredient": "Boar",
+      "name": "멧돼지고기",
+      "weight": 10.0
+    },
+    {
+      "table": "WaveIsland",
+      "ingredient": "Seafood",
+      "name": "해산물",
+      "weight": 45.0
+    },
+    {
+      "table": "WaveIsland",
+      "ingredient": "Bird",
+      "name": "새고기",
+      "weight": 30.0
+    },
+    {
+      "table": "WaveIsland",
+      "ingredient": "Egg",
+      "name": "새알",
+      "weight": 25.0
+    },
     {
       "table": "Gather",
       "ingredient": "Rice",
@@ -180,5 +318,55 @@
   "settings": {
     "purchaseBaseCost": 300.0,
     "purchaseCostGrowth": 1.35
-  }
+  },
+  "destinations": [
+    {
+      "id": "FirstField",
+      "prop": "Gather",
+      "name": "첫걸음 들판",
+      "rarity": "하",
+      "minIntimacy": 0.0,
+      "goldenChance": 0.0
+    },
+    {
+      "id": "ScarecrowPaddy",
+      "prop": "Gather",
+      "name": "허수아비 논밭",
+      "rarity": "중",
+      "minIntimacy": 25.0,
+      "goldenChance": 0.0
+    },
+    {
+      "id": "HerbCliff",
+      "prop": "Gather",
+      "name": "절벽의 약초골",
+      "rarity": "상",
+      "minIntimacy": 50.0,
+      "goldenChance": 1.0
+    },
+    {
+      "id": "BoarHill",
+      "prop": "Hunt",
+      "name": "멧돼지 앞산",
+      "rarity": "하",
+      "minIntimacy": 0.0,
+      "goldenChance": 0.0
+    },
+    {
+      "id": "BeeForest",
+      "prop": "Hunt",
+      "name": "꿀벌의 숲",
+      "rarity": "중",
+      "minIntimacy": 25.0,
+      "goldenChance": 0.0
+    },
+    {
+      "id": "WaveIsland",
+      "prop": "Hunt",
+      "name": "파도치는 섬",
+      "rarity": "상",
+      "minIntimacy": 50.0,
+      "goldenChance": 1.0
+    }
+  ]
 }

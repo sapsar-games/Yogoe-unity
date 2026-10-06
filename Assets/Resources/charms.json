@@ -3,27 +3,37 @@
     {
       "id": "PlusFive",
       "name": "+5초",
-      "weight": 1.0
+      "weight": 1.0,
+      "seconds": 20.0,
+      "adExtend": "true"
     },
     {
       "id": "Diagonal",
       "name": "대각선",
-      "weight": 1.0
+      "weight": 1.0,
+      "seconds": 15.0,
+      "adExtend": "true"
     },
     {
       "id": "Clairvoyance",
       "name": "천리안",
-      "weight": 1.0
+      "weight": 1.0,
+      "seconds": 15.0,
+      "adExtend": "true"
     },
     {
       "id": "Recycle",
       "name": "회수",
-      "weight": 1.0
+      "weight": 1.0,
+      "seconds": 12.0,
+      "adExtend": "false"
     },
     {
       "id": "Double",
       "name": "몰빵",
-      "weight": 1.0
+      "weight": 1.0,
+      "seconds": 10.0,
+      "adExtend": "false"
     },
     {
       "id": "Cancel",

@@ -1,15 +1,33 @@
 table,ingredient,name,weight,note
-Gather,Rice,쌀,39,
-Gather,Namul,산나물,20,
-Gather,Fruit,과실,15,
-Gather,Chili,고추,10,
-Gather,Herb,약재,10,
-Gather,Grain,잡곡,5,
-Gather,GoldenRice,황금쌀,1,
-Hunt,Egg,새알,20,
-Hunt,Oil,기름,20,
-Hunt,Seafood,해산물,20,
-Hunt,Boar,멧돼지고기,15,
-Hunt,Bird,새고기,15,
-Hunt,Honey,꿀,9,
-Hunt,GoldenHoney,황금꿀,1,
+FirstField,Rice,쌀,35,
+FirstField,Chili,고추,35,
+FirstField,Oil,기름,30,
+ScarecrowPaddy,Rice,쌀,55,
+ScarecrowPaddy,Grain,잡곡,30,
+ScarecrowPaddy,Oil,기름,15,
+HerbCliff,Namul,산나물,60,
+HerbCliff,Herb,약재,30,
+HerbCliff,Chili,고추,10,
+BoarHill,Boar,멧돼지고기,80,
+BoarHill,Bird,새고기,15,
+BoarHill,Egg,새알,5,
+BeeForest,Honey,꿀,60,
+BeeForest,Fruit,과실,30,
+BeeForest,Boar,멧돼지고기,10,
+WaveIsland,Seafood,해산물,45,
+WaveIsland,Bird,새고기,30,
+WaveIsland,Egg,새알,25,
+Gather,Rice,쌀,39,지금 게임용 — 보내기 팝업이 생기면 삭제
+Gather,Namul,산나물,20,지금 게임용 — 보내기 팝업이 생기면 삭제
+Gather,Fruit,과실,15,지금 게임용 — 보내기 팝업이 생기면 삭제
+Gather,Chili,고추,10,지금 게임용 — 보내기 팝업이 생기면 삭제
+Gather,Herb,약재,10,지금 게임용 — 보내기 팝업이 생기면 삭제
+Gather,Grain,잡곡,5,지금 게임용 — 보내기 팝업이 생기면 삭제
+Gather,GoldenRice,황금쌀,1,지금 게임용 — 보내기 팝업이 생기면 삭제
+Hunt,Egg,새알,20,지금 게임용 — 보내기 팝업이 생기면 삭제
+Hunt,Oil,기름,20,지금 게임용 — 보내기 팝업이 생기면 삭제
+Hunt,Seafood,해산물,20,지금 게임용 — 보내기 팝업이 생기면 삭제
+Hunt,Boar,멧돼지고기,15,지금 게임용 — 보내기 팝업이 생기면 삭제
+Hunt,Bird,새고기,15,지금 게임용 — 보내기 팝업이 생기면 삭제
+Hunt,Honey,꿀,9,지금 게임용 — 보내기 팝업이 생기면 삭제
+Hunt,GoldenHoney,황금꿀,1,지금 게임용 — 보내기 팝업이 생기면 삭제

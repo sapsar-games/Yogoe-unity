@@ -205,6 +205,9 @@ NOTE_KEYS: dict[str, list[str]] = {
     "props": ["propId"],
     "prop_drop_tables": ["table", "ingredient"],
     "prop_settings": ["key"],
+    "destinations": ["id"],
+    "charms": ["id"],
+    "ingredients": ["id"],
     "attendance": ["day"],
     "yut_fortune": ["gua"],
 }

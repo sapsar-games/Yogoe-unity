@@ -84,8 +84,8 @@ namespace Yoegoe.Tests.EditMode
         {
             Assert.IsTrue(PropCatalog.TryGet("옹달샘", out var well));
             Assert.AreEqual(PropResourceType.Water, well.ResourceType);
-            Assert.AreEqual(30f, well.cycleMinutes, 0.001f);
-            Assert.AreEqual(6, well.baseCapacity);
+            Assert.AreEqual(15f, well.cycleMinutes, 0.001f); // v1.2: 모든 기물 15분에 1개 · 보관 15
+            Assert.AreEqual(15, well.baseCapacity);
 
             Assert.IsTrue(PropCatalog.TryGet("갯바위", out var rock));
             Assert.AreEqual(PropResourceType.Yeopjeon, rock.ResourceType);

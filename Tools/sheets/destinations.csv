@@ -1,0 +1,7 @@
+id,prop,name,rarity,minIntimacy,goldenChance,note
+FirstField,Gather,첫걸음 들판,하,0,0,
+ScarecrowPaddy,Gather,허수아비 논밭,중,25,0,
+HerbCliff,Gather,절벽의 약초골,상,50,1,
+BoarHill,Hunt,멧돼지 앞산,하,0,0,
+BeeForest,Hunt,꿀벌의 숲,중,25,0,
+WaveIsland,Hunt,파도치는 섬,상,50,1,
