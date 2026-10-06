@@ -38,8 +38,12 @@ namespace Yoegoe.Tests.EditMode
             Assert.AreEqual(5, SpiritPier.Spirits.Count, "줄이 차 있는 동안엔 더 오지 않는다");
             At(210);
             Assert.AreEqual(4, SpiritPier.Spirits.Count, "첫 혼령(20분 도착)은 3시간 뒤인 200분에 떠난다");
+            At(218);
+            Assert.AreEqual(4, SpiritPier.Spirits.Count);
+            At(219);
+            Assert.AreEqual(5, SpiritPier.Spirits.Count, "자리가 난 200분부터 다시 20분 (그 분 안에 도착)");
             At(220);
-            Assert.AreEqual(5, SpiritPier.Spirits.Count, "자리가 난 뒤부터 다시 20분");
+            Assert.AreEqual(4, SpiritPier.Spirits.Count, "40분에 온 혼령은 220분에 떠난다");
         }
 
         [Test]
@@ -71,7 +75,9 @@ namespace Yoegoe.Tests.EditMode
             At(60);
             Assert.AreEqual(3, SpiritPier.Spirits.Count);
             At(60 * 24 * 3);
-            Assert.AreEqual(5, SpiritPier.Spirits.Count, "오래 비워도 줄은 5명까지");
+            // 오래 비우면 '하나 떠나고 20분 뒤 하나 옴'이 되풀이 — 4~5명, 넘치지 않음
+            Assert.LessOrEqual(SpiritPier.Spirits.Count, 5, "오래 비워도 줄은 5명까지");
+            Assert.GreaterOrEqual(SpiritPier.Spirits.Count, 4);
         }
 
         [Test]
