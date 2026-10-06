@@ -243,7 +243,11 @@ namespace Yoegoe.Characters
 
         public void DestroyVisuals()
         {
-            if (offeringIcon != null) Object.Destroy(offeringIcon.gameObject);
+            if (offeringIcon != null)
+            {
+                if (Application.isPlaying) Object.Destroy(offeringIcon.gameObject);
+                else Object.DestroyImmediate(offeringIcon.gameObject); // 에디터 테스트
+            }
             offeringIcon = null;
         }
     }
