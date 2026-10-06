@@ -100,7 +100,7 @@ namespace Yoegoe.Tests.EditMode
         {
             Assert.AreEqual((int)CookingIngredientId.Rice, PropCatalog.RollDrop(PropResourceType.Gather, 0f));
             Assert.AreEqual((int)CookingIngredientId.Rice, PropCatalog.RollDrop(PropResourceType.Gather, 0.385f));
-            Assert.AreEqual((int)CookingIngredientId.RedBean, PropCatalog.RollDrop(PropResourceType.Gather, 0.985f));
+            Assert.AreEqual((int)CookingIngredientId.Grain, PropCatalog.RollDrop(PropResourceType.Gather, 0.985f));
             int golden = PropCatalog.RollDrop(PropResourceType.Gather, 0.999f);
             Assert.IsTrue(PropCatalog.IsSpecialCode(golden));
             Assert.AreEqual(SpecialItemId.GoldenRice, PropCatalog.SpecialOf(golden));

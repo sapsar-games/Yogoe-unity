@@ -60,7 +60,7 @@
       "kind": "Food",
       "ingredients": [
         "Water",
-        "Fish"
+        "Seafood"
       ]
     },
     {
@@ -78,7 +78,7 @@
       "kind": "Food",
       "ingredients": [
         "Water",
-        "RedBean"
+        "Grain"
       ]
     },
     {
@@ -87,7 +87,7 @@
       "kind": "Food",
       "ingredients": [
         "Rice",
-        "RedBean"
+        "Grain"
       ]
     },
     {
@@ -204,7 +204,7 @@
       "name": "생선구이",
       "kind": "Food",
       "ingredients": [
-        "Fish",
+        "Seafood",
         "Oil"
       ]
     },
@@ -223,7 +223,7 @@
       "kind": "Food",
       "ingredients": [
         "Chili",
-        "Fish"
+        "Seafood"
       ]
     },
     {
@@ -479,7 +479,7 @@
       "kind": "Offering",
       "ingredients": [
         "Rice",
-        "RedBean",
+        "Grain",
         "Water"
       ]
     },
@@ -568,7 +568,7 @@
       "name": "매운탕",
       "kind": "Offering",
       "ingredients": [
-        "Fish",
+        "Seafood",
         "Chili",
         "Water"
       ]

@@ -124,8 +124,8 @@
     },
     {
       "table": "Gather",
-      "ingredient": "RedBean",
-      "name": "팥",
+      "ingredient": "Grain",
+      "name": "잡곡",
       "weight": 5.0
     },
     {
@@ -148,8 +148,8 @@
     },
     {
       "table": "Hunt",
-      "ingredient": "Fish",
-      "name": "물고기",
+      "ingredient": "Seafood",
+      "name": "해산물",
       "weight": 20.0
     },
     {

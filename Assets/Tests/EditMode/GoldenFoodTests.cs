@@ -95,7 +95,7 @@ namespace Yoegoe.Tests.EditMode
         public void Cooking_GoldenRiceMakesGoldenFood_AndIsSpentAtStart()
         {
             eco.AddSpecialItem(SpecialItemId.GoldenRice, 1);
-            eco.AddMaterial(CookingIngredientId.RedBean, 1); // 쌀 + 팥 = 팥떡
+            eco.AddMaterial(CookingIngredientId.Grain, 1); // 쌀 + 팥 = 팥떡
             Assert.AreEqual(1, eco.GetBoardMaterialCount(CookingIngredientId.Rice));
 
             var session = new CookingSession();
@@ -103,14 +103,14 @@ namespace Yoegoe.Tests.EditMode
             Assert.AreEqual(2, session.MaterialsOnBoard);
             Assert.IsTrue(session.StartRound());
             Assert.AreEqual(0, eco.GetSpecialItemCount(SpecialItemId.GoldenRice));
-            Assert.AreEqual(0, eco.GetMaterialCount(CookingIngredientId.RedBean));
+            Assert.AreEqual(0, eco.GetMaterialCount(CookingIngredientId.Grain));
 
             (int x, int y)? rice = null, bean = null;
             for (int y = 0; y < CookingSession.GridSize; y++)
             for (int x = 0; x < CookingSession.GridSize; x++)
             {
                 if (session.Grid[x, y] == CookingIngredientId.Rice) { rice = (x, y); Assert.IsTrue(session.Golden[x, y]); }
-                if (session.Grid[x, y] == CookingIngredientId.RedBean) bean = (x, y);
+                if (session.Grid[x, y] == CookingIngredientId.Grain) bean = (x, y);
             }
             Assume.That(CookingRecipeCatalog.Adjacent(rice.Value.x, rice.Value.y, bean.Value.x, bean.Value.y, false),
                 "판 배치가 연결되지 않으면(드묾) 건너뜀");
@@ -130,7 +130,7 @@ namespace Yoegoe.Tests.EditMode
         public void Cooking_Nagari_ReturnsGoldenRice()
         {
             eco.AddSpecialItem(SpecialItemId.GoldenRice, 1);
-            eco.AddMaterial(CookingIngredientId.RedBean, 1);
+            eco.AddMaterial(CookingIngredientId.Grain, 1);
             var session = new CookingSession();
             session.Prepare(CookingCharmType.None);
             Assert.IsTrue(session.StartRound());
@@ -138,7 +138,7 @@ namespace Yoegoe.Tests.EditMode
             session.CancelNagari();
             Assert.AreEqual(1, eco.GetSpecialItemCount(SpecialItemId.GoldenRice));
             Assert.AreEqual(0, eco.GetMaterialCount(CookingIngredientId.Rice));
-            Assert.AreEqual(1, eco.GetMaterialCount(CookingIngredientId.RedBean));
+            Assert.AreEqual(1, eco.GetMaterialCount(CookingIngredientId.Grain));
         }
     }
 }

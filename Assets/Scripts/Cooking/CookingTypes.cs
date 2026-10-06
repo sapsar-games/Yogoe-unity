@@ -12,14 +12,14 @@ namespace Yoegoe.Cooking
         Water = 0,   // 물
         Chili,       // 고추
         Rice,        // 쌀
-        RedBean,     // 팥
+        Grain,       // 잡곡 (구 팥 RedBean)
         Fruit,       // 과실
         Namul,       // 산나물
         Herb,        // 약재
         Honey,       // 꿀
         Boar,        // 멧돼지고기
         Bird,        // 새고기
-        Fish,        // 물고기
+        Seafood,     // 해산물 (구 물고기 Fish)
         Egg,         // 새알
         Oil,         // 기름
         Count

@@ -11,7 +11,7 @@ namespace Yoegoe.Tests.EditMode
     {
         static readonly CookingIngredientId[] Gather =
             { CookingIngredientId.Rice, CookingIngredientId.Namul, CookingIngredientId.Fruit,
-              CookingIngredientId.Chili, CookingIngredientId.Herb, CookingIngredientId.RedBean };
+              CookingIngredientId.Chili, CookingIngredientId.Herb, CookingIngredientId.Grain };
 
         [Test]
         public void Roll_GivesThree_NeverWaterOrGolden()

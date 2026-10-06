@@ -83,8 +83,8 @@ _LINES: dict[str, list[str]] = {
     "prop_drop_tables": [
         "※ 활터(Hunt) · 약초밭(Gather) 재료 확률",
         "- weight = 확률 % (표마다 합 100 권장)",
-        "- ingredient: Rice 쌀 / Namul 산나물 / Fruit 과실 / Chili 고추 / Herb 약재 / RedBean 팥",
-        "              Egg 새알 / Oil 기름 / Fish 물고기 / Boar 멧돼지고기 / Bird 새고기 / Honey 꿀",
+        "- ingredient: Rice 쌀 / Namul 산나물 / Fruit 과실 / Chili 고추 / Herb 약재 / Grain 잡곡",
+        "              Egg 새알 / Oil 기름 / Seafood 해산물 / Boar 멧돼지고기 / Bird 새고기 / Honey 꿀",
         "              GoldenRice 황금쌀 / GoldenHoney 황금꿀",
         "- 수정 후: npm run props",
     ],

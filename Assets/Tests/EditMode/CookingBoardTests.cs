@@ -73,7 +73,7 @@ namespace Yoegoe.Tests.EditMode
         public void Prepare_DoesNotSpend_StartSpends()
         {
             eco.AddMaterial(CookingIngredientId.Rice, 3);
-            eco.AddMaterial(CookingIngredientId.RedBean, 3);
+            eco.AddMaterial(CookingIngredientId.Grain, 3);
 
             var session = new CookingSession();
             session.Prepare(CookingCharmType.None);
@@ -87,7 +87,7 @@ namespace Yoegoe.Tests.EditMode
 
             Assert.IsTrue(session.StartRound());
             Assert.AreEqual(0, eco.GetMaterialCount(CookingIngredientId.Rice));
-            Assert.AreEqual(0, eco.GetMaterialCount(CookingIngredientId.RedBean));
+            Assert.AreEqual(0, eco.GetMaterialCount(CookingIngredientId.Grain));
         }
 
         [Test]

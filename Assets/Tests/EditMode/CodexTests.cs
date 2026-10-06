@@ -74,9 +74,9 @@ namespace Yoegoe.Tests.EditMode
             try
             {
                 CookingRecipeCatalog.LoadFromJson(
-                    "{\"recipes\":[{\"id\":\"newdish\",\"name\":\"새요리\",\"kind\":\"Food\",\"ingredients\":[\"Rice\",\"Fish\"]}," +
+                    "{\"recipes\":[{\"id\":\"newdish\",\"name\":\"새요리\",\"kind\":\"Food\",\"ingredients\":[\"Rice\",\"Seafood\"]}," +
                     "{\"id\":\"bad\",\"name\":\"잘못\",\"kind\":\"Food\",\"ingredients\":[\"Rice\",\"Nope\"]}]}");
-                Assert.IsTrue(CookingRecipeCatalog.TryMatch(new[] { CookingIngredientId.Fish, CookingIngredientId.Rice }, out var r));
+                Assert.IsTrue(CookingRecipeCatalog.TryMatch(new[] { CookingIngredientId.Seafood, CookingIngredientId.Rice }, out var r));
                 Assert.AreEqual("newdish", r.Id);
                 Assert.AreEqual(1, CookingCodex.Total, "잘못된 재료 줄은 건너뜀");
             }
@@ -111,7 +111,7 @@ namespace Yoegoe.Tests.EditMode
         CookingSession StartRiceBeanBoard()
         {
             eco.AddMaterial(CookingIngredientId.Rice, 1);
-            eco.AddMaterial(CookingIngredientId.RedBean, 1);
+            eco.AddMaterial(CookingIngredientId.Grain, 1);
             var session = new CookingSession();
             session.Prepare(CookingCharmType.None);
             Assert.IsTrue(session.StartRound());
@@ -125,7 +125,7 @@ namespace Yoegoe.Tests.EditMode
             for (int x = 0; x < CookingSession.GridSize; x++)
             {
                 if (session.Grid[x, y] == CookingIngredientId.Rice) rice = (x, y);
-                if (session.Grid[x, y] == CookingIngredientId.RedBean) bean = (x, y);
+                if (session.Grid[x, y] == CookingIngredientId.Grain) bean = (x, y);
             }
             if (!CookingRecipeCatalog.Adjacent(rice.Value.x, rice.Value.y, bean.Value.x, bean.Value.y, false)) return false;
             session.TryBeginPath(rice.Value.x, rice.Value.y);

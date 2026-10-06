@@ -28,6 +28,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from export_characters import load_config, push_tab, read_csv_text, write_csv  # noqa: E402
 from export_yut_bubbles import fetch_sheet_csv  # noqa: E402
+from recipes_data import current_id  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 JSON_PATH = ROOT / "Assets" / "Resources" / "props.json"
@@ -143,7 +144,7 @@ def rows_to_json(props: list[dict], drops: list[dict], settings: list[dict]) -> 
     totals: dict[str, float] = {}
     for r in drops:
         where = f"[{TAB_DROPS}] {r['_row']}행"
-        table, ing = r.get("table", ""), r.get("ingredient", "")
+        table, ing = r.get("table", ""), current_id(r.get("ingredient", ""))
         if table not in DROP_TABLES:
             errors.append(f"{where}: table 은 {', '.join(DROP_TABLES)} 중 하나 ('{table}')")
             continue

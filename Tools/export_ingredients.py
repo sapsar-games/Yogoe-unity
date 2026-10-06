@@ -25,7 +25,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from export_characters import load_config, push_tab, read_csv_text, write_csv  # noqa: E402
 from export_yut_bubbles import fetch_sheet_csv  # noqa: E402
-from recipes_data import DEFAULT_INGREDIENTS, ROOT  # noqa: E402
+from recipes_data import DEFAULT_INGREDIENTS, ROOT, current_id  # noqa: E402
 
 TAB = "ingredients"
 HEADERS = ["id", "name", "description", "note"]
@@ -43,7 +43,7 @@ def rows_to_json(rows: list[dict]) -> tuple[dict, list[str]]:
     errors, seen, out = [], set(), []
     for r in rows:
         where = f"[{TAB}] {r['_row']}행"
-        iid = r.get("id", "")
+        iid = current_id(r.get("id", ""))
         if iid not in known:
             errors.append(f"{where}: 모르는 id '{iid}' (코드의 재료 id만)")
             continue
