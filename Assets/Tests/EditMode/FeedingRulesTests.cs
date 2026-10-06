@@ -35,14 +35,14 @@ namespace Yoegoe.Tests.EditMode
             agentGO = new GameObject("Agent");
             agent = agentGO.AddComponent<CharacterAgent>();
             agent.Data = ScriptableObject.CreateInstance<CharacterData>();
-            agent.Data.id = CharacterId.SamjokO; // 선호: 신선로·화채·약주 (시트)
+            agent.Data.id = CharacterId.SamjokO; // 선호: 약주·화채 빙수·육전 (시트, v1.2 시연값)
             agent.Stats.State = ActionState.Walking;
             agent.Stats.Intimacy = 50f;
             agent.Stats.Stamina = 40f; // 최대 75
 
             food = Make("bap", OfferingKind.Food);
-            offering = Make("yukjeon", OfferingKind.General);
-            preferred = Make("sinseollo", OfferingKind.General);
+            offering = Make("samgyetang", OfferingKind.General);
+            preferred = Make("yakju", OfferingKind.General);
             water = Make("water", OfferingKind.Water);
         }
 
@@ -125,7 +125,7 @@ namespace Yoegoe.Tests.EditMode
             var first = agent.TryFeed(preferred, eco);
             Assert.AreEqual(5f, first.IntimacyGain);
             Assert.IsTrue(first.PreferenceRevealed);
-            Assert.IsTrue(agent.Stats.IsPreferenceRevealed("sinseollo"));
+            Assert.IsTrue(agent.Stats.IsPreferenceRevealed("yakju"));
 
             var second = agent.TryFeed(preferred, eco);
             Assert.IsTrue(second.Success);
