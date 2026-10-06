@@ -276,10 +276,10 @@ namespace Yoegoe.Tests.EditMode
 
             OfflineSimulator.Simulate(data, now);
 
-            // 6개(3시간) + 판정 사이클(30분)만 일함 → 기력 210분 / 10분 = 21 소모
-            Assert.GreaterOrEqual(data.props[0].storedResources, 6);
+            // v1.2: 15개(15분×15) + 판정 사이클(15분)만 일함 → 기력 240분 / 10분 = 24 소모
+            Assert.GreaterOrEqual(data.props[0].storedResources, 15);
             Assert.IsTrue(data.props[0].overflowJudged);
-            Assert.AreEqual(75f - 21f, data.agents[0].stamina, 0.05f);
+            Assert.AreEqual(75f - 24f, data.agents[0].stamina, 0.05f);
             Assert.AreEqual(ActionState.Staying, data.agents[0].state);
         }
     }

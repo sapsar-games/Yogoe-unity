@@ -104,7 +104,7 @@ namespace Yoegoe.Tests.EditMode
         [Test]
         public void ComboText_ListsEveryCombination()
         {
-            Assert.AreEqual("쌀 + 팥", CookingCodex.ComboText("patteok"));
+            Assert.AreEqual("쌀 + 잡곡", CookingCodex.ComboText("patteok"));
             StringAssert.Contains(" / ", CookingCodex.ComboText("gogijuk")); // 쌀+새고기 / 쌀+멧돼지고기
         }
 
@@ -227,13 +227,11 @@ namespace Yoegoe.Tests.EditMode
         [Test]
         public void IngredientsJson_HasEveryIngredientCell()
         {
-            // Resources/ingredients.json = 시트 ingredients 탭 (재료 13 + 황금쌀·황금꿀)
+            // Resources/ingredients.json = 시트 ingredients 탭 (재료 13 + 황금 재료 — v1.2 에서 황금쌀·황금꿀은 빠짐)
             var text = Resources.Load<TextAsset>(CodexDescriptions.IngredientsResourcePath)?.text;
             Assert.IsNotNull(text);
             for (int i = 0; i < (int)CookingIngredientId.Count; i++)
                 StringAssert.Contains("\"" + (CookingIngredientId)i + "\"", text);
-            StringAssert.Contains("\"GoldenRice\"", text);
-            StringAssert.Contains("\"GoldenHoney\"", text);
         }
 
         [Test]

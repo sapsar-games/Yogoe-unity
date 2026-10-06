@@ -19,7 +19,7 @@ namespace Yoegoe.Tests.EditMode
 
             Assert.AreNotSame(src, copy);
             Assert.AreEqual(PropResourceType.Water, copy.resourceType);
-            Assert.AreEqual(6, copy.baseCapacity);
+            Assert.AreEqual(15, copy.baseCapacity); // v1.2 보관 15
             Assert.AreEqual(PropResourceType.Merit, src.resourceType);
             Assert.AreEqual("옛 이름", src.displayName);
             Object.DestroyImmediate(copy);
