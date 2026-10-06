@@ -1,5 +1,5 @@
 /**
- * 윷 말풍선 JSON → 시트 쓰기용 Apps Script.
+ * 한폭요괴 기획 시트용 Apps Script — 시트 쓰기(개발 도구 npm run *:push) + 「한폭요괴」 메뉴(게임에 반영).
  *
  * 설치 (한 번) — 반드시 해당 스프레드시트에서:
  * 1) https://docs.google.com/spreadsheets/d/1d3c7nN8cZjKQUBBetL5B7q6U2hwUBRvwWtL5ys4nrRs
@@ -33,13 +33,11 @@ var DEPLOY_WORKFLOW = 'sheets-deploy.yml';
 var SPREADSHEET_ID = '1d3c7nN8cZjKQUBBetL5B7q6U2hwUBRvwWtL5ys4nrRs';
 
 function onOpen() {
-  const ui = SpreadsheetApp.getUi();
-  ui.createMenu('한폭요괴')
+  SpreadsheetApp.getUi().createMenu('한폭요괴')
     .addItem('게임에 반영 (검사 → 배포, 약 12분)', 'requestDeploy')
     .addItem('반영 기록 보기', 'showDeployStatus')
-    .addToUi();
-  ui.createMenu('Yut Bubbles')
-    .addItem('쓰기 엔드포인트 안내', 'showWriteHelp')
+    .addSeparator()
+    .addItem('(개발) 쓰기 엔드포인트 안내', 'showWriteHelp')
     .addToUi();
 }
 
