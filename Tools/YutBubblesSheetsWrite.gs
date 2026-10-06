@@ -15,15 +15,89 @@
  * 7) 코드를 고친 뒤에는 배포 관리 → 연필 → 버전: 새 버전 → 배포
  *
  * 로컬: npm run yut-bubbles:push
+ *
+ * ── 「한폭요괴 → 게임에 반영」 메뉴 (기획자가 시트에서 바로 배포) ──
+ * 설치 (한 번):
+ * a) GitHub → Settings → Developer settings → Fine-grained personal access token → Generate
+ *    - Repository access: Only select repositories → sapsar-games/Yogoe-unity
+ *    - Permissions → Repository → Actions: Read and write (다른 권한은 필요 없음)
+ * b) Apps Script → 프로젝트 설정(⚙) → 스크립트 속성 → 속성 추가
+ *    - 이름: GITHUB_TOKEN   값: a) 의 토큰
+ * c) 저장 후 시트를 새로고침하면 메뉴 「한폭요괴」가 생긴다. 처음 누를 때 권한 승인.
+ * 누르면 GitHub Actions 'Sheets → Deploy' 가 시트 검사 → 커밋 → 빌드 → 배포하고, deploy_status 탭에 결과를 적는다.
  */
+
+var GITHUB_REPO = 'sapsar-games/Yogoe-unity';
+var DEPLOY_WORKFLOW = 'sheets-deploy.yml';
 
 var SPREADSHEET_ID = '1d3c7nN8cZjKQUBBetL5B7q6U2hwUBRvwWtL5ys4nrRs';
 
 function onOpen() {
-  SpreadsheetApp.getUi()
-    .createMenu('Yut Bubbles')
+  const ui = SpreadsheetApp.getUi();
+  ui.createMenu('한폭요괴')
+    .addItem('게임에 반영 (검사 → 배포, 약 12분)', 'requestDeploy')
+    .addItem('반영 기록 보기', 'showDeployStatus')
+    .addToUi();
+  ui.createMenu('Yut Bubbles')
     .addItem('쓰기 엔드포인트 안내', 'showWriteHelp')
     .addToUi();
+}
+
+/** 메뉴: GitHub Actions 'Sheets → Deploy' 실행 요청. */
+function requestDeploy() {
+  const ui = SpreadsheetApp.getUi();
+  const token = PropertiesService.getScriptProperties().getProperty('GITHUB_TOKEN');
+  if (!token) {
+    ui.alert('스크립트 속성 GITHUB_TOKEN 이 없습니다.\n개발자에게 설치를 부탁하세요 (Tools/YutBubblesSheetsWrite.gs 맨 위 안내).');
+    return;
+  }
+  const ok = ui.alert('게임에 반영할까요?',
+    '시트 전체를 검사해서 문제없는 탭을 게임에 반영하고 배포해요.\n약 12분 뒤 deploy_status 탭에 \'배포 완료\'가 떠요.',
+    ui.ButtonSet.OK_CANCEL);
+  if (ok !== ui.Button.OK) return;
+
+  var who = '';
+  try { who = Session.getActiveUser().getEmail().split('@')[0]; } catch (e) {}
+  const res = UrlFetchApp.fetch(
+    'https://api.github.com/repos/' + GITHUB_REPO + '/actions/workflows/' + DEPLOY_WORKFLOW + '/dispatches', {
+      method: 'post',
+      contentType: 'application/json',
+      headers: { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json' },
+      payload: JSON.stringify({ ref: 'main', inputs: { requester: who } }),
+      muteHttpExceptions: true,
+    });
+  if (res.getResponseCode() === 204) {
+    writeDeployStatus_('요청됨', '시트 검사를 시작해요' + (who ? ' (' + who + ')' : ''),
+      'https://github.com/' + GITHUB_REPO + '/actions/workflows/' + DEPLOY_WORKFLOW);
+    SpreadsheetApp.getActive().toast('요청했어요. deploy_status 탭에서 진행을 볼 수 있어요.', '게임에 반영', 8);
+  } else {
+    ui.alert('요청 실패 (' + res.getResponseCode() + ')\n' + res.getContentText().slice(0, 300) +
+      '\n\n토큰이 만료됐거나 권한(Actions: Read and write)이 없을 수 있어요.');
+  }
+}
+
+/** 메뉴: deploy_status 탭으로 이동. */
+function showDeployStatus() {
+  const sheet = SpreadsheetApp.getActive().getSheetByName('deploy_status');
+  if (!sheet) { SpreadsheetApp.getUi().alert('아직 반영 기록이 없어요.'); return; }
+  SpreadsheetApp.getActive().setActiveSheet(sheet);
+}
+
+/** deploy_status 탭 기록 줄 바로 위(헤더 아래)에 한 줄 끼워 넣기 — 형식은 Tools/report_deploy_status.py 와 같다. */
+function writeDeployStatus_(result, detail, link) {
+  const ss = SpreadsheetApp.getActive();
+  var sheet = ss.getSheetByName('deploy_status');
+  if (!sheet) {
+    sheet = ss.insertSheet('deploy_status');
+    sheet.getRange(1, 1, 1, 4).setValues([['time', 'result', 'detail', 'link']]);
+  }
+  // 헤더 줄 찾기 (1행 ※설명이 있을 수 있음)
+  const firstCol = sheet.getRange(1, 1, Math.min(3, sheet.getLastRow() || 1), 1).getValues();
+  var headerRow = 1;
+  for (var i = 0; i < firstCol.length; i++) { if (String(firstCol[i][0]) === 'time') { headerRow = i + 1; break; } }
+  sheet.insertRowAfter(headerRow);
+  const now = Utilities.formatDate(new Date(), 'Asia/Seoul', 'MM-dd HH:mm');
+  sheet.getRange(headerRow + 1, 1, 1, 4).setValues([[now, result, detail, link]]);
 }
 
 function showWriteHelp() {
