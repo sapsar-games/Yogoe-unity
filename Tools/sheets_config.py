@@ -10,7 +10,7 @@ from __future__ import annotations
 # 대사·텍스트 시트에 있는 탭
 DIALOGUE_TABS = {
     "characters", "character_lines",
-    "yut_bubbles", "yut_fortune", "OPENING", "okto",
+    "yut_bubbles", "yut_fortune", "OPENING", "okto", "spirit_lines",
 }
 
 

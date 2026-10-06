@@ -49,6 +49,18 @@
       "value": 2.0
     },
     {
+      "key": "spiritIntervalMinutes",
+      "value": 20.0
+    },
+    {
+      "key": "spiritQueueMax",
+      "value": 5.0
+    },
+    {
+      "key": "spiritStayMinutes",
+      "value": 180.0
+    },
+    {
       "key": "cookBaseSeconds",
       "value": 15.0
     },

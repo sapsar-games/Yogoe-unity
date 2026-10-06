@@ -341,6 +341,7 @@ namespace Yoegoe.Economy
             }
 
             SeedStartingMaterials(Yoegoe.Data.GameSettings.StartMaterialEach);
+            SpiritPier.Reset(TrustedTime.UtcNow);
             CharmCounts.Clear();
             OnCharmsChanged?.Invoke();
 

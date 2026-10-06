@@ -30,6 +30,8 @@
     "settings": "python3 Tools/export_settings.py",
     "settings:csv": "python3 Tools/export_settings.py --csv",
     "settings:push": "python3 Tools/export_settings.py --push",
+    "spirits": "python3 Tools/export_spirits.py",
+    "spirits:push": "python3 Tools/export_spirits.py --push",
     "sheets": "python3 Tools/pull_all_sheets.py",
     "sheets:describe": "python3 Tools/sheet_descriptions.py --apply"
   }

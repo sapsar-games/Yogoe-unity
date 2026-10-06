@@ -23,6 +23,9 @@ namespace Yoegoe.Save
         /// <summary>진행 중이던 윷놀이 매치(있을 때만). null이면 매치 없음 — 앱을 껐다 켜거나
         /// 나갔다 들어와도 보드 상태(말 위치·완주 여부)를 그대로 이어간다.</summary>
         public YutMatchSave yutMatch;
+
+        /// <summary>나루터 혼령 줄 · 기억 조각 (v2). 없던 세이브는 빈 줄에서 지금부터 시작.</summary>
+        public Yoegoe.Economy.SpiritPier.PierSave pier;
     }
 
     [Serializable]

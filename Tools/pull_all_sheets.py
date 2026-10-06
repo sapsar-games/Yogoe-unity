@@ -26,6 +26,7 @@ STEPS = [
     ("yut_bubbles · 윷 말풍선", ["Tools/export_yut_bubbles.py"]),
     ("charms · 완주 부적 확률", ["Tools/export_charms.py"]),
     ("game_settings · 전역 수치", ["Tools/export_settings.py"]),
+    ("spirit_lines · 나루터 혼령 대사", ["Tools/export_spirits.py"]),
 ]
 
 

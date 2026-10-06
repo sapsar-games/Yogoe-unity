@@ -1,0 +1,64 @@
+{
+  "lines": [
+    {
+      "kind": "woman",
+      "type": "ask",
+      "text": "‘{dish}’ 주세요."
+    },
+    {
+      "kind": "woman",
+      "type": "thanks",
+      "text": "고마워요."
+    },
+    {
+      "kind": "woman",
+      "type": "bye",
+      "text": "…배가 떠나네요."
+    },
+    {
+      "kind": "man",
+      "type": "ask",
+      "text": "‘{dish}’ 주시오."
+    },
+    {
+      "kind": "man",
+      "type": "thanks",
+      "text": "고맙소."
+    },
+    {
+      "kind": "man",
+      "type": "bye",
+      "text": "…배가 떠나는구려."
+    },
+    {
+      "kind": "elder",
+      "type": "ask",
+      "text": "‘{dish}’ 한 그릇 주게."
+    },
+    {
+      "kind": "elder",
+      "type": "thanks",
+      "text": "고맙네."
+    },
+    {
+      "kind": "elder",
+      "type": "bye",
+      "text": "…배가 떠나는군."
+    },
+    {
+      "kind": "child",
+      "type": "ask",
+      "text": "‘{dish}’ 줘!"
+    },
+    {
+      "kind": "child",
+      "type": "thanks",
+      "text": "고마워!"
+    },
+    {
+      "kind": "child",
+      "type": "bye",
+      "text": "배 간다…"
+    }
+  ]
+}

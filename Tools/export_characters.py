@@ -215,6 +215,7 @@ NOTE_KEYS: dict[str, list[str]] = {
     "destinations": ["id"],
     "charms": ["id"],
     "game_settings": ["key"],
+    "spirit_lines": ["kind", "type", "text_ko"],
     "ingredients": ["id"],
     "attendance": ["day"],
     "yut_fortune": ["gua"],

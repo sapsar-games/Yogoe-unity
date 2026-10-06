@@ -148,6 +148,7 @@ namespace Yoegoe.Save
             if (YutScreen.Instance != null)
                 data.yutMatch = YutScreen.Instance.CaptureForSave();
 
+            data.pier = SpiritPier.CaptureToSave();
             return data;
         }
 
@@ -157,6 +158,8 @@ namespace Yoegoe.Save
 
             // Economy — StartingState를 덮어쓴다
             ApplyEconomy(data.economy);
+            // 나루터 — 오프라인 동안 온 혼령은 AppSession.Tick 의 SpiritPier.Advance 가 따라잡는다
+            SpiritPier.ResetFromSave(data.pier, TrustedTime.UtcNow);
 
             // Props — 점유 초기화 후 더미·레벨 반영
             var props = UnityEngine.Object.FindObjectsByType<PropSlot>(FindObjectsSortMode.None);

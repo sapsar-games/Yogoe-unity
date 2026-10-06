@@ -29,6 +29,9 @@ namespace Yoegoe.Data
             { "guestCoolIntimacyMul", 1f },
             { "spiritPiecesFood", 1f },
             { "spiritPiecesOffering", 2f },
+            { "spiritIntervalMinutes", 20f },
+            { "spiritQueueMax", 5f },
+            { "spiritStayMinutes", 180f },
             { "cookBaseSeconds", 15f },
             { "cookAdExtendSeconds", 15f },
             { "cookFoodSeconds", 1.5f },
@@ -82,6 +85,12 @@ namespace Yoegoe.Data
         public static float GuestCoolIntimacyMul => Get("guestCoolIntimacyMul");
         public static int SpiritPiecesFood => Int("spiritPiecesFood");
         public static int SpiritPiecesOffering => Int("spiritPiecesOffering");
+        /// <summary>나루터 · 혼령이 오는 간격(분).</summary>
+        public static float SpiritIntervalMinutes => Get("spiritIntervalMinutes");
+        /// <summary>나루터 · 줄 최대 인원.</summary>
+        public static int SpiritQueueMax => Mathf.Max(1, Int("spiritQueueMax"));
+        /// <summary>나루터 · 혼령이 기다리는 시간(분).</summary>
+        public static float SpiritStayMinutes => Get("spiritStayMinutes");
 
         // 요리판
         public static float CookBaseSeconds => Get("cookBaseSeconds");
