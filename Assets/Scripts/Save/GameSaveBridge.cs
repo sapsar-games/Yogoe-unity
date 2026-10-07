@@ -21,10 +21,38 @@ namespace Yoegoe.Save
         /// 없으면 false (기존 StartingState 유지).
         /// </summary>
         /// <param name="bubbleFont">세이브에만 있어 새로 스폰하는 요괴(고라니·구미호)의 말풍선 폰트 — 없으면 한글이 깨진다.</param>
+        /// <summary>
+        /// 세이브가 있었는데 불러오다 실패했으면 true — 새 게임 상태로 진짜 세이브를 덮어쓰지 않게 저장을 막는다.
+        /// </summary>
+        public static bool SaveBlockedByLoadFailure { get; private set; }
+
         public static bool TryLoadSimulateAndApply(Font bubbleFont = null)
         {
             if (!GameSaveService.TryLoad(out var data)) return false;
+            try
+            {
+                LoadAndApply(data, bubbleFont);
+                GameSaveService.RecordLoadStatus("ok v" + data.version);
+                return true;
+            }
+            catch (System.Exception e)
+            {
+                SaveBlockedByLoadFailure = true;
+                GameSaveService.RecordLoadStatus("error: " + e.GetType().Name + ": " + e.Message + " @ " + FirstFrame(e.StackTrace));
+                Debug.LogError("[GameSaveBridge] 세이브 불러오기 실패 — 덮어쓰지 않도록 저장을 막습니다.\n" + e);
+                return false;
+            }
+        }
 
+        static string FirstFrame(string stack)
+        {
+            if (string.IsNullOrEmpty(stack)) return "";
+            var lines = stack.Split('\n');
+            return lines.Length > 0 ? lines[0].Trim() : "";
+        }
+
+        static void LoadAndApply(GameSaveData data, Font bubbleFont)
+        {
             GameSaveMigration.MigrateToCurrent(data);
 
             var sim = OfflineSimulator.Simulate(data, TrustedTime.UtcNow);
@@ -37,7 +65,6 @@ namespace Yoegoe.Save
             ApplyToWorld(data, bubbleFont);
             // 공덕 더미는 기물에 남겨 두고 버드나무에서 수거한다 (7-4). 예전의 콜드스타트 일괄 스윕은 폐지.
             RefreshAllPropPileLabels();
-            return true;
         }
 
         /// <summary>기물 더미 표시를 즉시 맞춘다 (일괄 수거·로드 직후).</summary>
@@ -58,6 +85,7 @@ namespace Yoegoe.Save
             SaveRequested = false;
             // Play 중이 아니거나 Economy 부팅 전이면 OnApplicationQuit 등에서 NRE 남
             if (GameEconomy.Instance == null) return;
+            if (SaveBlockedByLoadFailure) return; // 불러오기 실패 — 진짜 세이브를 새 게임으로 덮어쓰지 않는다
             var data = CaptureFromWorld();
             GameSaveService.Save(data);
         }

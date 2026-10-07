@@ -39,13 +39,32 @@ namespace Yoegoe.Save
 #endif
         }
 
+        /// <summary>마지막 불러오기 결과 — 진단용 (PlayerPrefs "Yoegoe.LoadStatus"). nokey · parsefail · ok · error: …</summary>
+        public const string LoadStatusKey = "Yoegoe.LoadStatus";
+        /// <summary>불러오기 직전 원본 세이브 백업 (불러오다 실패해도 되살릴 수 있게).</summary>
+        public const string BackupKey = "Yoegoe.GameSave.backup";
+
+        public static void RecordLoadStatus(string status)
+        {
+            try
+            {
+                PlayerPrefs.SetString(LoadStatusKey, System.DateTime.UtcNow.ToString("u") + " " + status);
+                PlayerPrefs.Save();
+            }
+            catch { /* 진단 실패는 무시 */ }
+            Debug.Log("[GameSaveService] 불러오기: " + status);
+        }
+
         public static bool TryLoad(out GameSaveData data)
         {
             data = null;
 
 #if UNITY_WEBGL && !UNITY_EDITOR
-            if (!PlayerPrefs.HasKey(PrefsKey)) return false;
-            return TryParse(PlayerPrefs.GetString(PrefsKey), out data);
+            if (!PlayerPrefs.HasKey(PrefsKey)) { RecordLoadStatus("nokey"); return false; }
+            string raw = PlayerPrefs.GetString(PrefsKey);
+            PlayerPrefs.SetString(BackupKey, raw);
+            if (!TryParse(raw, out data)) { RecordLoadStatus("parsefail len=" + (raw?.Length ?? 0)); return false; }
+            return true;
 #else
             // 파일·Prefs 둘 다 있으면 savedAtUtcTicks가 더 최신인 쪽을 쓴다.
             // (예전엔 파일만 있으면 Prefs를 무시해서, 파일만 낡은 출석 키(0)일 때 재수령되던 구멍)
