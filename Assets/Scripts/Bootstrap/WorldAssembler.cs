@@ -110,6 +110,10 @@ namespace Yoegoe.Bootstrap
         {
             if (PropManager.Instance != null) return;
             if (Object.FindAnyObjectByType<PropManager>(FindObjectsInactive.Include) != null) return;
+            Debug.LogWarning(
+                "[WorldAssembler] 씬에 PropManager Prefab 인스턴스 없음 — 런타임 폴백 생성. " +
+                "메뉴 Yoegoe/Bake Bootstrap Prefabs (Main · PropManager) 또는 " +
+                "Yoegoe/Place Map & Props In Main Scene 을 실행하세요.");
             var go = new GameObject("PropManager");
             go.AddComponent<PropManager>();
         }

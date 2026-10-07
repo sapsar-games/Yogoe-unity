@@ -1,9 +1,8 @@
 {
-    "name": "Yoegoe.Characters.Editor",
-    "rootNamespace": "Yoegoe.Characters.EditorTools",
+    "name": "Yoegoe.Bootstrap.Editor",
+    "rootNamespace": "Yoegoe.Bootstrap.EditorTools",
     "references": [
-        "Yoegoe.Runtime",
-        "Yoegoe.Bootstrap.Editor"
+        "Yoegoe.Runtime"
     ],
     "includePlatforms": [
         "Editor"

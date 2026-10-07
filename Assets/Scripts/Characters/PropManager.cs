@@ -3,7 +3,10 @@ using UnityEngine;
 
 namespace Yoegoe.Characters
 {
-    /// <summary>씬 안의 모든 PropSlot을 등록해두고, 걷기 목적지 후보를 골라주는 매니저.</summary>
+    /// <summary>
+    /// 씬 안의 모든 PropSlot을 등록해두고, 걷기 목적지 후보를 골라주는 매니저.
+    /// Prefab: Assets/Prefabs/Bootstrap/PropManager.prefab
+    /// </summary>
     public class PropManager : MonoBehaviour
     {
         public static PropManager Instance { get; private set; }

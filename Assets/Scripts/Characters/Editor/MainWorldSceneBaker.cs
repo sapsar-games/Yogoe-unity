@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using Yoegoe.Bootstrap;
+using Yoegoe.Bootstrap.EditorTools;
 using Yoegoe.Data;
 
 namespace Yoegoe.Characters.EditorTools
@@ -13,7 +14,7 @@ namespace Yoegoe.Characters.EditorTools
     /// </summary>
     public static class MainWorldSceneBaker
     {
-        const string MainScenePath = "Assets/Scenes/Main.unity";
+        const string MainScenePath = BootstrapPrefabBaker.MainScenePath;
         const string MapFolder = "Assets/Prefabs/Map";
         const string PropsFolder = PropPrefabBaker.PrefabFolder;
         const string LayoutPath = "Assets/Resources/PropLayoutSettings.asset";
@@ -60,9 +61,17 @@ namespace Yoegoe.Characters.EditorTools
         static void EnsurePropManager()
         {
             if (Object.FindAnyObjectByType<PropManager>(FindObjectsInactive.Include) != null) return;
-            var go = new GameObject("PropManager");
-            go.AddComponent<PropManager>();
-            Undo.RegisterCreatedObjectUndo(go, "Create PropManager");
+
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(BootstrapPrefabBaker.PropManagerPrefabPath);
+            GameObject go;
+            if (prefab != null)
+                go = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+            else
+            {
+                go = new GameObject("PropManager");
+                go.AddComponent<PropManager>();
+            }
+            Undo.RegisterCreatedObjectUndo(go, "Place PropManager Prefab");
         }
 
         static void EnsureMapBackgrounds(Yoegoe.Main main, ArtScaleSettings scale, float mapScale)
