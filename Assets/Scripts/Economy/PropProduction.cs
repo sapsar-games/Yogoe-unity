@@ -103,7 +103,7 @@ namespace Yoegoe.Economy
 
         /// <summary>
         /// 앉은 요괴가 dt초 머무는 동안의 생산. 반환 = 실제로 일한 초(이만큼만 기력이 닳는다, 만창이면 0).
-        /// meritAdded = 공덕 더미에 더할 양. 활터·약초밭은 뽑힌 드롭 코드를 onDrop으로 넘긴다.
+        /// meritAdded = 공덕 더미에 더할 양. 사냥·채집 목적지는 뽑힌 드롭 코드를 onDrop으로 넘긴다.
         /// </summary>
         public static float Produce(in Config c, int level, float intimacy, bool ownerOnEndingProp,
             double pendingMerit, ref PropStorage.State storage, float dt,

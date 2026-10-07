@@ -147,7 +147,7 @@ namespace Yoegoe.Save
         public float cycleProgressSeconds;
         /// <summary>이번 만창 사이클 오버플로우 판정 완료(=정지) 여부.</summary>
         public bool overflowJudged;
-        /// <summary>활터·약초밭 보관 재료 (CookingIngredientId 정수, 1개당 1칸).</summary>
+        /// <summary>사냥·채집 목적지 보관 재료 (CookingIngredientId 정수, 1개당 1칸).</summary>
         public int[] pendingIngredients = Array.Empty<int>();
         /// <summary>v1.3 사냥터·채집터에서 고른 목적지 id (비면 예전 표).</summary>
         public string destinationId = "";

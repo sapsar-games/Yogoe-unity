@@ -64,6 +64,10 @@ namespace Yoegoe.Data
 
         [Tooltip("공덕 보관량이 레벨마다 몇 배로 늘어나는지 (제단 1.1). 시트 props capacityGrowth 가 덮어쓴다.")]
         public double capacityGrowth = 1.0;
+
+        [Header("v1.3 목적지 (사냥·채집)")]
+        [Tooltip("비어 있지 않으면 이 기물의 목적지가 고정된다 (시트 destinations id). 보내기 창에서 목적지 선택 없음.")]
+        public string fixedDestinationId;
     }
 }
 

@@ -24,14 +24,21 @@ namespace Yoegoe.Characters
         /// <summary>건립 여부. prebuilt면 시작 true, 자물쇠는 구매 후 true.</summary>
         public bool IsBuilt { get; private set; }
 
-        /// <summary>v1.3 사냥터·채집터: 지금 보낸 목적지 id (시트 destinations). null 이면 예전 Hunt/Gather 표.</summary>
+        /// <summary>v1.3 사냥·채집 목적지 id (시트 destinations). 고정 기물이면 PropData.fixedDestinationId.</summary>
         public string DestinationId { get; set; }
 
         /// <summary>공덕을 이 기물을 눌러 바로 받는지 (v1.3 북제단·남제단). 아니면 버드나무로.</summary>
         public bool CollectsByTap => data != null && data.collectByTap;
 
-        /// <summary>목적지가 있는 기물(사냥터·채집터)인지.</summary>
+        /// <summary>목적지가 있는 기물(사냥·채집)인지.</summary>
         public bool HasDestinations => ResourceType == PropResourceType.Hunt || ResourceType == PropResourceType.Gather;
+
+        /// <summary>목적지가 PropData에 고정돼 있어 보내기 창에서 고를 필요가 없는지.</summary>
+        public bool HasFixedDestination =>
+            data != null && !string.IsNullOrEmpty(data.fixedDestinationId);
+
+        /// <summary>목적지 카드를 고르는 UI가 필요한지 (고정이면 false).</summary>
+        public bool NeedsDestinationPick => HasDestinations && !HasFixedDestination;
 
         /// <summary>지금 목적지의 입장 친밀도 (없으면 0).</summary>
         public float RequiredIntimacy => PropCatalog.FindDestination(DestinationId)?.minIntimacy ?? 0f;
@@ -47,7 +54,7 @@ namespace Yoegoe.Characters
         public bool HasPendingMerit => IsBuilt && PendingMerit.Mantissa != 0;
 
         PropStorage.State storage;
-        /// <summary>활터·약초밭: 보관 중인 재료(1개당 1칸, 뽑힌 순서).</summary>
+        /// <summary>사냥·채집 목적지: 보관 중인 재료(1개당 1칸, 뽑힌 순서).</summary>
         readonly List<int> pendingIngredients = new List<int>();
 
         /// <summary>생산 설정 — 시트(props.json) 우선, 없으면 PropData. 규칙은 <see cref="PropProduction"/>.</summary>
@@ -109,6 +116,14 @@ namespace Yoegoe.Characters
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
             meshRenderer = GetComponent<Renderer>();
+            ApplyFixedDestination();
+        }
+
+        /// <summary>PropData.fixedDestinationId 가 있으면 DestinationId 로 고정.</summary>
+        public void ApplyFixedDestination()
+        {
+            if (data != null && !string.IsNullOrEmpty(data.fixedDestinationId))
+                DestinationId = data.fixedDestinationId;
         }
 
         private void OnEnable() => PropManager.Instance?.Register(this);

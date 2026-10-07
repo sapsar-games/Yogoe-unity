@@ -5,7 +5,7 @@ namespace Yoegoe.Economy
 {
     /// <summary>
     /// "요리재료 랜덤 N개" 추첨 — 선물꾸러미·윷판 재료보따리 공용 (기획 10-3 · 11장).
-    /// 한 개마다 채집(약초밭)/사냥(활터)을 50%씩 고른 뒤 7-3 확률표(시트 prop_drop_tables)를 적용한다.
+    /// 한 개마다 채집/사냥을 50%씩 고른 뒤 7-3 확률표(시트 prop_drop_tables)를 적용한다.
     /// 황금쌀·황금꿀은 요리재료가 아니라 제외.
     /// </summary>
     public static class IngredientDraw

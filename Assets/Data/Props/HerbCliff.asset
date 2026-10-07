@@ -10,12 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c48ac105ccb6741d59f151fd9c1d1d61, type: 3}
-  m_Name: ThatchedHut
+  m_Name: HerbCliff
   m_EditorClassIdentifier: 
-  propId: 약초밭
-  displayName: 약초밭
+  propId: 절벽의 약초골
+  displayName: 절벽의 약초골
   icon: {fileID: 21300000, guid: 50029804a430456a9961ca2743ee1643, type: 3}
+  resourceType: 5
   baseProductionPerMinute: 0
+  levelGrowth: 1
+  meritCapacityMinutes: 30
+  intimacyBonus: 0
+  ownerMultiplier: 1
+  cycleMinutes: 15
+  baseCapacity: 15
+  upgradable: 1
   upgradeBaseCost: 500
   upgradeCostMultiplier: 1.15
   isPrebuilt: 0
@@ -23,3 +31,8 @@ MonoBehaviour:
   owner: 0
   hasUniqueEndingAnimation: 0
   occupiedByOwnerSprite: {fileID: 0}
+  opensGongyanggan: 0
+  opensPier: 0
+  collectByTap: 0
+  capacityGrowth: 1
+  fixedDestinationId: HerbCliff

@@ -65,10 +65,13 @@ namespace Yoegoe.UI
             if (target == null || !target.IsBuilt || !target.AcceptsWorkers) return;
             EnsureBuilt();
             prop = target;
+            prop.ApplyFixedDestination();
             var dests = PropCatalog.DestinationsFor(prop.ResourceType);
             selectedDest = prop.DestinationId;
-            if (prop.HasDestinations && (selectedDest == null || PropCatalog.FindDestination(selectedDest) == null))
+            if (prop.NeedsDestinationPick && (selectedDest == null || PropCatalog.FindDestination(selectedDest) == null))
                 selectedDest = dests.Count > 0 ? dests[0].id : null;
+            else if (prop.HasFixedDestination)
+                selectedDest = prop.DestinationId;
             selectedAgent = preselect;
             refusing = null;
             root.SetActive(true);
@@ -212,7 +215,7 @@ namespace Yoegoe.UI
         {
             float y = 470f;
             var dests = PropCatalog.DestinationsFor(prop.ResourceType);
-            if (prop.HasDestinations && dests.Count > 0)
+            if (prop.NeedsDestinationPick && dests.Count > 0)
             {
                 Label("어디로 보낼까요?  목적지마다 나오는 재료가 달라요", new Vector2(0, y), 26, DimText);
                 y -= 150f;
@@ -228,6 +231,14 @@ namespace Yoegoe.UI
                     if (d.goldenChance > 0f) TextIn(card, $"황금 {d.goldenChance:0.#}%", new Vector2(0, -92), 22, Gold, FontStyle.Bold);
                 }
                 y -= 160f;
+            }
+            else if (prop.HasFixedDestination && Dest != null)
+            {
+                Label($"{Dest.name} · " + (Dest.minIntimacy > 0 ? $"♥ 친밀도 {Dest.minIntimacy:0} 이상" : "누구나"),
+                    new Vector2(0, y), 26, DimText);
+                y -= 50f;
+                Label(DropLine(Dest.id), new Vector2(0, y), 22, TextColor, new Vector2(860, 50));
+                y -= 70f;
             }
 
             Label("누구를 보낼까요?  보관함이 차면 빈 옹달샘·제단으로 옮겨 가요", new Vector2(0, y), 26, DimText);

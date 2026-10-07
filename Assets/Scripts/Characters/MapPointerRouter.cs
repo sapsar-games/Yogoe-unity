@@ -444,9 +444,9 @@ namespace Yoegoe.Characters
             {
                 CancelPendingMonologueTap();
                 var prop = FindDropProp(dragCharacter, screenPos);
-                // 사냥터·채집터는 목적지를 골라야 해서 바로 앉히지 않고 기물 창(그 요괴를 미리 골라 둠) (v1.3)
+                // 목적지 선택이 필요한 사냥·채집만 기물 창(요괴 미리 선택). 고정 목적지는 바로 착석.
                 var dropTarget = prop != null ? prop : FindAnyDestinationPropAt(dragCharacter, screenPos);
-                if (dropTarget != null && dropTarget.HasDestinations && !dropTarget.IsOccupied)
+                if (dropTarget != null && dropTarget.NeedsDestinationPick && !dropTarget.IsOccupied)
                 {
                     var who = dragCharacter;
                     who.EndPlayerDrag(null, showFloorMark: false);

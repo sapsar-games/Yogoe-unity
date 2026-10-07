@@ -35,8 +35,20 @@ namespace Yoegoe.Tests.EditMode
         [Test]
         public void SaveKeepsDestination()
         {
-            var json = JsonUtility.ToJson(new PropSave { propId = "활터", destinationId = "BeeForest" });
+            var json = JsonUtility.ToJson(new PropSave { propId = "꿀벌의 숲", destinationId = "BeeForest" });
             Assert.AreEqual("BeeForest", JsonUtility.FromJson<PropSave>(json).destinationId);
+        }
+
+        [Test]
+        public void Catalog_HasSixDestinationProps_NotLegacyHubs()
+        {
+            Assert.IsFalse(PropCatalog.TryGet("활터", out _));
+            Assert.IsFalse(PropCatalog.TryGet("약초밭", out _));
+            Assert.IsTrue(PropCatalog.TryGet("멧돼지 앞산", out var boar));
+            Assert.AreEqual(PropResourceType.Hunt, boar.ResourceType);
+            Assert.IsTrue(PropCatalog.TryGet("첫걸음 들판", out var field));
+            Assert.AreEqual(PropResourceType.Gather, field.ResourceType);
+            Assert.AreEqual(15, boar.baseCapacity);
         }
     }
 }

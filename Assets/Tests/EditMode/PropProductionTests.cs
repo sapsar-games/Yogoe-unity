@@ -71,7 +71,7 @@ namespace Yoegoe.Tests.EditMode
         [Test]
         public void LevelUpRaisingCapacity_KeepsOverflowItems_AndReinterprets()
         {
-            // 활터 Lv9 오버플로우 10/9 → Lv10 기본 보관 10 → 10/10 (삭제 없음, 계속 정지)
+            // 사냥 목적지 Lv9 오버플로우 10/9 → Lv10 기본 보관 10 → 10/10 (삭제 없음, 계속 정지)
             var s = new PropStorage.State { Stored = 10, OverflowJudged = true };
             Assert.IsTrue(PropStorage.IsHalted(s, PropStorage.Capacity(9, 10)));
             Assert.AreEqual(10, s.Stored);

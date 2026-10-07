@@ -325,6 +325,7 @@ namespace Yoegoe.Bootstrap
             if (slot == null) return;
             if (slot.data != null)
                 slot.data = PropCatalog.RuntimeCopy(slot.data); // 시트 값은 사본에만
+            slot.ApplyFixedDestination();
 
             var sr = slot.GetComponent<SpriteRenderer>();
             if (sr != null)

@@ -16,12 +16,6 @@ MonoBehaviour:
   - data: {fileID: 11400000, guid: 02407d71c6ce4774aa1aa398a85f0696, type: 2}
     prefab: {fileID: 100004, guid: 6463814ef9575c3e84c40d7dcf7d8703, type: 3}
     position: {x: -2.1, y: 1.2, z: 0}
-  - data: {fileID: 11400000, guid: 5fa8a72554e9464baef4062c05ea1522, type: 2}
-    prefab: {fileID: 100004, guid: 50d2e2451d90517aa3d3c5a0ef00d6c2, type: 3}
-    position: {x: -0.6, y: -0.2, z: 0}
-  - data: {fileID: 11400000, guid: ba9161d81ea341fe971bc0440876feed, type: 2}
-    prefab: {fileID: 100004, guid: b5dbf5616ebc5b59b80f7909553bd701, type: 3}
-    position: {x: 2, y: 0.8, z: 0}
   - data: {fileID: 11400000, guid: 347b96b5781f468e8e9593fe9d8032f6, type: 2}
     prefab: {fileID: 100004, guid: 8dd64d38927e58d7bc8ca89eea06c4a2, type: 3}
     position: {x: 1.6, y: -1.4, z: 0}
@@ -43,4 +37,22 @@ MonoBehaviour:
   - data: {fileID: 11400000, guid: f1c8e5a63d21720e3a5b6c7d8e9f0a1b, type: 2}
     prefab: {fileID: 100004, guid: e0b7d4f52c10619d2f4a5b6c7d8e9f0a, type: 3}
     position: {x: 0.15, y: -1.95, z: 0}
+  - data: {fileID: 11400000, guid: a1b2c3d4e5f64001a2b3c4d5e6f70001, type: 2}
+    prefab: {fileID: 100004, guid: b1b2c3d4e5f64001a2b3c4d5e6f70001, type: 3}
+    position: {x: -1.5, y: 2.0, z: 0}
+  - data: {fileID: 11400000, guid: a1b2c3d4e5f64001a2b3c4d5e6f70002, type: 2}
+    prefab: {fileID: 100004, guid: b1b2c3d4e5f64001a2b3c4d5e6f70002, type: 3}
+    position: {x: -1.8, y: 0.4, z: 0}
+  - data: {fileID: 11400000, guid: a1b2c3d4e5f64001a2b3c4d5e6f70003, type: 2}
+    prefab: {fileID: 100004, guid: b1b2c3d4e5f64001a2b3c4d5e6f70003, type: 3}
+    position: {x: 2.0, y: -4.0, z: 0}
+  - data: {fileID: 11400000, guid: a1b2c3d4e5f64001a2b3c4d5e6f70004, type: 2}
+    prefab: {fileID: 100004, guid: b1b2c3d4e5f64001a2b3c4d5e6f70004, type: 3}
+    position: {x: 2.0, y: 0.5, z: 0}
+  - data: {fileID: 11400000, guid: a1b2c3d4e5f64001a2b3c4d5e6f70005, type: 2}
+    prefab: {fileID: 100004, guid: b1b2c3d4e5f64001a2b3c4d5e6f70005, type: 3}
+    position: {x: 1.8, y: -1.0, z: 0}
+  - data: {fileID: 11400000, guid: a1b2c3d4e5f64001a2b3c4d5e6f70006, type: 2}
+    prefab: {fileID: 100004, guid: b1b2c3d4e5f64001a2b3c4d5e6f70006, type: 3}
+    position: {x: 0.2, y: 2.5, z: 0}
   willowPosition: {x: 0, y: -0.35, z: 0}

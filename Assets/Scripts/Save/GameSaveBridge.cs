@@ -208,6 +208,8 @@ namespace Yoegoe.Save
                         p.SetPendingMeritFromSave(ps.pendingMerit.ToBigNumber());
                         p.RestoreStorage(ps.storedResources, ps.cycleProgressSeconds, ps.overflowJudged, ps.pendingIngredients);
                         p.DestinationId = string.IsNullOrEmpty(ps.destinationId) ? null : ps.destinationId;
+                        if (string.IsNullOrEmpty(p.DestinationId))
+                            p.ApplyFixedDestination();
                         break;
                     }
                 }

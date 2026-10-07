@@ -246,7 +246,7 @@ namespace Yoegoe.Data
             if (e.upgradeCostMultiplier > 0) data.upgradeCostMultiplier = e.upgradeCostMultiplier;
         }
 
-        /// <summary>활터(Hunt)·약초밭(Gather) 1개 뽑기 (시트 prop_drop_tables 가중치). 반환 = 드롭 코드.
+        /// <summary>사냥(Hunt)·채집(Gather) 1개 뽑기 (시트 prop_drop_tables 가중치). 반환 = 드롭 코드.
         /// includeSpecial=false면 황금쌀·황금꿀을 빼고 나머지 가중치로 뽑는다(요리재료만).</summary>
         public static int RollDrop(PropResourceType table, float random01, bool includeSpecial = true)
         {
