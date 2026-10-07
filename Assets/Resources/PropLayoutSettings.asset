@@ -36,5 +36,5 @@ MonoBehaviour:
     position: {x: -2.0, y: -3.3, z: 0}
   - data: {fileID: 11400000, guid: aad88d1e579a428186decdb6e394b558, type: 2}
     prefab: {fileID: 100004, guid: fac8b362c8fc436080483e8fb3a41299, type: 3}
-    position: {x: 0.6, y: -6.4, z: 0}
+    position: {x: -2.67, y: -4.83, z: 0}
   willowPosition: {x: 0, y: -0.35, z: 0}
