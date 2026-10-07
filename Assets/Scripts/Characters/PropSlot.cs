@@ -110,7 +110,6 @@ namespace Yoegoe.Characters
 
         private void OnEnable() => PropManager.Instance?.Register(this);
         private void OnDisable() => PropManager.Instance?.Unregister(this);
-        private void OnDestroy() => DestroyLevelTag();
 
         private void LateUpdate()
         {
@@ -272,6 +271,7 @@ namespace Yoegoe.Characters
                 Destroy(pileLabel.gameObject);
                 pileLabel = null;
             }
+            DestroyLevelTag();
         }
 
 #if UNITY_EDITOR
