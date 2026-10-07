@@ -28,4 +28,10 @@ MonoBehaviour:
   - data: {fileID: 11400000, guid: f0c8b64ef3024908823f6d370c0933e6, type: 2}
     prefab: {fileID: 100004, guid: e3b48ae6705859bcb3a65c7da9ee1796, type: 3}
     position: {x: 0.5, y: 1.35, z: 0}
+  - data: {fileID: 11400000, guid: cf462cd41b984f549d7855b6ad17835d, type: 2}
+    prefab: {fileID: 100004, guid: 18d1f079baa94615afaac6c4b28e7a53, type: 3}
+    position: {x: 0.67, y: 1.83, z: 0}
+  - data: {fileID: 11400000, guid: 0c03f9c879a6437ba5accc26b5a2e3a7, type: 2}
+    prefab: {fileID: 100004, guid: 91750233941940ad895cb5949f795d3b, type: 3}
+    position: {x: -2.5, y: -3.5, z: 0}
   willowPosition: {x: 0, y: -0.35, z: 0}

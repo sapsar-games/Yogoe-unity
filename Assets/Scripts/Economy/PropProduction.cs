@@ -21,6 +21,8 @@ namespace Yoegoe.Economy
             public double MeritPerMinute;
             public double LevelGrowth;
             public float MeritCapacityMinutes;
+            /// <summary>공덕 보관량 레벨당 배수 (v1.3 제단 1.1, 나머지 1).</summary>
+            public double CapacityGrowth;
             public bool IntimacyBonus;
             public double OwnerMultiplier;
             public float CycleMinutes;
@@ -32,6 +34,7 @@ namespace Yoegoe.Economy
                 MeritPerMinute = e.meritPerMinute,
                 LevelGrowth = e.levelGrowth > 0 ? e.levelGrowth : 1.0,
                 MeritCapacityMinutes = e.meritCapacityMinutes,
+                CapacityGrowth = e.capacityGrowth > 0 ? e.capacityGrowth : 1.0,
                 IntimacyBonus = e.intimacyBonus,
                 OwnerMultiplier = e.ownerMultiplier > 0 ? e.ownerMultiplier : 1.0,
                 CycleMinutes = e.cycleMinutes,
@@ -44,6 +47,7 @@ namespace Yoegoe.Economy
                 MeritPerMinute = d.baseProductionPerMinute,
                 LevelGrowth = d.levelGrowth > 0 ? d.levelGrowth : 1.0,
                 MeritCapacityMinutes = d.meritCapacityMinutes,
+                CapacityGrowth = d.capacityGrowth > 0 ? d.capacityGrowth : 1.0,
                 IntimacyBonus = d.intimacyBonus,
                 OwnerMultiplier = d.ownerMultiplier > 0 ? d.ownerMultiplier : 1.0,
                 CycleMinutes = d.cycleMinutes,
@@ -76,9 +80,12 @@ namespace Yoegoe.Economy
             return perMin;
         }
 
-        /// <summary>공덕 보관(만창) = 보정 전 분당 × MeritCapacityMinutes. 0 이하면 무제한.</summary>
+        /// <summary>공덕 보관(만창) = 보정 전 분당 × MeritCapacityMinutes × capacityGrowth^(L−1). 0 이하면 무제한.</summary>
         public static double MeritCapacity(in Config c, int level) =>
-            c.MeritCapacityMinutes > 0f ? BaseMeritPerMinute(c, level) * c.MeritCapacityMinutes : double.PositiveInfinity;
+            c.MeritCapacityMinutes > 0f
+                ? BaseMeritPerMinute(c, level) * c.MeritCapacityMinutes
+                  * ProductionFormula.LevelMultiplier(level, c.CapacityGrowth > 0 ? c.CapacityGrowth : 1.0)
+                : double.PositiveInfinity;
 
         public static int ResourceCapacity(in Config c, int level) => PropStorage.Capacity(c.BaseCapacity, level);
 

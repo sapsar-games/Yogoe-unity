@@ -487,8 +487,8 @@ namespace Yoegoe.Characters
                 return;
             }
             lastCollectedProp = null;
-            // 떡절구(공덕)는 v1.3에서도 '지금 그대로' — 탭은 수거만, 레벨업은 길게 누르기로.
-            if (prop.ResourceType == PropResourceType.Merit) return;
+            // 떡절구(버드나무로 가는 공덕)는 v1.3에서도 '지금 그대로' — 탭은 수거만, 레벨업은 길게 누르기로.
+            if (prop.ResourceType == PropResourceType.Merit && !prop.CollectsByTap) return;
             // 보관함이 비었으면(또는 방금 받았으면) 기물 창 — 보내기 / 일하는 중 / 레벨업 (v1.3)
             PropPanelRequested?.Invoke(prop, null);
         }

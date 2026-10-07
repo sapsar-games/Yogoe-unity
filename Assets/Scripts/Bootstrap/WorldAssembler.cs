@@ -310,6 +310,7 @@ namespace Yoegoe.Bootstrap
             {
                 for (int i = 0; i < slots.Length; i++)
                     ConfigureProp(slots[i], cfg.scale);
+                SpawnMissingFromLayout(cfg, slots);
                 return;
             }
 
@@ -336,6 +337,36 @@ namespace Yoegoe.Bootstrap
             slot.SetBuiltAppearance(sprite, Color.white, occupied);
             bool prebuilt = slot.data != null && slot.data.isPrebuilt;
             slot.ConfigureBuiltState(prebuilt);
+        }
+
+        /// <summary>
+        /// 씬에 아직 없는 기물(v1.3 북제단·남제단 등)은 PropLayoutSettings 배치대로 만든다 — 씬을 다시 굽지 않아도 나오게.
+        /// 크기는 씬에 있는 기물과 맞춘다.
+        /// </summary>
+        static void SpawnMissingFromLayout(Config cfg, PropSlot[] sceneSlots)
+        {
+            var layout = cfg.propLayout != null ? cfg.propLayout : PropLayoutSettings.Get();
+            if (layout?.placements == null) return;
+            var have = new System.Collections.Generic.HashSet<string>();
+            Vector3 sceneScale = Vector3.one;
+            foreach (var s in sceneSlots)
+            {
+                if (s == null) continue;
+                if (s.data != null) have.Add(s.data.propId);
+                sceneScale = s.transform.localScale;
+            }
+            float mapScale = Mathf.Max(0.01f, cfg.scale.mapScale);
+            foreach (var place in layout.placements)
+            {
+                if (place?.data == null || place.prefab == null || have.Contains(place.data.propId)) continue;
+                var slot = Object.Instantiate(place.prefab);
+                slot.transform.position = MapToWorld(place.position, mapScale);
+                slot.transform.localScale = sceneScale;
+                if (slot.data == null) slot.data = place.data;
+                ConfigureProp(slot, cfg.scale);
+                slot.gameObject.name = "Prop_" + (!string.IsNullOrEmpty(slot.data.displayName) ? slot.data.displayName : slot.data.propId);
+                have.Add(place.data.propId);
+            }
         }
 
         static void SpawnPropsFromLayoutFallback(Config cfg)

@@ -59,9 +59,9 @@ namespace Yoegoe.Characters
             if (meritAdded > 0)
             {
                 AddToMeritPile(meritAdded);
-                // 가끔 공덕꽃잎이 버드나무로 날아가 붙는다 (연출)
+                // 가끔 공덕꽃잎이 버드나무로 날아가 붙는다 (연출) — 제단은 버드나무를 거치지 않으므로 없음
                 petalTimer += worked;
-                if (petalTimer >= nextPetalAt && worked < 60f)
+                if (!CollectsByTap && petalTimer >= nextPetalAt && worked < 60f)
                 {
                     petalTimer = 0f;
                     nextPetalAt = UnityEngine.Random.Range(15f, 35f);

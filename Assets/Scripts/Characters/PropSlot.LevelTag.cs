@@ -18,7 +18,7 @@ namespace Yoegoe.Characters
         bool WantsLevelTag()
         {
             if (!IsBuilt || data == null || !AcceptsWorkers) return false;
-            if (ResourceType == PropResourceType.Merit) return false;
+            if (ResourceType == PropResourceType.Merit && !CollectsByTap) return false; // 떡절구 제외, 제단은 포함
             if (!PropEconomy.CanUpgrade(this)) return false;
             var eco = GameEconomy.Instance;
             return eco != null && eco.MeritPile >= PropEconomy.GetUpgradeCost(this);

@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c48ac105ccb6741d59f151fd9c1d1d61, type: 3}
+  m_Name: SouthAltar
+  m_EditorClassIdentifier: 
+  propId: 남제단
+  displayName: 남제단
+  icon: {fileID: 21300000, guid: a21c78f104ef4fbfb6403b62b9fb0461, type: 3}
+  baseProductionPerMinute: 0
+  upgradeBaseCost: 500
+  upgradeCostMultiplier: 1.15
+  isPrebuilt: 1
+  isEndingProp: 0
+  owner: 0
+  hasUniqueEndingAnimation: 0
+  occupiedByOwnerSprite: {fileID: 0}
+  collectByTap: 1

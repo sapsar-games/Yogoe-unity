@@ -51,7 +51,7 @@ TAB_SETTINGS = "prop_settings"
 TAB_DEST = "destinations"
 
 PROP_HEADERS = ["propId", "displayName", "resourceType", "cycleMinutes", "baseCapacity", "meritPerMinute",
-                "levelGrowth", "meritCapacityMinutes", "intimacyBonus", "ownerMultiplier", "upgradable",
+                "levelGrowth", "meritCapacityMinutes", "capacityGrowth", "intimacyBonus", "ownerMultiplier", "upgradable",
                 "upgradeBaseCost", "upgradeCostMultiplier", "note"]
 DROP_HEADERS = ["table", "ingredient", "name", "weight", "note"]
 SETTING_HEADERS = ["key", "value", "note"]
@@ -60,7 +60,7 @@ DEST_HEADERS = ["id", "prop", "name", "rarity", "minIntimacy", "goldenChance", "
 RESOURCE_TYPES = ["Merit", "Water", "Hunt", "Gather", "None"]
 DROP_TABLES = ["Hunt", "Gather"]
 SETTING_KEYS = {"purchaseBaseCost": 300.0, "purchaseCostGrowth": 1.35}
-FLOAT_COLS = ["cycleMinutes", "meritPerMinute", "levelGrowth", "meritCapacityMinutes", "ownerMultiplier",
+FLOAT_COLS = ["cycleMinutes", "meritPerMinute", "levelGrowth", "meritCapacityMinutes", "capacityGrowth", "ownerMultiplier",
               "upgradeBaseCost", "upgradeCostMultiplier"]
 
 

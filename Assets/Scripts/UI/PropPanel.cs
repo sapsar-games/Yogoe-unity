@@ -175,7 +175,9 @@ namespace Yoegoe.UI
             if (prop == null) return;
             if (!PropEconomy.TryUpgrade(prop)) { Rebuild(); return; }
             PropUpgradeFx.SpawnWorld(prop.transform.position, "+1 급", font);
-            levelNote = prop.IsResourceProp && prop.level % 10 == 0
+            levelNote = prop.ResourceType == PropResourceType.Merit
+                ? $"레벨업! 보관 공덕 {((BigNumber)prop.MeritCapacity).ToDisplayString()}"
+                : prop.IsResourceProp && prop.level % 10 == 0
                 ? "레벨업! 보관함의 총량이 +1 되었어요"
                 : $"{prop.DisplayName} Lv{prop.level}";
             GameSaveBridge.SaveFromWorld();
@@ -198,7 +200,11 @@ namespace Yoegoe.UI
         string SubLine()
         {
             var c = prop.ProductionConfig;
-            if (c.Type == PropResourceType.Merit) return $"Lv{prop.level} · 공덕";
+            if (c.Type == PropResourceType.Merit)
+            {
+                BigNumber per15 = PropProduction.BaseMeritPerMinute(c, prop.level) * 15.0;
+                return $"Lv{prop.level} · 15분에 공덕 {per15.ToDisplayString()} · 보관 {((BigNumber)prop.MeritCapacity).ToDisplayString()}";
+            }
             return $"Lv{prop.level} · {c.CycleMinutes:0}분에 1개 · 보관 {prop.ResourceCapacity}";
         }
 
@@ -258,9 +264,20 @@ namespace Yoegoe.UI
             else if (selectedAgent != null)
             {
                 float gi = selectedAgent.Stats.Stamina;
-                int room = Mathf.Max(0, prop.ResourceCapacity - prop.StoredResources);
-                float cycle = prop.ProductionConfig.CycleMinutes;
-                float workMin = gi * GameSettings.Get("staminaDrainMinutes"), fillMin = room * cycle;
+                float cycle, fillMin;
+                if (prop.ResourceType == PropResourceType.Merit)
+                {
+                    double perMin = PropProduction.BaseMeritPerMinute(prop.ProductionConfig, prop.level);
+                    cycle = 15f;
+                    fillMin = perMin > 0 ? (float)((prop.MeritCapacity - prop.PendingMerit.ToDouble()) / perMin) : 0f;
+                }
+                else
+                {
+                    int room = Mathf.Max(0, prop.ResourceCapacity - prop.StoredResources);
+                    cycle = prop.ProductionConfig.CycleMinutes;
+                    fillMin = room * cycle;
+                }
+                float workMin = gi * GameSettings.Get("staminaDrainMinutes");
                 summary = workMin <= fillMin
                     ? $"기력 {Mathf.FloorToInt(gi)}이면 약 {Dur(workMin)} 일하고 쉬어요 ({Mathf.FloorToInt(workMin / Mathf.Max(1f, cycle))}개쯤)"
                     : $"약 {Dur(fillMin)}이면 보관함이 차고, 남은 기력으로 빈 옹달샘·제단에 옮겨 가요";
@@ -275,7 +292,7 @@ namespace Yoegoe.UI
             y -= 120f;
             if (prop.HasPendingCollectible)
             {
-                Button($"받기 {prop.StoredResources}개", new Vector2(0, y), new Vector2(300, 70), Btn, Take);
+                Button(TakeLabel(), new Vector2(0, y), new Vector2(340, 70), Btn, Take);
                 y -= 90f;
             }
             BuildLevelRow(y);
@@ -291,7 +308,17 @@ namespace Yoegoe.UI
             y -= 90f;
 
             int cap = prop.ResourceCapacity, n = prop.StoredResources;
-            if (prop.IsResourceProp)
+            if (prop.ResourceType == PropResourceType.Merit)
+            {
+                double mc = prop.MeritCapacity, mp = prop.PendingMerit.ToDouble();
+                Label($"쌓인 공덕  {prop.PendingMerit.ToDisplayString()} / {((BigNumber)mc).ToDisplayString()}" + (prop.IsStorageHalted ? "  (가득 — 받아 주세요)" : ""),
+                    new Vector2(0, y), 28, prop.IsStorageHalted ? Warn : TextColor);
+                y -= 60f;
+                Bar(new Vector2(0, y), mc > 0 && !double.IsInfinity(mc) ? (float)(mp / mc) : 0f, Gold);
+                y -= 70f;
+                n = prop.HasPendingMerit ? 1 : 0;
+            }
+            else if (prop.IsResourceProp)
             {
                 Label($"보관함  {n}/{cap}" + (prop.IsStorageHalted ? "  (가득 — 받아 주세요)" : ""), new Vector2(0, y), 28, prop.IsStorageHalted ? Warn : TextColor);
                 y -= 60f;
@@ -315,7 +342,7 @@ namespace Yoegoe.UI
             }
 
             Button("불러들이기", new Vector2(-170, y), new Vector2(300, 90), BtnOff, Recall);
-            Button(n > 0 ? $"받기 {n}개" : "받기", new Vector2(170, y), new Vector2(300, 90), n > 0 ? Btn : BtnOff, n > 0 ? Take : (System.Action)null);
+            Button(n > 0 ? TakeLabel() : "받기", new Vector2(170, y), new Vector2(300, 90), n > 0 ? Btn : BtnOff, n > 0 ? Take : (System.Action)null);
             y -= 130f;
             BuildLevelRow(y);
             Label("기물마다 한 번에 한 마리만 일해요.", new Vector2(0, -600), 22, DimText);
@@ -328,7 +355,9 @@ namespace Yoegoe.UI
             var eco = GameEconomy.Instance;
             bool ok = eco != null && eco.MeritPile >= cost;
             string have = eco != null ? eco.MeritPile.ToDisplayString() : "0";
-            Label(prop.IsResourceProp ? $"지금 Lv{prop.level} · 보관함 {prop.ResourceCapacity}칸" : $"지금 Lv{prop.level}", new Vector2(0, y), 24, DimText);
+            Label(prop.IsResourceProp ? $"지금 Lv{prop.level} · 보관함 {prop.ResourceCapacity}칸"
+                  : prop.ResourceType == PropResourceType.Merit ? $"지금 Lv{prop.level} · 보관 공덕 {((BigNumber)prop.MeritCapacity).ToDisplayString()} (레벨마다 ×{prop.ProductionConfig.CapacityGrowth:0.##})"
+                  : $"지금 Lv{prop.level}", new Vector2(0, y), 24, DimText);
             y -= 70f;
             var b = Button($"레벨업 Lv{prop.level} → {prop.level + 1}", new Vector2(0, y), new Vector2(420, 80), ok ? Gold * 0.85f : BtnOff, ok ? LevelUp : (System.Action)null);
             y -= 60f;
@@ -339,6 +368,10 @@ namespace Yoegoe.UI
                 levelNote = null;
             }
         }
+
+        string TakeLabel() => prop.ResourceType == PropResourceType.Merit
+            ? $"받기 공덕 {prop.PendingMerit.ToDisplayString()}"
+            : $"받기 {prop.StoredResources}개";
 
         static string DropLine(string destId)
         {

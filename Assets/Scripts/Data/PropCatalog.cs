@@ -23,6 +23,8 @@ namespace Yoegoe.Data
             public double meritPerMinute;
             public double levelGrowth;
             public float meritCapacityMinutes;
+            /// <summary>공덕 보관량 레벨당 배수 (v1.3 제단 1.1). 0이면 1.</summary>
+            public double capacityGrowth;
             public bool intimacyBonus;
             public double ownerMultiplier;
             public bool upgradable;
@@ -234,6 +236,7 @@ namespace Yoegoe.Data
             data.baseProductionPerMinute = e.meritPerMinute;
             data.levelGrowth = e.levelGrowth > 0 ? e.levelGrowth : 1.0;
             data.meritCapacityMinutes = e.meritCapacityMinutes;
+            data.capacityGrowth = e.capacityGrowth > 0 ? e.capacityGrowth : 1.0;
             data.intimacyBonus = e.intimacyBonus;
             data.ownerMultiplier = e.ownerMultiplier > 0 ? e.ownerMultiplier : 1.0;
             data.cycleMinutes = e.cycleMinutes;

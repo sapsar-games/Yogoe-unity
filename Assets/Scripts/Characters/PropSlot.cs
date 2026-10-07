@@ -27,6 +27,9 @@ namespace Yoegoe.Characters
         /// <summary>v1.3 사냥터·채집터: 지금 보낸 목적지 id (시트 destinations). null 이면 예전 Hunt/Gather 표.</summary>
         public string DestinationId { get; set; }
 
+        /// <summary>공덕을 이 기물을 눌러 바로 받는지 (v1.3 북제단·남제단). 아니면 버드나무로.</summary>
+        public bool CollectsByTap => data != null && data.collectByTap;
+
         /// <summary>목적지가 있는 기물(사냥터·채집터)인지.</summary>
         public bool HasDestinations => ResourceType == PropResourceType.Hunt || ResourceType == PropResourceType.Gather;
 

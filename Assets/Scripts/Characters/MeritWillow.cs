@@ -73,7 +73,8 @@ namespace Yoegoe.Characters
         {
             if (PropManager.Instance == null) yield break;
             foreach (var p in PropManager.Instance.All)
-                if (p != null && p.IsBuilt && p.ResourceType == PropResourceType.Merit)
+                // 제단(collectByTap)은 버드나무를 거치지 않고 제단을 눌러 받는다 (v1.3)
+                if (p != null && p.IsBuilt && p.ResourceType == PropResourceType.Merit && !p.CollectsByTap)
                     yield return p;
         }
 
