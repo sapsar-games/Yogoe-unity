@@ -76,7 +76,7 @@ namespace Yoegoe.Characters
             float spriteTop = spriteRenderer != null ? spriteRenderer.bounds.extents.y : 0.3f;
             // 말풍선 아랫변을 머리 위에 고정 — 여러 줄이 돼도 아래로 늘어나 머리를 가리지 않게
             float halfH = bubbleBg != null ? bubbleBg.transform.localScale.y * 0.5f : 0.25f;
-            Vector3 bubblePos = transform.position + Vector3.up * (spriteTop + 0.3f + halfH);
+            Vector3 bubblePos = transform.position + Vector3.up * (spriteTop + 0.1f + halfH); //머리 위에서 약간 떠 있을 수 있게
             bubbleTextMesh.transform.position = bubblePos;
             if (bubbleBg != null) bubbleBg.transform.position = bubblePos;
         }
