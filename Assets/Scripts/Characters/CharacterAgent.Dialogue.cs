@@ -303,7 +303,7 @@ namespace Yoegoe.Characters
 
         // 말풍선 크기 — 글자 크기 · 여백 · 한 줄 최대 글자 수 (긴 대사가 한 줄로 늘어나 말풍선이 커지지 않게)
         // 배율·한 줄 글자 수 = 시트 game_settings(bubbleTextScale · bubbleMaxChars) × 설정 화면 글자 크기 (UiTextScale)
-        const float BubbleCharacterSize = 0.038f;
+        const float BubbleCharacterSize = 0.019f; //대략 20px
         const float BubblePadX = 0.2f;
         const float BubblePadY = 0.12f;
         static int BubbleMaxCharsPerLine => UiTextScale.BubbleMaxChars;
