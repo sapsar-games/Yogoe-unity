@@ -57,8 +57,8 @@ MonoBehaviour:
   waterIcon: {fileID: 21300000, guid: f245b0d861e8b4deca4320d79c23c5c1, type: 3}
   offerings:
   - {fileID: 11400000, guid: 26314678e70647f398a9913fc6d62b7e, type: 2}
-  - {fileID: 11400000, guid: 7f5cedae05be4608aa496627ce941ad9, type: 2}
+  - {fileID: 0}
   - {fileID: 11400000, guid: a15a1ddf375640078a72ff37f11d2266, type: 2}
-  - {fileID: 11400000, guid: 41009a9beb1b4c5c8ceb5d0d9d3beaf8, type: 2}
-  - {fileID: 11400000, guid: 020f33cfa21347f6a2b168044ef90c3e, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 11400000, guid: b6ca2b1a55e147e69481a0813cb4fed5, type: 2}

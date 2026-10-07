@@ -26,6 +26,17 @@ namespace Yoegoe.Characters.EditorTools
             Debug.Log($"[MainWorldSceneBaker] Main 씬에 맵·기물 {n}개 배치 완료. Scene 뷰에서 드래그로 위치를 조절하세요.");
         }
 
+        /// <summary>
+        /// 이미 있는 기물은 유지하고, PropLayoutSettings에만 있는 기물만 추가.
+        /// (YAML을 밖에서 고쳐도 Unity가 Main* 미저장 상태를 들고 있으면 Hierarchy에 안 보이므로 이 메뉴로 올린다.)
+        /// </summary>
+        [MenuItem("Yoegoe/Place Missing Props In Main Scene")]
+        public static void PlaceMissingFromMenu()
+        {
+            int n = PlaceMissingOnly();
+            Debug.Log($"[MainWorldSceneBaker] 빠진 기물 {n}개 추가. Scene 뷰에서 위치를 맞추세요.");
+        }
+
         /// <summary>배치 모드용.</summary>
         public static void PlaceAllBatch()
         {
@@ -132,6 +143,85 @@ namespace Yoegoe.Characters.EditorTools
 
             PrefabUtility.SaveAsPrefabAssetAndConnect(go, prefabPath, InteractionMode.AutomatedAction);
             return go;
+        }
+
+        /// <summary>씬에 없는 PropLayoutSettings 기물만 Prefab으로 추가. 기존 배치 유지.</summary>
+        public static int PlaceMissingOnly()
+        {
+            PropPrefabBaker.BakeAll();
+
+            var scene = EditorSceneManager.OpenScene(MainScenePath, OpenSceneMode.Single);
+            var main = Object.FindAnyObjectByType<Yoegoe.Main>(FindObjectsInactive.Include);
+            if (main == null)
+            {
+                Debug.LogError("[MainWorldSceneBaker] Main 컴포넌트가 없습니다.");
+                return 0;
+            }
+
+            var scale = main.artScale != null ? main.artScale : ArtScaleSettings.GetOrDefault();
+            float mapScale = Mathf.Max(0.01f, scale.mapScale);
+            var layout = main.propLayout != null
+                ? main.propLayout
+                : AssetDatabase.LoadAssetAtPath<PropLayoutSettings>(LayoutPath);
+            if (layout?.placements == null) return 0;
+
+            var have = new System.Collections.Generic.HashSet<string>();
+            Vector3 sceneScale = Vector3.one * Mathf.Max(0.01f, scale.propScale);
+            foreach (var s in Object.FindObjectsByType<PropSlot>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            {
+                if (s == null) continue;
+                if (s.data != null && !string.IsNullOrEmpty(s.data.propId))
+                    have.Add(s.data.propId);
+                sceneScale = s.transform.localScale;
+            }
+
+            int count = 0;
+            for (int i = 0; i < layout.placements.Length; i++)
+            {
+                var place = layout.placements[i];
+                if (place?.data == null || have.Contains(place.data.propId)) continue;
+
+                PropSlot prefab = place.prefab;
+                if (prefab == null)
+                {
+                    string path = $"{PropsFolder}/{Sanitize(place.data.name)}.prefab";
+                    var go = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                    prefab = go != null ? go.GetComponent<PropSlot>() : null;
+                }
+                if (prefab == null)
+                {
+                    Debug.LogWarning($"[MainWorldSceneBaker] Prefab 없음: {place.data.name}");
+                    continue;
+                }
+
+                var instance = (PropSlot)PrefabUtility.InstantiatePrefab(prefab);
+                string label = !string.IsNullOrEmpty(place.data.displayName)
+                    ? place.data.displayName
+                    : place.data.name;
+                instance.gameObject.name = "Prop_" + label;
+                Vector3 world = new Vector3(
+                    place.position.x * mapScale,
+                    place.position.y * mapScale,
+                    place.position.z);
+                instance.transform.position = world;
+                instance.transform.localScale = sceneScale;
+                if (instance.data == null) instance.data = place.data;
+
+                var sr = instance.GetComponent<SpriteRenderer>();
+                if (sr != null)
+                    sr.sortingOrder = scale.SortOrderForProp(world.y);
+
+                Undo.RegisterCreatedObjectUndo(instance.gameObject, "Place Missing Prop");
+                have.Add(place.data.propId);
+                count++;
+            }
+
+            if (count > 0)
+            {
+                EditorSceneManager.MarkSceneDirty(scene);
+                EditorSceneManager.SaveScene(scene);
+            }
+            return count;
         }
 
         static int EnsureProps(Yoegoe.Main main, float mapScale, ArtScaleSettings scale)
