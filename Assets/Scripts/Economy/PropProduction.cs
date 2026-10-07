@@ -100,7 +100,7 @@ namespace Yoegoe.Economy
         /// </summary>
         public static float Produce(in Config c, int level, float intimacy, bool ownerOnEndingProp,
             double pendingMerit, ref PropStorage.State storage, float dt,
-            Func<float> random01, Action<int> onDrop, out double meritAdded)
+            Func<float> random01, Action<int> onDrop, out double meritAdded, string destinationId = null)
         {
             meritAdded = 0;
             if (dt <= 0f) return 0f;
@@ -128,7 +128,7 @@ namespace Yoegoe.Economy
                     () =>
                     {
                         if (dropsIngredients)
-                            onDrop?.Invoke(PropCatalog.RollDrop(type, random01()));
+                            onDrop?.Invoke(PropCatalog.RollDrop(type, destinationId, random01()));
                     });
             }
 

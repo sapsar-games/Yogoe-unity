@@ -149,6 +149,8 @@ namespace Yoegoe.Save
         public bool overflowJudged;
         /// <summary>활터·약초밭 보관 재료 (CookingIngredientId 정수, 1개당 1칸).</summary>
         public int[] pendingIngredients = Array.Empty<int>();
+        /// <summary>v1.3 사냥터·채집터에서 고른 목적지 id (비면 예전 표).</summary>
+        public string destinationId = "";
     }
 
     [Serializable]

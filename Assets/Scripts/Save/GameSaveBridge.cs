@@ -112,6 +112,7 @@ namespace Yoegoe.Save
                     cycleProgressSeconds = cycleProgress,
                     overflowJudged = judged,
                     pendingIngredients = ingredients,
+                    destinationId = p.DestinationId ?? "",
                     propId = id,
                     level = p.level,
                     isBuilt = p.IsBuilt,
@@ -178,6 +179,7 @@ namespace Yoegoe.Save
                         p.ApplySaveBuiltState(ps.isBuilt, ps.level);
                         p.SetPendingMeritFromSave(ps.pendingMerit.ToBigNumber());
                         p.RestoreStorage(ps.storedResources, ps.cycleProgressSeconds, ps.overflowJudged, ps.pendingIngredients);
+                        p.DestinationId = string.IsNullOrEmpty(ps.destinationId) ? null : ps.destinationId;
                         break;
                     }
                 }

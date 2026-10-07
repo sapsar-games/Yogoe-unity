@@ -41,6 +41,21 @@ namespace Yoegoe.Data
             public float weight;
         }
 
+        /// <summary>v1.3 사냥터·채집터 목적지 (시트 destinations 탭). 재료 확률은 dropTables 의 table = id.</summary>
+        [Serializable]
+        public class Destination
+        {
+            public string id;
+            public string prop;          // Hunt / Gather
+            public string name;
+            public string rarity;        // 하 · 중 · 상
+            public float minIntimacy;    // 입장 친밀도
+            public float goldenChance;   // 황금 확률 % (황금 재료 개편 전까지 안 씀)
+
+            public PropResourceType PropType =>
+                Enum.TryParse(prop, true, out PropResourceType t) ? t : PropResourceType.None;
+        }
+
         [Serializable]
         public class Settings
         {
@@ -55,6 +70,7 @@ namespace Yoegoe.Data
             public Entry[] props;
             public Drop[] dropTables;
             public Settings settings;
+            public Destination[] destinations;
         }
 
         static Settings settings;
@@ -73,12 +89,66 @@ namespace Yoegoe.Data
         public static SpecialItemId SpecialOf(int code) => (SpecialItemId)(code - SpecialCodeBase);
 
         static Dictionary<PropResourceType, List<(int code, float weight)>> drops;
+        static Dictionary<string, List<(int code, float weight)>> destDrops;
+        static List<Destination> destinations;
+
+        /// <summary>그 기물(Hunt/Gather)의 목적지 — 시트 순서 그대로.</summary>
+        public static List<Destination> DestinationsFor(PropResourceType type)
+        {
+            EnsureLoaded();
+            var list = new List<Destination>();
+            if (destinations != null)
+                foreach (var d in destinations) if (d.PropType == type) list.Add(d);
+            return list;
+        }
+
+        public static Destination FindDestination(string id)
+        {
+            EnsureLoaded();
+            if (string.IsNullOrEmpty(id) || destinations == null) return null;
+            foreach (var d in destinations) if (string.Equals(d.id, id, StringComparison.OrdinalIgnoreCase)) return d;
+            return null;
+        }
+
+        /// <summary>목적지 재료 (드롭 코드, 가중치) — 창에 아이콘·이름으로 보여 줄 때.</summary>
+        public static IReadOnlyList<(int code, float weight)> DestinationDrops(string id)
+        {
+            EnsureLoaded();
+            return destDrops != null && id != null && destDrops.TryGetValue(id, out var l) ? l : (IReadOnlyList<(int, float)>)Array.Empty<(int, float)>();
+        }
+
+        /// <summary>목적지 표에서 1개 뽑기. 목적지가 없거나 표가 비면 예전 Hunt/Gather 표.</summary>
+        public static int RollDrop(PropResourceType table, string destinationId, float random01)
+        {
+            EnsureLoaded();
+            if (!string.IsNullOrEmpty(destinationId) && destDrops != null
+                && destDrops.TryGetValue(destinationId, out var list) && list.Count > 0)
+                return Roll(list, random01, true);
+            return RollDrop(table, random01);
+        }
+
+        static int Roll(List<(int code, float weight)> list, float random01, bool includeSpecial)
+        {
+            float total = 0f; int last = -1;
+            foreach (var (code, w) in list) { if (!includeSpecial && IsSpecialCode(code)) continue; total += w; last = code; }
+            if (last < 0) return (int)CookingIngredientId.Rice;
+            float r = Mathf.Min(Mathf.Clamp01(random01) * total, total - 0.0001f);
+            foreach (var (code, w) in list)
+            {
+                if (!includeSpecial && IsSpecialCode(code)) continue;
+                if (r < w) return code;
+                r -= w;
+            }
+            return last;
+        }
 
         public static void EnsureLoaded()
         {
             if (byId != null) return;
             byId = new Dictionary<string, Entry>();
             drops = new Dictionary<PropResourceType, List<(int, float)>>();
+            destDrops = new Dictionary<string, List<(int, float)>>(StringComparer.OrdinalIgnoreCase);
+            destinations = new List<Destination>();
 
             var text = Resources.Load<TextAsset>("props");
             if (text == null)
@@ -88,6 +158,9 @@ namespace Yoegoe.Data
             }
             var root = JsonUtility.FromJson<Root>(text.text);
             settings = root?.settings;
+            if (root?.destinations != null)
+                foreach (var d in root.destinations)
+                    if (d != null && !string.IsNullOrEmpty(d.id)) destinations.Add(d);
             if (root?.props != null)
                 foreach (var e in root.props)
                     if (e != null && !string.IsNullOrEmpty(e.propId))
@@ -98,18 +171,33 @@ namespace Yoegoe.Data
                 foreach (var d in root.dropTables)
                 {
                     if (d == null || d.weight <= 0f) continue;
-                    if (!Enum.TryParse(d.table, true, out PropResourceType table)) continue;
+                    bool isDest = FindDestInList(d.table) != null;
+                    PropResourceType table = PropResourceType.None;
+                    if (!isDest && !Enum.TryParse(d.table, true, out table)) continue;
                     int code;
                     if (Enum.TryParse(d.ingredient, true, out SpecialItemId special))
                         code = SpecialCodeBase + (int)special;
                     else if (Enum.TryParse(d.ingredient, true, out CookingIngredientId ing))
                         code = (int)ing;
                     else continue;
+                    if (isDest)
+                    {
+                        if (!destDrops.TryGetValue(d.table, out var dl)) destDrops[d.table] = dl = new List<(int, float)>();
+                        dl.Add((code, d.weight));
+                        continue;
+                    }
                     if (!drops.TryGetValue(table, out var list))
                         drops[table] = list = new List<(int, float)>();
                     list.Add((code, d.weight));
                 }
             }
+        }
+
+        static Destination FindDestInList(string id)
+        {
+            if (destinations == null || string.IsNullOrEmpty(id)) return null;
+            foreach (var d in destinations) if (string.Equals(d.id, id, StringComparison.OrdinalIgnoreCase)) return d;
+            return null;
         }
 
         public static bool TryGet(string propId, out Entry entry)

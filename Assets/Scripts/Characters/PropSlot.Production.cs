@@ -53,7 +53,7 @@ namespace Yoegoe.Characters
                     pendingIngredients.Add(code);
                     if (PropCatalog.IsSpecialCode(code) && Occupant != null) goldenFinder = Occupant;
                 },
-                out double meritAdded);
+                out double meritAdded, DestinationId);
             float worked = producedSeconds / speed;
 
             if (meritAdded > 0)

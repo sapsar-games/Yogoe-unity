@@ -105,6 +105,12 @@ namespace Yoegoe.Bootstrap
             gift.font = cfg.hudFont;
             giftGO.SetActive(true);
 
+            var panelGO = new GameObject("PropPanel");
+            panelGO.SetActive(false);
+            var propPanel = panelGO.AddComponent<PropPanel>();
+            propPanel.font = cfg.hudFont;
+            panelGO.SetActive(true);
+
             var feedGO = new GameObject("FeedPopup");
             feedGO.SetActive(false);
             var feed = feedGO.AddComponent<FeedPopup>();

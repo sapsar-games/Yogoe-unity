@@ -174,7 +174,7 @@ namespace Yoegoe.Save
             var ingredients = new System.Collections.Generic.List<int>(prop.pendingIngredients ?? Array.Empty<int>());
             float worked = PropProduction.Produce(ConfigFor(prop), prop.level, agent.intimacy,
                 IsOwnerOnEndingProp(agent, prop), prop.pendingMerit.ToBigNumber().ToDouble(), ref st, dt,
-                () => UnityEngine.Random.value, ingredients.Add, out double meritAdded);
+                () => UnityEngine.Random.value, ingredients.Add, out double meritAdded, prop.destinationId);
 
             if (meritAdded > 0)
                 prop.pendingMerit = BigNumberSave.From(prop.pendingMerit.ToBigNumber() + (BigNumber)meritAdded);

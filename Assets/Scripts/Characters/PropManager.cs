@@ -8,6 +8,7 @@ namespace Yoegoe.Characters
     {
         public static PropManager Instance { get; private set; }
         private readonly List<PropSlot> allProps = new List<PropSlot>();
+        public IReadOnlyList<PropSlot> AllProps => allProps;
 
         /// <summary>등록된 기물 목록 (HUD 등에서 FindObjectsByType 대신 사용).</summary>
         public List<PropSlot> All => allProps;

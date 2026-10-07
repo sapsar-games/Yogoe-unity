@@ -24,6 +24,15 @@ namespace Yoegoe.Characters
         /// <summary>건립 여부. prebuilt면 시작 true, 자물쇠는 구매 후 true.</summary>
         public bool IsBuilt { get; private set; }
 
+        /// <summary>v1.3 사냥터·채집터: 지금 보낸 목적지 id (시트 destinations). null 이면 예전 Hunt/Gather 표.</summary>
+        public string DestinationId { get; set; }
+
+        /// <summary>목적지가 있는 기물(사냥터·채집터)인지.</summary>
+        public bool HasDestinations => ResourceType == PropResourceType.Hunt || ResourceType == PropResourceType.Gather;
+
+        /// <summary>지금 목적지의 입장 친밀도 (없으면 0).</summary>
+        public float RequiredIntimacy => PropCatalog.FindDestination(DestinationId)?.minIntimacy ?? 0f;
+
         public CharacterAgent Occupant { get; private set; }
         public bool IsOccupied => Occupant != null;
 
@@ -101,12 +110,14 @@ namespace Yoegoe.Characters
 
         private void OnEnable() => PropManager.Instance?.Register(this);
         private void OnDisable() => PropManager.Instance?.Unregister(this);
+        private void OnDestroy() => DestroyLevelTag();
 
         private void LateUpdate()
         {
             RefreshPileLabel();
             RefreshLockVisual();
             RefreshGoldenSparkle();
+            RefreshLevelTag();
         }
 
         /// <summary>Main 스폰 직후 호출. prebuilt면 즉시 건립.</summary>
@@ -234,6 +245,8 @@ namespace Yoegoe.Characters
             if (!IsBuilt) return false;
             if (data == null || agent == null || agent.Data == null) return true;
             if (data.isEndingProp && data.owner != agent.Data.id) return false;
+            // v1.3: 사냥터·채집터는 지금 목적지의 입장 친밀도가 모자라면 못 간다
+            if (HasDestinations && agent.Stats.Intimacy + 0.001f < RequiredIntimacy) return false;
             return true;
         }
 

@@ -16,6 +16,8 @@ namespace Yoegoe.Characters
         private const float SeparationSpeed = 1.2f;
 
         private PropSlot currentProp;
+        /// <summary>지금 앉아 일하는 기물 (없으면 null).</summary>
+        public PropSlot CurrentProp => currentProp;
         private PropSlot previousProp;
         private PropSlot destination;
         private bool isWandering;
