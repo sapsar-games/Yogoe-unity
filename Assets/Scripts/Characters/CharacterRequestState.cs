@@ -188,7 +188,7 @@ namespace Yoegoe.Characters
             }
             offeringIcon.sprite = BowlSprite();
             offeringIcon.color = Color.white;
-            offeringIcon.transform.localScale = Vector3.one * 0.55f;
+            offeringIcon.transform.localScale = Vector3.one * 0.18f; // 20px · 16ppu → 폭 약 0.22
             offeringIcon.gameObject.SetActive(true);
         }
 

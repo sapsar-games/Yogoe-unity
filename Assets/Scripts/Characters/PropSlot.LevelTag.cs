@@ -41,7 +41,7 @@ namespace Yoegoe.Characters
                 levelTag = go.AddComponent<SpriteRenderer>();
                 levelTag.sprite = LevelTagSprite();
                 levelTag.sortingOrder = 1150;
-                go.transform.localScale = Vector3.one * 0.5f;
+                go.transform.localScale = Vector3.one * 0.13f; // 16px · 16ppu → 지름 약 0.13 (기물 폭의 1/4쯤)
             }
             if (!levelTag.gameObject.activeSelf) levelTag.gameObject.SetActive(true);
             PlaceLevelTag();
