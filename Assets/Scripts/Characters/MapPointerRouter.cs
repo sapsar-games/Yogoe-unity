@@ -85,7 +85,7 @@ namespace Yoegoe.Characters
         private enum Phase { Idle, Pending, MapDrag, CharacterDrag, PinchZoom }
 
         /// <summary>press 시점에 딱 한 번 정해지는 "무엇을 눌렀는지". Hold/Release는 이 값만 본다.</summary>
-        public enum PressTarget { Empty, LockedProp, Prop, Character, GongyangganProp, Willow, PropLevelTag }
+        public enum PressTarget { Empty, LockedProp, Prop, Character, GongyangganProp, Willow, PropLevelTag, PierProp }
 
         /// <summary>길게 누르기로 이미 처리(업그레이드 팝업)한 press — release에서 탭으로 다시 처리하지 않는다.</summary>
         private bool pressConsumed;
@@ -278,6 +278,9 @@ namespace Yoegoe.Characters
             pressTarget = ClassifyPress(pressCharacter != null, pressProp != null,
                 pressProp != null && pressProp.IsBuilt,
                 pressProp != null && pressProp.data != null && pressProp.data.opensGongyanggan);
+            // 나루터(요괴가 앉지 않는 시설) — 누르면 나루터 화면 (v1.3)
+            if (pressTarget == PressTarget.Prop && pressProp != null && pressProp.data != null && pressProp.data.opensPier)
+                pressTarget = PressTarget.PierProp;
             // 공덕 버드나무: 요괴·기물이 아닌 곳에서만 (드래그 방해 안 하게)
             if (pressTarget == PressTarget.Empty && IsOverWillow(screenPos))
                 pressTarget = PressTarget.Willow;
@@ -414,6 +417,11 @@ namespace Yoegoe.Characters
                         // 쌓인 게 없거나, 방금(2초 안) 수거한 기물을 다시 탭하면 기물 창 (v1.2 시연).
                         CancelPendingMonologueTap();
                         HandlePropTap(pressProp);
+                        break;
+
+                    case PressTarget.PierProp:
+                        CancelPendingMonologueTap();
+                        PierScreen.Instance?.Open();
                         break;
 
                     case PressTarget.PropLevelTag:

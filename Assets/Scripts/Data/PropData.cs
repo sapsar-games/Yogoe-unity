@@ -55,6 +55,9 @@ namespace Yoegoe.Data
         [Tooltip("탭하면 공양간(요리) 화면을 연다. 화덕.")]
         public bool opensGongyanggan;
 
+        [Tooltip("탭하면 나루터 화면을 연다 (v1.3). 요괴가 앉지 않는 시설.")]
+        public bool opensPier;
+
         [Header("v1.3 제단")]
         [Tooltip("공덕을 버드나무로 보내지 않고 이 기물을 눌러 바로 받는다 (북제단·남제단).")]
         public bool collectByTap;

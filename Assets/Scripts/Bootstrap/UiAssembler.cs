@@ -105,6 +105,12 @@ namespace Yoegoe.Bootstrap
             gift.font = cfg.hudFont;
             giftGO.SetActive(true);
 
+            var pierGO = new GameObject("PierScreen");
+            pierGO.SetActive(false);
+            var pier = pierGO.AddComponent<PierScreen>();
+            pier.font = cfg.hudFont;
+            pierGO.SetActive(true);
+
             var panelGO = new GameObject("PropPanel");
             panelGO.SetActive(false);
             var propPanel = panelGO.AddComponent<PropPanel>();
