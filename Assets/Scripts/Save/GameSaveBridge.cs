@@ -80,17 +80,12 @@ namespace Yoegoe.Save
         /// <summary><see cref="RequestSave"/> 이후 아직 저장 안 됨.</summary>
         public static bool SaveRequested { get; private set; }
 
-        public static void SaveFromWorld(
-            [System.Runtime.CompilerServices.CallerMemberName] string callerMember = null,
-            [System.Runtime.CompilerServices.CallerFilePath] string callerFile = null,
-            [System.Runtime.CompilerServices.CallerLineNumber] int callerLine = 0)
+        public static void SaveFromWorld()
         {
             SaveRequested = false;
             // Play 중이 아니거나 Economy 부팅 전이면 OnApplicationQuit 등에서 NRE 남
             if (GameEconomy.Instance == null) return;
             if (SaveBlockedByLoadFailure) return; // 불러오기 실패 — 진짜 세이브를 새 게임으로 덮어쓰지 않는다
-            string fileShort = string.IsNullOrEmpty(callerFile) ? "?" : callerFile.Substring(callerFile.LastIndexOfAny(new[] { '/', '\\' }) + 1);
-            UnityEngine.Debug.Log($"[DIAG] SaveFromWorld called from {callerMember} @ {fileShort}:{callerLine}");
             var data = CaptureFromWorld();
             GameSaveService.Save(data);
         }
@@ -128,7 +123,6 @@ namespace Yoegoe.Save
             data.economy.specialItems = GameEconomy.Instance.CaptureSpecialItemCounts();
             data.economy.charms = GameEconomy.Instance.CaptureCharmCounts();
             Attendance.CaptureToSave(out data.economy.attendanceNextDayIndex, out data.economy.attendanceLastHandledDayKey);
-            UnityEngine.Debug.Log($"[DIAG] CaptureFromWorld attendance: next={data.economy.attendanceNextDayIndex} last={data.economy.attendanceLastHandledDayKey} (live Attendance.NextDayIndex={Attendance.NextDayIndex} Attendance.LastHandledDayKey={Attendance.LastHandledDayKey})");
             data.economy.codexDiscovered = Yoegoe.Cooking.CookingCodex.CaptureToSave();
             data.economy.lockedSlotUnlocked = CharacterSummon.LockedSlotUnlocked;
 
@@ -301,7 +295,6 @@ namespace Yoegoe.Save
             GiftBundle.ResetFromSave(e.giftMissStreak, e.giftFirstGrantDone, e.adRewardTickets);
             ShopStock.ResetFromSave(e.shopLeftOfferingId, e.shopRightOfferingId, e.shopNextRefreshUtcTicks);
             Attendance.ResetFromSave(e.attendanceNextDayIndex, e.attendanceLastHandledDayKey);
-            UnityEngine.Debug.Log($"[DIAG] ApplyEconomy attendance: from save next={e.attendanceNextDayIndex} last={e.attendanceLastHandledDayKey} → live now Attendance.LastHandledDayKey={Attendance.LastHandledDayKey}");
             CharacterSummon.ResetFromSave(e.lockedSlotUnlocked);
             Yoegoe.Cooking.CookingCodex.ResetFromSave(e.codexDiscovered);
         }

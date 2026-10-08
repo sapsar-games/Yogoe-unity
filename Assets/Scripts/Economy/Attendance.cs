@@ -53,7 +53,6 @@ namespace Yoegoe.Economy
             NextDayIndex = (idx + 1) % rewards.Length;
             LastHandledDayKey = todayKey;
             GameEconomy.Instance?.AddYeopjeon(amount);
-            UnityEngine.Debug.Log($"[DIAG] Attendance.Claim done: todayKey={todayKey} LastHandledDayKey now={LastHandledDayKey} NextDayIndex now={NextDayIndex} amount={amount}");
             return amount;
         }
 

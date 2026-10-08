@@ -312,8 +312,9 @@ namespace Yoegoe.UI
         /// <summary>
         /// "나가기"를 눌러도 승패가 안 난 매치는 메모리에 그대로 둔다 — 다시 열면 이어서 하고,
         /// 세이브에도 매번 담겨서 앱을 껐다 켜도 이어진다. 승패가 이미 난 매치만 완전히 정리한다.
+        /// persist=false: 콜드스타트 강제 닫기 등 — 세이브 불러오기 전에 저장하면 안 될 때.
         /// </summary>
-        public void Close()
+        public void Close(bool persist = true)
         {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             DebugStopAutoPlay();
@@ -342,7 +343,7 @@ namespace Yoegoe.UI
             if (miniGame != null) miniGame.Hide();
             if (root != null) root.SetActive(false);
             IsOpen = false;
-            GameSaveBridge.SaveFromWorld();
+            if (persist) GameSaveBridge.SaveFromWorld();
             // 머리 위 획득물·이어지는 공양 요구는 완주 후 윷을 완전히 끝낼 때만.
             // 중도 나가기는 매치를 이어가므로 연출하지 않고, 미연출 목록은 유지한다.
             if (allowPostYutLootPresentation)

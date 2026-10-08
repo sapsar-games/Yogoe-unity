@@ -21,10 +21,6 @@ namespace Yoegoe.Save
             if (data == null) return;
             data.savedAtUtcTicks = TrustedTime.UtcNow.Ticks;
             string json = JsonUtility.ToJson(data, prettyPrint: true);
-            Debug.Log("[DIAG] GameSaveService.Save json attendance snippet: " +
-                      (json.Contains("attendanceLastHandledDayKey")
-                          ? json.Substring(json.IndexOf("attendanceLastHandledDayKey"), 45)
-                          : "FIELD NOT IN JSON"));
 
 #if UNITY_WEBGL && !UNITY_EDITOR
             PlayerPrefs.SetString(PrefsKey, json);

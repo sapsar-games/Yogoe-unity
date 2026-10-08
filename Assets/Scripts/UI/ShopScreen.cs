@@ -111,7 +111,8 @@ namespace Yoegoe.UI
             root.SetActive(true);
         }
 
-        public void Close()
+        /// <summary>persist=false: 콜드스타트 강제 닫기 등 — 세이브 불러오기 전에 저장하면 안 될 때.</summary>
+        public void Close(bool persist = true)
         {
             if (GameEconomy.Instance != null)
             {
@@ -120,7 +121,7 @@ namespace Yoegoe.UI
             }
             if (packagePopup != null) packagePopup.SetActive(false);
             if (root != null) root.SetActive(false);
-            GameSaveBridge.SaveFromWorld();
+            if (persist) GameSaveBridge.SaveFromWorld();
         }
 
         void OnYeopjeonChanged(int _) => RefreshCurrencyBar();
@@ -253,7 +254,7 @@ namespace Yoegoe.UI
             BindButton(root.transform.Find("RightFood/PriceBuy"), OnBuyRight);
             BindButton(root.transform.Find("Hyang/PriceBuy"), OnBuyHyang);
             BindButton(root.transform.Find("Reroll"), OnReroll);
-            BindButton(root.transform.Find("Close"), Close);
+            BindButton(root.transform.Find("Close"), () => Close());
 
             for (int i = 0; i < Packages.Length; i++)
             {

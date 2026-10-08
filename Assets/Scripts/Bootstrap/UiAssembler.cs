@@ -159,14 +159,15 @@ namespace Yoegoe.Bootstrap
             var detail = Object.FindAnyObjectByType<DetailScreen>(FindObjectsInactive.Include);
             if (detail != null) detail.Close();
 
+            // persist: false — 세이브 불러오기 전에 호출되므로 여기서 저장하면 안 됨(기본값으로 진짜 세이브를 덮어씀).
             var shop = Object.FindAnyObjectByType<ShopScreen>(FindObjectsInactive.Include);
-            if (shop != null) shop.Close();
+            if (shop != null) shop.Close(persist: false);
 
             var gongyanggan = Object.FindAnyObjectByType<GongyangganScreen>(FindObjectsInactive.Include);
             if (gongyanggan != null) gongyanggan.Close();
 
             var yut = Object.FindAnyObjectByType<YutScreen>(FindObjectsInactive.Include);
-            if (yut != null) yut.Close();
+            if (yut != null) yut.Close(persist: false);
 
             var attendance = Object.FindAnyObjectByType<AttendanceScreen>(FindObjectsInactive.Include);
             if (attendance != null) attendance.Close();
