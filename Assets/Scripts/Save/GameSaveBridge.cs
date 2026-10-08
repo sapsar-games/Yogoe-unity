@@ -80,13 +80,17 @@ namespace Yoegoe.Save
         /// <summary><see cref="RequestSave"/> 이후 아직 저장 안 됨.</summary>
         public static bool SaveRequested { get; private set; }
 
-        public static void SaveFromWorld()
+        public static void SaveFromWorld(
+            [System.Runtime.CompilerServices.CallerMemberName] string callerMember = null,
+            [System.Runtime.CompilerServices.CallerFilePath] string callerFile = null,
+            [System.Runtime.CompilerServices.CallerLineNumber] int callerLine = 0)
         {
             SaveRequested = false;
             // Play 중이 아니거나 Economy 부팅 전이면 OnApplicationQuit 등에서 NRE 남
             if (GameEconomy.Instance == null) return;
             if (SaveBlockedByLoadFailure) return; // 불러오기 실패 — 진짜 세이브를 새 게임으로 덮어쓰지 않는다
-            UnityEngine.Debug.Log("[DIAG] SaveFromWorld called from:\n" + System.Environment.StackTrace);
+            string fileShort = string.IsNullOrEmpty(callerFile) ? "?" : callerFile.Substring(callerFile.LastIndexOfAny(new[] { '/', '\\' }) + 1);
+            UnityEngine.Debug.Log($"[DIAG] SaveFromWorld called from {callerMember} @ {fileShort}:{callerLine}");
             var data = CaptureFromWorld();
             GameSaveService.Save(data);
         }
