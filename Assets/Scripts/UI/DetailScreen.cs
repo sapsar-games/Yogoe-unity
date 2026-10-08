@@ -94,12 +94,29 @@ namespace Yoegoe.UI
             RefreshStats();
         }
 
+        private void OnDestroy() => UiBlockGate.Unregister(this);
+
+        /// <summary>set 될 때마다 UiBlockGate에 자동 등록/해제 — 열려 있는 동안 맵 입력 차단.</summary>
+        bool isOpen;
+        public bool IsOpen
+        {
+            get => isOpen;
+            private set
+            {
+                if (isOpen == value) return;
+                isOpen = value;
+                if (value) UiBlockGate.Register(this);
+                else UiBlockGate.Unregister(this);
+            }
+        }
+
         public void Open(CharacterAgent agent, string highlightOfferingId = null)
         {
             EnsureBuilt();
             if (!HasPrefabShell || root == null) return;
             currentAgent = agent;
             root.SetActive(true);
+            IsOpen = true;
             if (inventoryPanel != null) inventoryPanel.SetActive(false);
 
 
@@ -167,6 +184,7 @@ namespace Yoegoe.UI
             if (emoteBubble != null) emoteBubble.Hide();
             if (inventoryPanel != null) inventoryPanel.SetActive(false);
             if (root != null) root.SetActive(false);
+            IsOpen = false;
             currentAgent = null;
         }
 

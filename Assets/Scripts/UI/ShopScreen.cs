@@ -15,6 +15,21 @@ namespace Yoegoe.UI
     {
         public static ShopScreen Instance { get; private set; }
 
+        /// <summary>set 될 때마다 UiBlockGate에 자동 등록/해제 — 열려 있는 동안 맵 입력 차단
+        /// (프리팹의 Background raycastTarget 설정에만 기대지 않는 안전망).</summary>
+        bool isOpen;
+        public bool IsOpen
+        {
+            get => isOpen;
+            private set
+            {
+                if (isOpen == value) return;
+                isOpen = value;
+                if (value) Yoegoe.Core.UiBlockGate.Register(this);
+                else Yoegoe.Core.UiBlockGate.Unregister(this);
+            }
+        }
+
         public Font font;
         public OfferingData[] offerings;
         public Sprite shopBackground;
@@ -88,6 +103,7 @@ namespace Yoegoe.UI
         void OnDestroy()
         {
             if (Instance == this) Instance = null;
+            Yoegoe.Core.UiBlockGate.Unregister(this);
         }
 
         public void Open()
@@ -109,6 +125,7 @@ namespace Yoegoe.UI
             }
             if (packagePopup != null) packagePopup.SetActive(false);
             root.SetActive(true);
+            IsOpen = true;
         }
 
         /// <summary>persist=false: 콜드스타트 강제 닫기 등 — 세이브 불러오기 전에 저장하면 안 될 때.</summary>
@@ -121,6 +138,7 @@ namespace Yoegoe.UI
             }
             if (packagePopup != null) packagePopup.SetActive(false);
             if (root != null) root.SetActive(false);
+            IsOpen = false;
             if (persist) GameSaveBridge.SaveFromWorld();
         }
 

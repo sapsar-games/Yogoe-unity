@@ -90,6 +90,7 @@ public class GongyangganScreen : MonoBehaviour
     void OnDestroy()
     {
         if (Instance == this) Instance = null;
+        Yoegoe.Core.UiBlockGate.Unregister(this);
         if (session != null)
         {
             session.Changed -= RefreshView;
@@ -105,7 +106,19 @@ public class GongyangganScreen : MonoBehaviour
             session.Tick(Time.unscaledDeltaTime);
     }
 
-    public bool IsOpen { get; private set; }
+    /// <summary>set 될 때마다 UiBlockGate에 자동 등록/해제 — 열려 있는 동안 맵 입력 차단.</summary>
+    bool isOpen;
+    public bool IsOpen
+    {
+        get => isOpen;
+        private set
+        {
+            if (isOpen == value) return;
+            isOpen = value;
+            if (value) Yoegoe.Core.UiBlockGate.Register(this);
+            else Yoegoe.Core.UiBlockGate.Unregister(this);
+        }
+    }
 
     public void Open()
     {

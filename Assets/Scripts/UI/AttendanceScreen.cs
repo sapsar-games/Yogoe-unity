@@ -18,7 +18,20 @@ namespace Yoegoe.UI
     public class AttendanceScreen : MonoBehaviour
     {
         public static AttendanceScreen Instance { get; private set; }
-        public static bool IsOpen { get; private set; }
+
+        /// <summary>set 될 때마다 UiBlockGate에 자동 등록/해제 — 열려 있는 동안 맵 입력 차단.</summary>
+        static bool isOpen;
+        public static bool IsOpen
+        {
+            get => isOpen;
+            private set
+            {
+                if (isOpen == value) return;
+                isOpen = value;
+                if (value) Yoegoe.Core.UiBlockGate.Register(typeof(AttendanceScreen));
+                else Yoegoe.Core.UiBlockGate.Unregister(typeof(AttendanceScreen));
+            }
+        }
 
         public Font font;
 

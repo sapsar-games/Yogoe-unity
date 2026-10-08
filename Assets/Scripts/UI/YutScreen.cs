@@ -76,8 +76,21 @@ namespace Yoegoe.UI
         public bool HasPrefabShell => root != null && miniGame != null;
 
         /// <summary>윷 화면이 떠 있는 동안 본맵 핀치/휠 줌·드래그가 새면 안 된다.
-        /// Prefab Root가 켜져 있어도, Open() 전에는 맵 입력을 막지 않는다.</summary>
-        public bool IsOpen { get; private set; }
+        /// Prefab Root가 켜져 있어도, Open() 전에는 맵 입력을 막지 않는다.
+        /// set 될 때마다 UiBlockGate에 자동으로 등록/해제 — MapPointerRouter가 이 화면 입장에서
+        /// 입력을 막아야 한다는 걸 안다(값 바뀌는 지점을 일일이 찾아다니지 않아도 됨).</summary>
+        bool isOpen;
+        public bool IsOpen
+        {
+            get => isOpen;
+            private set
+            {
+                if (isOpen == value) return;
+                isOpen = value;
+                if (value) Yoegoe.Core.UiBlockGate.Register(this);
+                else Yoegoe.Core.UiBlockGate.Unregister(this);
+            }
+        }
 
         YutMatch match;
         YutThrowOutcome? pendingOutcome;
@@ -172,6 +185,7 @@ namespace Yoegoe.UI
         {
             if (Instance == this) Instance = null;
             CharacterSummon.Summoned -= OnCharacterSummoned;
+            Yoegoe.Core.UiBlockGate.Unregister(this);
         }
 
         public void Open()

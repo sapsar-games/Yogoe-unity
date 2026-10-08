@@ -124,10 +124,11 @@ namespace Yoegoe.Characters
             FlushPendingMonologueTapIfDue();
 
             if (CeremonyGate.BlocksWorldInput) return;
-            // 윷은 풀스크린 UI인데 보드 칸 Image가 raycast를 안 먹는 구멍이 있어,
-            // 휠/핀치가 IsBlockingUi를 통과해 본맵 카메라로 새는 경우가 있다.
-            if (YutScreen.Instance != null && YutScreen.Instance.IsOpen) return;
-            if (GongyangganScreen.Instance != null && GongyangganScreen.Instance.IsOpen) return;
+            // 풀스크린 UI가 열려 있으면 전부 차단 (UiBlockGate — 화면이 스스로 등록/해제).
+            // 일부 풀스크린 UI는 보드 칸 Image가 raycast를 안 먹는 구멍이 있어,
+            // 휠/핀치가 IsBlockingUi(per-tap 레이캐스트) 판정을 통과해 본맵 카메라로 새는 경우가
+            // 있어서 여기서 Update() 맨 앞에 통째로 막는다.
+            if (UiBlockGate.IsBlocking) return;
 
             // 핀치·휠은 단일 포인터 제스처보다 우선
             if (TryHandlePinchZoom()) return;
