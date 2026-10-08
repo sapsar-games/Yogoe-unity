@@ -123,6 +123,7 @@ namespace Yoegoe.Save
             data.economy.specialItems = GameEconomy.Instance.CaptureSpecialItemCounts();
             data.economy.charms = GameEconomy.Instance.CaptureCharmCounts();
             Attendance.CaptureToSave(out data.economy.attendanceNextDayIndex, out data.economy.attendanceLastHandledDayKey);
+            UnityEngine.Debug.Log($"[DIAG] CaptureFromWorld attendance: next={data.economy.attendanceNextDayIndex} last={data.economy.attendanceLastHandledDayKey} (live Attendance.NextDayIndex={Attendance.NextDayIndex} Attendance.LastHandledDayKey={Attendance.LastHandledDayKey})");
             data.economy.codexDiscovered = Yoegoe.Cooking.CookingCodex.CaptureToSave();
             data.economy.lockedSlotUnlocked = CharacterSummon.LockedSlotUnlocked;
 
@@ -295,6 +296,7 @@ namespace Yoegoe.Save
             GiftBundle.ResetFromSave(e.giftMissStreak, e.giftFirstGrantDone, e.adRewardTickets);
             ShopStock.ResetFromSave(e.shopLeftOfferingId, e.shopRightOfferingId, e.shopNextRefreshUtcTicks);
             Attendance.ResetFromSave(e.attendanceNextDayIndex, e.attendanceLastHandledDayKey);
+            UnityEngine.Debug.Log($"[DIAG] ApplyEconomy attendance: from save next={e.attendanceNextDayIndex} last={e.attendanceLastHandledDayKey} → live now Attendance.LastHandledDayKey={Attendance.LastHandledDayKey}");
             CharacterSummon.ResetFromSave(e.lockedSlotUnlocked);
             Yoegoe.Cooking.CookingCodex.ResetFromSave(e.codexDiscovered);
         }
