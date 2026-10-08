@@ -1,25 +1,31 @@
 # 한 폭의 요괴 (Scroll of Yoegoe)
 
-한국 설화 기반 **방치형(유휴) 육성 시뮬레이션** 모바일 게임 프로토타입입니다.
-(기획문서 "한폭요괴 1.0" MVP 2차 기준)
+한국 설화 기반 **방치형(유휴) 육성 시뮬레이션** 모바일 게임입니다.
+(기획문서 "한폭요괴 1.0" — MVP 3차 + v1.2/v1.3 기물·공양간·나루터 통합 기획 기준)
 
-족자 위에서 요괴들이 스스로 돌아다니며 기물을 사용해 공덕을 생산하고,
-공양으로 친밀도·기력을 관리하는 육성 루프입니다.
+족자 위에서 요괴들이 스스로 돌아다니며 기물을 사용해 공덕·자원을 생산하고,
+공양으로 친밀도·기력을 관리하는 육성 루프입니다. 윷놀이·공양간 요리·상점·나루터 혼령·
+출석 윷점 등 서브 콘텐츠를 갖춘 상태로 WebGL 데모가 계속 업데이트되고 있습니다.
 
 ## 현재 진행
 
 - [x] BigNumber 무한 자릿수 재화 시스템 (ㄱㄴㄷ...ㅎ → ㄱㄱ,ㄴㄴ 순환 단위)
-- [x] 캐릭터 행동 상태머신 (걷기 → 머무르기 → 늘어짐 → 기절), 기물 점유/생산 계산
-- [x] 기물/공양/캐릭터 데이터 정의 (ScriptableObject)
-- [x] Main 씬 진입점 (`Main` + `Assets/Scenes/Main.unity`)
-- [x] 시작값 설정 (`Resources/StartingStateSettings.asset`)
-- [x] 화면 크기 설정 (`Resources/ArtScaleSettings.asset`)
-- [x] 윷놀이 보드 계산 · 확률표 · 화면(기존 프로젝트에서 재사용, 검증 완료)
-- [ ] 윷놀이 승패 판정 / 상대 AI / 잡기 / 보상 지급 (새로 설계·구현 필요)
-- [ ] 공양물 24종 에셋 채우기 (현재 일부만 StartingState에 연결)
-- [ ] 소환, 요구와 보상상자, 상점/업적/저장 시스템
+- [x] 캐릭터 행동 상태머신(걷기·머물기·놀기·기절) · 혼잣말·요구 대사 · 드래그 착석
+- [x] 기물 구매·업그레이드·생산(공덕/물/사냥·채집 재료) · 보관 확장 · 개별/일괄 수거
+- [x] 공양(상세 화면) · 친밀도·기력 · 랜덤 음식 요구 · 선물꾸러미
+- [x] 소환(향으로 빈 슬롯/잠긴 슬롯 개방)
+- [x] 윷놀이 — 보드·확률표·대전 AI·특수칸·보물상자·완주 부적·귀환 수거까지 완결
+- [x] 공양간 요리 미니게임(5×5 판) · 레시피 76종(음식40·공양물36) · 부적 6종 · 요리책(도감)
+- [x] 상점(고가구점) — 진열 로테이션, 공덕으로 리셋
+- [x] 북제단·남제단(탭으로 공덕 수거) · 나루터(혼령 접대 → 기억 조각)
+- [x] 출석 윷점 (KST 새벽 4시 리셋, 64괘)
+- [x] 로컬 세이브 + 오프라인 정산(기력 소모·생산·보관 동일 규칙)
+- [x] WebGL 빌드 → GitHub Pages 자동 배포 (push 시 CI)
+- [ ] 사운드(목탁·엽전·풍경·나무·가야금) — 음원 미보유
+- [ ] 서버 시각(Firebase) 연동 — 연결 지점만 준비(`TrustedTime`), 로컬 시계로 동작 중
+- [ ] 광고 SDK 실연동 — 지금은 전부 스텁(즉시 성공 처리)
 
-자세한 현황은 [`Docs/02_개발진행.md`](Docs/02_개발진행.md), 기획 요약은
+세부 항목별 ✅/⚠️/❌ 현황은 [`Docs/02_개발진행.md`](Docs/02_개발진행.md), 기획 요약은
 [`Docs/00_기획정리.md`](Docs/00_기획정리.md), 미확정 설계 이슈는
 [`Docs/05_기획_미확정사항.md`](Docs/05_기획_미확정사항.md)을 참고하세요.
 
@@ -51,51 +57,56 @@
 ```
 Assets/
   Scripts/
-    Core/            BigNumber
-    Data/            Enums, Character/Prop/Offering Data, StartingStateSettings, ArtScaleSettings
-    Characters/      CharacterAgent 등
-    Economy/         GameEconomy
-    Main.cs          Main 씬 진입점
-    Debugging/       MapCameraDrag
+    Core/            BigNumber, TrustedTime, CeremonyGate, SpeechGate
+    Data/            Enums, Character/Prop/Offering/Settings Data (ScriptableObject)
+    Characters/      CharacterAgent(상태머신·드래그·공양·연출), PropSlot, PropManager, MapPointerRouter
+    Bootstrap/       AppSession, WorldAssembler, UiAssembler, MapIntro — Main 씬 조립
+    Economy/         GameEconomy, PropStorage/Production, Attendance, ShopStock, SpiritPier(나루터) 등
+    Cooking/         공양간 요리 세션·레시피·도감·손님 주문
+    Save/            GameSaveService/Bridge/Migration, OfflineSimulator
+    UI/              GameHud, DetailScreen, GongyangganScreen, PierScreen, ShopScreen, YutScreen 등 화면 전체
     Minigames/Yut/   윷놀이
-  Resources/         StartingStateSettings.asset, ArtScaleSettings.asset  ← 숫자 조절
-  Data/              Characters/, Offerings/ (.asset)
+    Debugging/       MapCameraDrag
+  Resources/         StartingStateSettings.asset, ArtScaleSettings.asset, props.json 등 ← 숫자 조절
+  Data/              Characters/, Offerings/, Props/ (.asset)
   Scenes/Main.unity
 Docs/
-  00_기획정리.md
-  02_개발진행.md
-  04_CI_배포.md
-  05_기획_미확정사항.md
-  코드정리.md
+  00_기획정리.md          기획 확정 스펙 요약
+  02_개발진행.md          장별 구현 현황(✅/⚠️/❌)
+  03_백엔드_설계.md       신뢰 시각(오프라인 정산) 설계
+  04_CI_배포.md           WebGL → GitHub Pages CI
+  05_기획_미확정사항.md   아직 안 정해진 것
+  06_행동룰.md            캐릭터 행동 상태 상세
+  07_탭_인터랙션_경우의수.md  탭/드래그 입력 표(3차 기준)
+  08_유저인터랙션_v1.2.md    탭/드래그 입력 표(v1.2 변경분)
+  09_v1.2_시연_역기획.md     v1.2 시연 역기획 노트
+  코드정리.md             비개발자용 코드 공부 노트
 ```
 
 ### 윷놀이 미니게임 (`Minigames/Yut/`)
 
-보드 좌표·이동 경로·화면 연출(홉 이동·말풍선·던지기 영역)까지 동작 중.
-승패/보상 등 일부 규칙은 `Docs/05_기획_미확정사항.md`와 맞춰 계속 다듬는 중.
+보드 이동·확률표·대전 AI·특수칸·보물상자·완주 부적·귀환 수거까지 동작 중인 완결 콘텐츠.
 
 | 파일 | 역할 |
 |------|------|
-| `YutMiniGame.cs` | 보드 UI·윷 연출·말/후보 표시 |
+| `YutMiniGame.cs` + `YutMiniGame.*.cs` | 보드 UI·윷 연출·말/후보·HUD·보상 (part class로 분리) |
 | `YutMatch.cs` | 한 판 상태·이동 미리보기 |
-| `YutBoardLayout.cs` | 전통 윷판 29발 좌표 |
+| `YutBoardLayout.cs` | 전통 윷판 29발 좌표 + 특수칸 |
 | `YutMoveResolver.cs` | 도/개/걸/윷/모/빽도 → 경로 |
 | `YutThrowRoller.cs` | 확률표 RNG |
-| `YutBoardQuadrant.cs` | 4구역 enum (UI용) |
+| `YutRewards.cs` | 보물상자·완주 부적 추첨 |
+| `YutChallenge.cs` / `YutChallengePresenter.cs` | 이무기 대전 판정·연출 |
 
 말풍선 문구: `Assets/Resources/Yut/yut_bubbles.{locale}.json`  
 카탈로그: `Assets/Scripts/Data/YutBubbleCatalog.cs`
 
-## 윷 말풍선 Google Sheets 동기화
+## Google Sheets 동기화
 
-시트 탭 `yut_bubbles` ↔ 로컬 JSON. 설정: `Tools/yut_bubbles_sheets.config.json`
-
-| 명령 | 방향 |
-|------|------|
-| `npm run yut-bubbles` | 시트 → `Assets/Resources/Yut/yut_bubbles.*.json` |
-| `npm run yut-bubbles:csv` | 로컬 CSV → JSON (오프라인) |
-| `npm run yut-bubbles:to-csv` | JSON → `Tools/sheets/yut_bubbles.csv` |
-| `npm run yut-bubbles:push` | JSON → 시트 (Apps Script 웹 앱) |
+기획 수치·대사는 코드가 아니라 구글 시트 두 개(밸런스 시트 · 대사 시트)가 정본입니다.
+탭별로 `npm run <이름>` (`characters` / `props` / `attendance` / `yut-bubbles` / `recipes` /
+`ingredients` / `charms` / `settings` / `spirits`) 또는 전체 한 번에 `npm run sheets`.
+각 명령은 `:csv`(오프라인 변환) · `:push`(시트에 쓰기) 변형도 있습니다. 시트 탭 ↔ 로컬 파일
+연결은 `Tools/sheets_config.py` 참고.
 
 **가져오기**는 시트를 `링크 있는 모든 사용자: 뷰어`로 두면 됩니다 (공개 CSV).
 
@@ -111,4 +122,4 @@ Docs/
 
 ## 라이선스
 
-프로토타입 / 비공개 개발용. (추후 명시)
+비공개 개발용. (추후 명시)
