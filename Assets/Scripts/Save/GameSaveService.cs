@@ -25,6 +25,7 @@ namespace Yoegoe.Save
 #if UNITY_WEBGL && !UNITY_EDITOR
             PlayerPrefs.SetString(PrefsKey, json);
             PlayerPrefs.Save();
+            try { YogoeSyncFilesystem(); } catch { /* ignore */ }
 #else
             try
             {
