@@ -70,8 +70,9 @@ namespace Yoegoe.Save
         /// <summary>기물 더미 표시를 즉시 맞춘다 (일괄 수거·로드 직후).</summary>
         public static void RefreshAllPropPileLabels()
         {
-            foreach (var p in UnityEngine.Object.FindObjectsByType<PropSlot>(FindObjectsSortMode.None))
-                p?.ForceRefreshPileLabel();
+            var props = PropManager.Instance?.All;
+            if (props == null) return;
+            for (int i = 0; i < props.Count; i++) props[i]?.ForceRefreshPileLabel();
         }
 
         /// <summary>저장이 필요함만 표시 (수거·요리처럼 자주 일어나는 변경). AppSession이 곧 한 번 몰아서 저장한다.</summary>
@@ -127,9 +128,9 @@ namespace Yoegoe.Save
             data.economy.lockedSlotUnlocked = CharacterSummon.LockedSlotUnlocked;
 
             // Props
-            var props = UnityEngine.Object.FindObjectsByType<PropSlot>(FindObjectsSortMode.None);
-            data.props = new PropSave[props.Length];
-            for (int i = 0; i < props.Length; i++)
+            var props = PropManager.Instance?.All ?? new List<PropSlot>();
+            data.props = new PropSave[props.Count];
+            for (int i = 0; i < props.Count; i++)
             {
                 var p = props[i];
                 string id = p.data != null ? p.data.propId : p.name;
@@ -191,7 +192,7 @@ namespace Yoegoe.Save
             SpiritPier.ResetFromSave(data.pier, TrustedTime.UtcNow);
 
             // Props — 점유 초기화 후 더미·레벨 반영
-            var props = UnityEngine.Object.FindObjectsByType<PropSlot>(FindObjectsSortMode.None);
+            var props = PropManager.Instance?.All ?? new List<PropSlot>();
             foreach (var p in props)
                 p.ClearOccupantForSaveRestore();
 
@@ -328,7 +329,9 @@ namespace Yoegoe.Save
 
         private static string FindOccupiedPropId(CharacterAgent agent)
         {
-            foreach (var p in UnityEngine.Object.FindObjectsByType<PropSlot>(FindObjectsSortMode.None))
+            var props = PropManager.Instance?.All;
+            if (props == null) return "";
+            foreach (var p in props)
             {
                 if (p.Occupant == agent)
                 {
