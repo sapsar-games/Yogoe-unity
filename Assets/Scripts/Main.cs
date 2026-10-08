@@ -116,6 +116,7 @@ namespace Yoegoe
         IEnumerator Start()
         {
             yield return null;
+            BootSanityCheck.Run(hudFont);
             UiAssembler.ForceCloseOverlayScreens();
             GameSaveBridge.TryLoadSimulateAndApply(hudFont);
 
