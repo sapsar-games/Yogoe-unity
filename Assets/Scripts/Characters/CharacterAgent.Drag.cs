@@ -8,7 +8,8 @@ namespace Yoegoe.Characters
     {
         const float DragLiftScale = 1.12f;
         const float DragBesideDistance = 0.85f;
-        const float DropMarkSeconds = 2f;
+        /// <summary>드롭 실패 (?)/(x) 딱지 지속 시간 (시트 game_settings, Docs/06: 2초).</summary>
+        static float DropMarkSeconds => GameSettings.DropMarkSeconds;
         const float DropMarkPad = 0.08f;
         Vector3 dragScaleBefore;
         private bool showingDropMark;

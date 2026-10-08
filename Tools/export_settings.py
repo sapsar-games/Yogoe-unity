@@ -84,6 +84,10 @@ KEYS: dict[str, tuple[float, str]] = {
     "startYutToken": (5, "새 게임 · 시작 윷 토큰"),
     "startMaterialEach": (5, "새 게임 · 재료 종류마다 시작 개수"),
     "startIntimacy": (50, "새 게임 · 시작 요괴(옥토끼·삼족오) 친밀도"),
+    "wanderRetrySeconds": (30, "행동 · 걷기 목적지 후보/자리가 없을 때 방황 후 재추첨 간격(초)"),
+    "haltedRecheckSeconds": (2, "행동 · 만창으로 멈춰 있을 때 다른 기물을 찾아보는 간격(초)"),
+    "awaySecondsForGreeting": (300, "행동 · 이보다 오래 비웠다 돌아오면 다시 접속 인사(초, 5분)"),
+    "dropMarkSeconds": (2, "행동 · 드래그 드롭 실패 (?)/(x) 딱지가 떠 있는 시간(초)"),
 }
 
 

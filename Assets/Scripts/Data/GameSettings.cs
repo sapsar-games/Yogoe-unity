@@ -69,6 +69,10 @@ namespace Yoegoe.Data
             { "startYutToken", 5f },
             { "startMaterialEach", 5f },
             { "startIntimacy", 50f },
+            { "wanderRetrySeconds", 30f },
+            { "haltedRecheckSeconds", 2f },
+            { "awaySecondsForGreeting", 300f },
+            { "dropMarkSeconds", 2f },
         };
 
         static Dictionary<string, float> values;
@@ -129,6 +133,15 @@ namespace Yoegoe.Data
         public static int GiftPityMisses => Int("giftPityMisses");
         // 새 게임 시작
         public static int StartMaterialEach => Int("startMaterialEach");
+        // 행동 AI (Docs/06_행동룰.md)
+        /// <summary>걷기 목적지 후보/자리 없음 → 이만큼 방황 후 재추첨.</summary>
+        public static float WanderRetrySeconds => Get("wanderRetrySeconds");
+        /// <summary>만창으로 멈춰 있을 때 다른 기물을 찾아보는 간격.</summary>
+        public static float HaltedRecheckSeconds => Get("haltedRecheckSeconds");
+        /// <summary>이보다 오래 비웠다 돌아오면 다시 접속 인사(어서와 등).</summary>
+        public static float AwaySecondsForGreeting => Get("awaySecondsForGreeting");
+        /// <summary>드래그 드롭 실패 시 (?)/(x) 딱지가 떠 있는 시간.</summary>
+        public static float DropMarkSeconds => Get("dropMarkSeconds");
 
         /// <summary>시작 상태 에셋 사본에 시트 값을 덮어쓴다 (새 게임에만 쓰인다).</summary>
         public static void ApplyStart(StartingStateSettings s)

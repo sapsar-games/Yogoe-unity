@@ -10,7 +10,7 @@ namespace Yoegoe.Characters
         private const float PlayDurationSeconds = 1f * 60f; // 기력 있는 놀기
         private static float FaintThresholdSeconds => GameSettings.FaintThresholdSeconds; // 기력0 놀기 → 기절 (시트 game_settings)
         private static float StaminaDrainPerSecond => GameSettings.StaminaDrainPerSecond; // 10분당 1 (시트 game_settings)
-        private const float WanderRetrySeconds = 30f;
+        private static float WanderRetrySeconds => GameSettings.WanderRetrySeconds; // 30초 재추첨 (시트 game_settings, Docs/06)
         private const float SeparationRadius = 0.55f;
         /// <summary>전진을 죽이지 않도록 이동 속도보다 낮게 유지.</summary>
         private const float SeparationSpeed = 1.2f;
@@ -25,8 +25,8 @@ namespace Yoegoe.Characters
         private Vector3? wanderTarget; // isWandering 중 실제로 걸어갈 맵 안의 임시 목적지
         private float boundaryStuckTimer;
         private const float BoundaryStuckSeconds = 0.35f;
-        /// <summary>만창으로 멈춰 있을 때 다른 기물을 찾아보는 간격.</summary>
-        private const float HaltedRecheckSeconds = 2f;
+        /// <summary>만창으로 멈춰 있을 때 다른 기물을 찾아보는 간격 (시트 game_settings, Docs/02: 2초마다 확인).</summary>
+        private static float HaltedRecheckSeconds => GameSettings.HaltedRecheckSeconds;
         private float haltedRecheckTimer;
 
         /// <summary>
