@@ -86,6 +86,7 @@ namespace Yoegoe.Save
             // Play 중이 아니거나 Economy 부팅 전이면 OnApplicationQuit 등에서 NRE 남
             if (GameEconomy.Instance == null) return;
             if (SaveBlockedByLoadFailure) return; // 불러오기 실패 — 진짜 세이브를 새 게임으로 덮어쓰지 않는다
+            UnityEngine.Debug.Log("[DIAG] SaveFromWorld called from:\n" + System.Environment.StackTrace);
             var data = CaptureFromWorld();
             GameSaveService.Save(data);
         }
