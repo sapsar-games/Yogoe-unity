@@ -10,8 +10,9 @@ namespace Yoegoe.Economy
     /// <summary>12장 고가구점 재고: 2시간 랜덤 공양 2칸 + 향.</summary>
     public static class ShopStock
     {
-        public const int OfferingPriceYeopjeon = 10;
-        public const int HyangPriceYeopjeon = 20;
+        // 시트 game_settings
+        public static int OfferingPriceYeopjeon => Yoegoe.Data.GameSettings.ShopOfferingPrice;
+        public static int HyangPriceYeopjeon => Yoegoe.Data.GameSettings.ShopHyangPrice;
         /// <summary>진열 3시간마다 랜덤 교체 (3차 기획).</summary>
         public static readonly TimeSpan RefreshInterval = TimeSpan.FromHours(3);
 
@@ -19,7 +20,7 @@ namespace Yoegoe.Economy
         public enum BuyFail { None, NoStock, NotEnoughYeopjeon, NotEnoughMerit }
 
         /// <summary>진열 리셋 비용 = 떡절구 현재 분당 산출 × 이 분 (12장 '5분치 공덕').</summary>
-        public const float RerollMeritMinutes = 5f;
+        public static float RerollMeritMinutes => Yoegoe.Data.GameSettings.ShopRerollMeritMinutes;
 
         public static string LeftOfferingId { get; private set; }
         public static string RightOfferingId { get; private set; }

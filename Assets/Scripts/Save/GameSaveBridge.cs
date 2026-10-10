@@ -21,10 +21,38 @@ namespace Yoegoe.Save
         /// 없으면 false (기존 StartingState 유지).
         /// </summary>
         /// <param name="bubbleFont">세이브에만 있어 새로 스폰하는 요괴(고라니·구미호)의 말풍선 폰트 — 없으면 한글이 깨진다.</param>
+        /// <summary>
+        /// 세이브가 있었는데 불러오다 실패했으면 true — 새 게임 상태로 진짜 세이브를 덮어쓰지 않게 저장을 막는다.
+        /// </summary>
+        public static bool SaveBlockedByLoadFailure { get; private set; }
+
         public static bool TryLoadSimulateAndApply(Font bubbleFont = null)
         {
             if (!GameSaveService.TryLoad(out var data)) return false;
+            try
+            {
+                LoadAndApply(data, bubbleFont);
+                GameSaveService.RecordLoadStatus("ok v" + data.version);
+                return true;
+            }
+            catch (System.Exception e)
+            {
+                SaveBlockedByLoadFailure = true;
+                GameSaveService.RecordLoadStatus("error: " + e.GetType().Name + ": " + e.Message + " @ " + FirstFrame(e.StackTrace));
+                Debug.LogError("[GameSaveBridge] 세이브 불러오기 실패 — 덮어쓰지 않도록 저장을 막습니다.\n" + e);
+                return false;
+            }
+        }
 
+        static string FirstFrame(string stack)
+        {
+            if (string.IsNullOrEmpty(stack)) return "";
+            var lines = stack.Split('\n');
+            return lines.Length > 0 ? lines[0].Trim() : "";
+        }
+
+        static void LoadAndApply(GameSaveData data, Font bubbleFont)
+        {
             GameSaveMigration.MigrateToCurrent(data);
 
             var sim = OfflineSimulator.Simulate(data, TrustedTime.UtcNow);
@@ -37,14 +65,14 @@ namespace Yoegoe.Save
             ApplyToWorld(data, bubbleFont);
             // 공덕 더미는 기물에 남겨 두고 버드나무에서 수거한다 (7-4). 예전의 콜드스타트 일괄 스윕은 폐지.
             RefreshAllPropPileLabels();
-            return true;
         }
 
         /// <summary>기물 더미 표시를 즉시 맞춘다 (일괄 수거·로드 직후).</summary>
         public static void RefreshAllPropPileLabels()
         {
-            foreach (var p in UnityEngine.Object.FindObjectsByType<PropSlot>(FindObjectsSortMode.None))
-                p?.ForceRefreshPileLabel();
+            var props = PropManager.Instance?.All;
+            if (props == null) return;
+            for (int i = 0; i < props.Count; i++) props[i]?.ForceRefreshPileLabel();
         }
 
         /// <summary>저장이 필요함만 표시 (수거·요리처럼 자주 일어나는 변경). AppSession이 곧 한 번 몰아서 저장한다.</summary>
@@ -58,6 +86,7 @@ namespace Yoegoe.Save
             SaveRequested = false;
             // Play 중이 아니거나 Economy 부팅 전이면 OnApplicationQuit 등에서 NRE 남
             if (GameEconomy.Instance == null) return;
+            if (SaveBlockedByLoadFailure) return; // 불러오기 실패 — 진짜 세이브를 새 게임으로 덮어쓰지 않는다
             var data = CaptureFromWorld();
             GameSaveService.Save(data);
         }
@@ -99,9 +128,9 @@ namespace Yoegoe.Save
             data.economy.lockedSlotUnlocked = CharacterSummon.LockedSlotUnlocked;
 
             // Props
-            var props = UnityEngine.Object.FindObjectsByType<PropSlot>(FindObjectsSortMode.None);
-            data.props = new PropSave[props.Length];
-            for (int i = 0; i < props.Length; i++)
+            var props = PropManager.Instance?.All ?? new List<PropSlot>();
+            data.props = new PropSave[props.Count];
+            for (int i = 0; i < props.Count; i++)
             {
                 var p = props[i];
                 string id = p.data != null ? p.data.propId : p.name;
@@ -112,6 +141,7 @@ namespace Yoegoe.Save
                     cycleProgressSeconds = cycleProgress,
                     overflowJudged = judged,
                     pendingIngredients = ingredients,
+                    destinationId = p.DestinationId ?? "",
                     propId = id,
                     level = p.level,
                     isBuilt = p.IsBuilt,
@@ -148,6 +178,7 @@ namespace Yoegoe.Save
             if (YutScreen.Instance != null)
                 data.yutMatch = YutScreen.Instance.CaptureForSave();
 
+            data.pier = SpiritPier.CaptureToSave();
             return data;
         }
 
@@ -157,9 +188,11 @@ namespace Yoegoe.Save
 
             // Economy — StartingState를 덮어쓴다
             ApplyEconomy(data.economy);
+            // 나루터 — 오프라인 동안 온 혼령은 AppSession.Tick 의 SpiritPier.Advance 가 따라잡는다
+            SpiritPier.ResetFromSave(data.pier, TrustedTime.UtcNow);
 
             // Props — 점유 초기화 후 더미·레벨 반영
-            var props = UnityEngine.Object.FindObjectsByType<PropSlot>(FindObjectsSortMode.None);
+            var props = PropManager.Instance?.All ?? new List<PropSlot>();
             foreach (var p in props)
                 p.ClearOccupantForSaveRestore();
 
@@ -175,6 +208,9 @@ namespace Yoegoe.Save
                         p.ApplySaveBuiltState(ps.isBuilt, ps.level);
                         p.SetPendingMeritFromSave(ps.pendingMerit.ToBigNumber());
                         p.RestoreStorage(ps.storedResources, ps.cycleProgressSeconds, ps.overflowJudged, ps.pendingIngredients);
+                        p.DestinationId = string.IsNullOrEmpty(ps.destinationId) ? null : ps.destinationId;
+                        if (string.IsNullOrEmpty(p.DestinationId))
+                            p.ApplyFixedDestination();
                         break;
                     }
                 }
@@ -293,7 +329,9 @@ namespace Yoegoe.Save
 
         private static string FindOccupiedPropId(CharacterAgent agent)
         {
-            foreach (var p in UnityEngine.Object.FindObjectsByType<PropSlot>(FindObjectsSortMode.None))
+            var props = PropManager.Instance?.All;
+            if (props == null) return "";
+            foreach (var p in props)
             {
                 if (p.Occupant == agent)
                 {

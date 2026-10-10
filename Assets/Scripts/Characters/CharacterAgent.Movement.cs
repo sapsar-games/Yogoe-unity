@@ -8,14 +8,16 @@ namespace Yoegoe.Characters
     public partial class CharacterAgent
     {
         private const float PlayDurationSeconds = 1f * 60f; // 기력 있는 놀기
-        private const float FaintThresholdSeconds = 18f * 60f * 60f; // 기력0 놀기 18시간 → 기절
-        private const float StaminaDrainPerSecond = 1f / 600f; // 10분당 1
-        private const float WanderRetrySeconds = 30f;
+        private static float FaintThresholdSeconds => GameSettings.FaintThresholdSeconds; // 기력0 놀기 → 기절 (시트 game_settings)
+        private static float StaminaDrainPerSecond => GameSettings.StaminaDrainPerSecond; // 10분당 1 (시트 game_settings)
+        private static float WanderRetrySeconds => GameSettings.WanderRetrySeconds; // 30초 재추첨 (시트 game_settings, Docs/06)
         private const float SeparationRadius = 0.55f;
         /// <summary>전진을 죽이지 않도록 이동 속도보다 낮게 유지.</summary>
         private const float SeparationSpeed = 1.2f;
 
         private PropSlot currentProp;
+        /// <summary>지금 앉아 일하는 기물 (없으면 null).</summary>
+        public PropSlot CurrentProp => currentProp;
         private PropSlot previousProp;
         private PropSlot destination;
         private bool isWandering;
@@ -23,8 +25,8 @@ namespace Yoegoe.Characters
         private Vector3? wanderTarget; // isWandering 중 실제로 걸어갈 맵 안의 임시 목적지
         private float boundaryStuckTimer;
         private const float BoundaryStuckSeconds = 0.35f;
-        /// <summary>만창으로 멈춰 있을 때 다른 기물을 찾아보는 간격.</summary>
-        private const float HaltedRecheckSeconds = 2f;
+        /// <summary>만창으로 멈춰 있을 때 다른 기물을 찾아보는 간격 (시트 game_settings, Docs/02: 2초마다 확인).</summary>
+        private static float HaltedRecheckSeconds => GameSettings.HaltedRecheckSeconds;
         private float haltedRecheckTimer;
 
         /// <summary>
@@ -215,12 +217,19 @@ namespace Yoegoe.Characters
         {
             if (currentProp != null && currentProp.IsStorageHalted)
             {
-                // 7장: 만창인데 기력이 남았으면 일할 수 있는 다른 기물로 간다. 없으면 그대로 앉아 대기(수거되면 재개).
+                // 만창인데 기력이 남았으면 일할 수 있는 다른 기물로 간다. 없으면 놀기 (v1.2 · 시연).
                 haltedRecheckTimer += dt;
                 if (haltedRecheckTimer >= HaltedRecheckSeconds)
                 {
                     haltedRecheckTimer = 0f;
                     if (TryLeaveHaltedProp()) return dt;
+                    if (Stats.Stamina > 0f)
+                    {
+                        // 갈 곳이 없으면 '다 찼어. 이제 놀래!' 하고 놀기 — 기력이 남아 있어 기절로 이어지지 않는다
+                        EnterPlaying();
+                        TrySayCatalogLine(e => e.fullIdleLines);
+                        return dt;
+                    }
                 }
                 Stats.StateTimer += dt;
                 return dt;
@@ -235,6 +244,7 @@ namespace Yoegoe.Characters
             {
                 Stats.Stamina = 0f;
                 EnterPlaying(); // 기력 0 → 놀기/쉬기 (점유 해제)
+                TrySayCatalogLine(e => e.tiredLines);
                 return 0.0001f;
             }
 
@@ -254,6 +264,7 @@ namespace Yoegoe.Characters
             {
                 Stats.Stamina = 0f;
                 EnterPlaying();
+                TrySayCatalogLine(e => e.tiredLines);
             }
 
             return slice;
@@ -286,13 +297,27 @@ namespace Yoegoe.Characters
             SetSpriteVisible(true);
         }
 
-        /// <summary>만창 기물에서 일어나 다른 빈 기물로 걸어간다. 갈 곳이 없거나 기력이 없으면 false(그대로 앉아 있음).</summary>
+        /// <summary>보관함이 찬 요괴가 옮겨 갈 수 있는 기물 — 옹달샘 · 제단(공덕 기물) (v1.2).</summary>
+        static bool IsOverflowSpot(PropSlot p) =>
+            p.ResourceType == PropResourceType.Water || p.ResourceType == PropResourceType.Merit;
+
+        /// <summary>만창 기물에서 일어나 빈 옹달샘·제단 중 하나로 걸어간다. 갈 곳이 없거나 기력이 없으면 false.</summary>
         private bool TryLeaveHaltedProp()
         {
             if (Stats.Stamina <= 0f || PropManager.Instance == null || currentProp == null) return false;
-            if (PropManager.Instance.GetRandomAvailableProp(this, currentProp) == null) return false;
+            var target = PropManager.Instance.GetRandomAvailableProp(this, currentProp, IsOverflowSpot);
+            if (target == null) return false;
             LeaveCurrentProp();   // previousProp = 만창 기물 → 걷기 목적지에서 빠진다
             EnterWalking();
+            if (destination != target)
+            {
+                if (destination != null) destination.ReleaseReservation(this);
+                destination = target;
+                destination.TryReserve(this);
+                isWandering = false;
+            }
+            // '다 찼어. {d}에 가 있을게' (v1.2 시연) — {d} = 걸어갈 기물
+            TrySayCatalogLine(e => e.fullLines, destination != null ? destination.DisplayName : "다른 데");
             return true;
         }
 

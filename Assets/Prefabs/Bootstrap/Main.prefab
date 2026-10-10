@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &100001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 100002}
+  - component: {fileID: 100003}
+  m_Layer: 0
+  m_Name: Main
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &100002
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &100003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 384bea504b22243b88c92d5e31cbb02c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Yoegoe.Runtime::Yoegoe.Main
+  oktoData: {fileID: 11400000, guid: 98fe9d32329b48a3a0b14e5866901fe5, type: 2}
+  samjokOData: {fileID: 11400000, guid: 8a1b2c3d4e5f60718293a4b5c6d7e8f9, type: 2}
+  gumihoData: {fileID: 11400000, guid: 3b7c1e9f2a4d4c6e8f0a1b2c3d4e5f60, type: 2}
+  goraniData: {fileID: 11400000, guid: 677de9b60f0a42bfb6758c34e48a5ca4, type: 2}
+  artScale: {fileID: 11400000, guid: 5f7601ef09d4400a80d6dbe5873da714, type: 2}
+  propLayout: {fileID: 11400000, guid: dfa2b26ea3ab4295b8871943cc4ec767, type: 2}
+  overviewBackgroundSprite: {fileID: 21300000, guid: 9f44e0c25249744e487d7ce4f92b0a33, type: 3}
+  playfieldSprite: {fileID: 21300000, guid: 5215ef6a9024d41f4ab9dd07fbc18cdc, type: 3}
+  overviewOffset: {x: -0.05, y: -0.32}
+  hudFont: {fileID: 12800000, guid: 8e00f09198e0495f8df7aa7fe5acd23d, type: 3}
+  waterIcon: {fileID: 21300000, guid: f245b0d861e8b4deca4320d79c23c5c1, type: 3}
+  offerings:
+  - {fileID: 11400000, guid: 26314678e70647f398a9913fc6d62b7e, type: 2}
+  - {fileID: 0}
+  - {fileID: 11400000, guid: a15a1ddf375640078a72ff37f11d2266, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 11400000, guid: b6ca2b1a55e147e69481a0813cb4fed5, type: 2}

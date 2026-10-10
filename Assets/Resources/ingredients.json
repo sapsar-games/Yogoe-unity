@@ -16,8 +16,8 @@
       "description": ""
     },
     {
-      "id": "RedBean",
-      "name": "팥",
+      "id": "Grain",
+      "name": "잡곡",
       "description": ""
     },
     {
@@ -51,8 +51,8 @@
       "description": ""
     },
     {
-      "id": "Fish",
-      "name": "물고기",
+      "id": "Seafood",
+      "name": "해산물",
       "description": ""
     },
     {
@@ -66,13 +66,33 @@
       "description": ""
     },
     {
-      "id": "GoldenRice",
-      "name": "황금쌀",
+      "id": "GoldenChili",
+      "name": "황금고추",
       "description": ""
     },
     {
-      "id": "GoldenHoney",
-      "name": "황금꿀",
+      "id": "GoldenNamul",
+      "name": "황금산나물",
+      "description": ""
+    },
+    {
+      "id": "GoldenHerb",
+      "name": "황금약재",
+      "description": ""
+    },
+    {
+      "id": "GoldenBird",
+      "name": "황금새고기",
+      "description": ""
+    },
+    {
+      "id": "GoldenFish",
+      "name": "황금해산물",
+      "description": ""
+    },
+    {
+      "id": "GoldenEgg",
+      "name": "황금새알",
       "description": ""
     }
   ]

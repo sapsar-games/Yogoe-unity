@@ -7,15 +7,17 @@ namespace Yoegoe.Cooking
 {
     /// <summary>
     /// 공양간 주문 요괴: 선호 공양물을 지금 판에서 지을 수 있을 때만 등장.
-    /// 퍼펙트(김) → 친밀도·기력 ×3 · 인벤 미지급 / 식음 → 친밀도 동일·기력 ×2 · 인벤 미지급 / 미제공 → 실망.
+    /// 퍼펙트(김) → 친밀도·기력 ×2 / 식음 → 친밀도 평소대로·기력 ×2 / 미제공 → 실망. 배수 = 시트 game_settings.
+    /// 완성품 하나가 요괴에게 가고 나머지는 창고로 (v1.3).
+    /// 기절한 요괴도 손님으로 온다 — 받으면 친밀도 없이 그 기력만큼 회복하며 바로 깨어난다(물의 '기력 1' 단계를 건너뜀).
     /// </summary>
     public sealed class CookingGuestOrder
     {
-        public const int PerfectStaminaMul = 3;
-        public const int PerfectIntimacyMul = 3;
-        public const int CoolStaminaMul = 2;
-        /// <summary>식음도 친밀도는 퍼펙트와 같음(×3).</summary>
-        public const int CoolIntimacyMul = PerfectIntimacyMul;
+        public static float PerfectStaminaMul => GameSettings.GuestPerfectStaminaMul;
+        public static float PerfectIntimacyMul => GameSettings.GuestPerfectIntimacyMul;
+        public static float CoolStaminaMul => GameSettings.GuestCoolStaminaMul;
+        /// <summary>식음은 친밀도 평소대로(×1, v1.3).</summary>
+        public static float CoolIntimacyMul => GameSettings.GuestCoolIntimacyMul;
 
         public CharacterAgent Yokai { get; }
         public string CharacterId { get; }
@@ -28,6 +30,8 @@ namespace Yoegoe.Cooking
         public bool Perfect { get; private set; }
         public int StaminaGain { get; private set; }
         public float IntimacyGain { get; private set; }
+        /// <summary>기절한 요괴가 받아서 깨어났는지 (친밀도 없음).</summary>
+        public bool RevivedFromFaint { get; private set; }
 
         public CookingGuestOrder(CharacterAgent yokai, string characterId, string displayName,
             string offeringId, string offeringName)
@@ -134,19 +138,19 @@ namespace Yoegoe.Cooking
             }
         }
 
-        /// <summary>선호 공양물 기본 수치에 배율 적용. 퍼펙트=기력·친밀 ×3, 식음=친밀 ×3·기력 ×2.</summary>
+        /// <summary>선호 공양물 기본 수치에 배율 적용 (시트 game_settings).</summary>
         public static void ComputeReward(OfferingData offering, bool perfect, out int stamina, out float intimacy)
         {
-            int baseStam = offering != null ? offering.ResolveStaminaGain(true) : 3;
-            float baseInti = offering != null ? offering.ResolveIntimacyGain(true) : 5f;
+            int baseStam = offering != null ? offering.ResolveStaminaGain(true) : GameSettings.OfferingStamina;
+            float baseInti = offering != null ? offering.ResolveIntimacyGain(true) : GameSettings.PreferredIntimacy;
             if (perfect)
             {
-                stamina = baseStam * PerfectStaminaMul;
+                stamina = UnityEngine.Mathf.RoundToInt(baseStam * PerfectStaminaMul);
                 intimacy = baseInti * PerfectIntimacyMul;
             }
             else
             {
-                stamina = baseStam * CoolStaminaMul;
+                stamina = UnityEngine.Mathf.RoundToInt(baseStam * CoolStaminaMul);
                 intimacy = baseInti * CoolIntimacyMul;
             }
         }
@@ -170,7 +174,15 @@ namespace Yoegoe.Cooking
 
             if (Yokai != null && Yokai.Data != null)
             {
-                Yokai.ReceiveOffering(stam, inti, OfferingKind.Preferred);
+                if (Yokai.Stats.State == ActionState.Fainted)
+                {
+                    // 기절: 기력만 회복하며 깨어남 (기절을 깨우는 경로는 물과 같다 — 친밀도 0)
+                    RevivedFromFaint = true;
+                    IntimacyGain = 0f;
+                    Yokai.ReceiveOffering(stam, 0f, OfferingKind.Water);
+                }
+                else
+                    Yokai.ReceiveOffering(stam, inti, OfferingKind.Preferred);
                 if (!string.IsNullOrEmpty(OfferingId))
                     Yokai.Stats.RevealPreference(OfferingId);
             }
@@ -192,7 +204,8 @@ namespace Yoegoe.Cooking
         public string RewardHint =>
             Failed ? OfferingName + "을(를) 못 먹었어"
             : !Fulfilled ? OfferingName + "?"
-            : Perfect ? $"친밀도·기력 ×{PerfectStaminaMul}"
-            : $"친밀도 ×{CoolIntimacyMul} · 기력 ×{CoolStaminaMul}";
+            : RevivedFromFaint ? $"기력 +{StaminaGain} — 깨어났어"
+            : Perfect ? $"친밀도 +{IntimacyGain:0.#} · 기력 +{StaminaGain}"
+            : $"친밀도 +{IntimacyGain:0.#} · 기력 +{StaminaGain}";
     }
 }

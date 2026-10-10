@@ -6,33 +6,29 @@ using Yoegoe.UI;
 
 namespace Yoegoe.Characters
 {
-    /// <summary>10장 음식 요구. CharacterAgent가 소유.</summary>
+    /// <summary>
+    /// 음식 요구 — v1.3 그릇 말풍선. CharacterAgent가 소유.
+    /// 기력이 (최대 − foodRequestMargin) 이하로 떨어지면 일하는 중에도 머리 위에 그릇이 뜨고,
+    /// 그보다 높아지는 순간 사라진다. 특정 음식을 요구하지 않는다 — 그릇(또는 노는 요괴)을 누르면 먹이기 창.
+    /// 먹여서 그릇을 없애면 고맙다는 말 + 선물꾸러미 판정.
+    /// </summary>
     public class CharacterRequestState
     {
-        public const float OfferingDurationSeconds = 60f;
-        public const float RequestIntervalMin = 3f * 60f;
-        public const float RequestIntervalMax = 5f * 60f;
-        /// <summary>기력 구간에 처음 들어왔을 때(소환·로드 포함) 첫 체크까지.</summary>
-        public const float EnterBandCheckMin = 0f;
-        public const float EnterBandCheckMax = 10f;
-        /// <summary>
-        /// 기력 ≤ 최대 − 이 값 이면 요구 후보.
-        /// 음식 1회 회복(+8) 기준 — 예전 +25 잔재가 아님.
-        /// 고라니 소환(1/25)도 바로 후보.
-        /// </summary>
-        public const float StaminaRequestMargin = 8f;
+        // 시트 game_settings
+        public static float StaminaRequestMargin => GameSettings.FoodRequestMargin; // v1.3: 10
 
         public static event System.Action<string> GiftBundleAwarded;
 
-        public OfferingData OfferingRequest { get; private set; }
-        public float OfferingExpireAt { get; private set; }
-        public float NextRequestCheckAt { get; private set; }
+        /// <summary>v1.3부터 특정 음식 요구는 없다 — 늘 null (예전 상세 화면 강조 경로 호환용).</summary>
+        public OfferingData OfferingRequest => null;
 
-        public bool HasOfferingRequest => OfferingRequest != null;
+        bool hungry;
+        /// <summary>배고픔(그릇 말풍선)이 떠 있는지.</summary>
+        public bool HasOfferingRequest => hungry;
+        public bool IsHungry => hungry;
 
         SpriteRenderer offeringIcon;
         readonly CharacterAgent owner;
-        bool wasInLowStaminaBand;
 
         const string DefaultThanksLine = "너무 맛있어. 고마워.";
         const string DefaultGiftLine = "이거… 챙겨뒀어.";
@@ -40,59 +36,15 @@ namespace Yoegoe.Characters
         public CharacterRequestState(CharacterAgent agent)
         {
             owner = agent;
-            wasInLowStaminaBand = InLowStaminaBand();
-            // 소환 직후(기력 1/25) 등은 3~5분을 기다리지 않고 곧 체크
-            if (wasInLowStaminaBand) ScheduleSoonCheck();
-            else ScheduleNextCheck();
         }
 
-        /// <summary>
-        /// 매 프레임 CharacterAgent.Update()에서 호출된다.
-        /// dt = 이번 프레임에 흐른 시간(초). 현재 로직에서는 직접 쓰지 않고
-        /// Time.time(게임 시작 후 누적 시간)으로 만료·인터벌을 판단한다.
-        /// </summary>
+        /// <summary>매 프레임 CharacterAgent.Update()에서 호출된다.</summary>
         public void Tick(float dt)
         {
-            // ── 1. 요구 만료 체크 ──────────────────────────────────────────
-            // 음식 요구가 있는데 만료 시각(OfferingExpireAt)이 지났으면 제거한다.
-            // OfferingExpireAt = 요구 생성 시각 + 60초(OfferingDurationSeconds)
-            if (HasOfferingRequest && Time.time >= OfferingExpireAt)
-                ClearOfferingRequest();
-
-            bool inBand = InLowStaminaBand();
-            // 풀피 → 저기력으로 들어오는 순간에도 곧 한 번 체크
-            if (inBand && !wasInLowStaminaBand && !HasOfferingRequest)
-                ScheduleSoonCheck();
-            wasInLowStaminaBand = inBand;
-
-            // ── 2. 새 음식 요구 생성 체크 ─────────────────────────────────
-            // 아래 조건을 모두 만족할 때만 새 요구를 만든다:
-            //   ① 현재 요구가 없을 것 (!HasOfferingRequest)
-            //   ② 기절 상태가 아닐 것  (CanSpawnOfferingRequest)
-            //   ③ 기력 ≤ 최대 − 8 (음식 +8 기준, InLowStaminaBand)
-            //   ④ 다음 체크 시각이 됐을 것 (구간 진입 직후 0~10초 / 이후 3~5분)
-            if (!HasOfferingRequest
-                && CanSpawnOfferingRequest()
-                && inBand
-                && Time.time >= NextRequestCheckAt)
-            {
-                TryStartOfferingRequest(); // 음식 결정 + 머리 위 아이콘 표시
-                ScheduleNextCheck();       // 다음 체크 시각을 3~5분 뒤로 예약
-            }
-
-            // ── 3. 머리 위 아이콘 위치 갱신 ──────────────────────────────
-            // 캐릭터가 이동하므로 매 프레임 아이콘 위치를 캐릭터 머리 위로 맞춘다.
+            bool want = CanSpawnOfferingRequest() && InLowStaminaBand();
+            if (want && !hungry) StartHungry(sayLine: true);
+            else if (!want && hungry) ClearOfferingRequest();
             UpdateVisualPositions();
-        }
-
-        void ScheduleNextCheck()
-        {
-            NextRequestCheckAt = Time.time + Random.Range(RequestIntervalMin, RequestIntervalMax);
-        }
-
-        void ScheduleSoonCheck()
-        {
-            NextRequestCheckAt = Time.time + Random.Range(EnterBandCheckMin, EnterBandCheckMax);
         }
 
         bool InLowStaminaBand()
@@ -108,38 +60,42 @@ namespace Yoegoe.Characters
             return true;
         }
 
+        /// <summary>배고프면 바로 그릇을 띄운다 (윷 복귀 연출 뒤 등).</summary>
         public void TryStartOfferingRequest()
         {
-            if (!CanSpawnOfferingRequest() || HasOfferingRequest) return;
-            if (!InLowStaminaBand()) return;
+            if (hungry || !CanSpawnOfferingRequest() || !InLowStaminaBand()) return;
+            StartHungry(sayLine: false);
+        }
 
-            var offering = PickFoodRequest(GameEconomy.Instance);
-            if (offering == null) return;
-
-            OfferingRequest = offering;
-            OfferingExpireAt = Time.time + OfferingDurationSeconds;
+        void StartHungry(bool sayLine)
+        {
+            hungry = true;
             EnsureOfferingIcon();
             HideMonologueIfAny();
+            if (sayLine) owner.SayCatalogLine(e => e.hungryLines);
         }
 
         public void ClearOfferingRequest()
         {
-            OfferingRequest = null;
+            hungry = false;
             if (offeringIcon != null) offeringIcon.gameObject.SetActive(false);
         }
 
         public void ClearAll() => ClearOfferingRequest();
 
-        /// <summary>머리 위 음식 요구 아이콘의 월드 범위 (떠 있을 때만).</summary>
+        /// <summary>머리 위 그릇의 월드 범위 (떠 있을 때만).</summary>
         public bool TryGetIconBounds(out Bounds bounds)
         {
             bounds = default;
-            if (!HasOfferingRequest || offeringIcon == null || !offeringIcon.gameObject.activeInHierarchy) return false;
+            if (!hungry || offeringIcon == null || !offeringIcon.gameObject.activeInHierarchy) return false;
             bounds = offeringIcon.bounds;
             return true;
         }
 
-        /// <summary>상세에서 급여. true면 처리 완료(호출측에서 인벤 차감·리프레시).</summary>
+        /// <summary>
+        /// 음식·공양물을 먹일 때(물 제외). 이번 그릇으로 배고픔이 풀리면 true — 기력 보너스(requestFulfillBonus)를 더하고
+        /// 고맙다는 말 + 선물꾸러미 판정. 아직 배고프면 false (기력·친밀도는 평소대로).
+        /// </summary>
         public bool TryHandleFeed(OfferingData offering, bool isWater, bool isPreferred,
             out int staminaGain, out float intimacyGain, out bool fulfilledRequest)
         {
@@ -147,47 +103,33 @@ namespace Yoegoe.Characters
             intimacyGain = offering != null ? offering.ResolveIntimacyGain(isPreferred) : 0f;
             fulfilledRequest = false;
 
-            if (isWater || !HasOfferingRequest)
-                return false;
+            if (isWater || !hungry) return false;
+            float after = owner.Stats.Stamina + staminaGain;
+            if (after <= owner.MaxStamina - StaminaRequestMargin + 0.001f) return false; // 아직 배고프다
 
-            bool matches = offering != null && OfferingRequest != null
-                && string.Equals(offering.BaseId, OfferingRequest.offeringId,
-                    System.StringComparison.OrdinalIgnoreCase);
-
-            if (matches)
-            {
-                // 음식 요구 완료: +12 · 친밀도 없음
-                staminaGain = 12;
-                intimacyGain = 0f;
-                fulfilledRequest = true;
-                ClearOfferingRequest();
-                ScheduleNextCheck();
-                bool gift = GiftBundle.RollAfterRequestFulfilled();
-                // 대사는 characters.json(시트 character_lines) — 없으면 기본 대사
-                CharacterCatalog.Entry entry = null;
-                if (owner.Data != null) CharacterCatalog.TryGet(owner.Data.id, out entry);
-                string thanks = CharacterCatalog.PickLine(entry?.requestThanksLines, DefaultThanksLine);
-                if (gift)
-                {
-                    string giftLine = CharacterCatalog.PickLine(entry?.requestGiftLines, DefaultGiftLine);
-                    owner.ShowTempSpeechSequence(
-                        new[] { thanks },
-                        () =>
-                        {
-                            owner.ShowTempSpeech(giftLine);
-                            GiftBundleAwarded?.Invoke("선물꾸러미");
-                        });
-                }
-                else
-                {
-                    owner.ShowTempSpeech(thanks);
-                }
-                return true;
-            }
-
-            // 다른 것 주면 기력(일반 효과)만 오르고 요구 삭제
+            staminaGain += GameSettings.RequestFulfillBonus;
+            fulfilledRequest = true;
             ClearOfferingRequest();
-            ScheduleNextCheck();
+            bool gift = GiftBundle.RollAfterRequestFulfilled();
+            // 대사는 characters.json(시트 character_lines) — 없으면 기본 대사
+            CharacterCatalog.Entry entry = null;
+            if (owner.Data != null) CharacterCatalog.TryGet(owner.Data.id, out entry);
+            string thanks = CharacterCatalog.PickLine(entry?.requestThanksLines, DefaultThanksLine);
+            if (gift)
+            {
+                string giftLine = CharacterCatalog.PickLine(entry?.requestGiftLines, DefaultGiftLine);
+                owner.ShowTempSpeechSequence(
+                    new[] { thanks },
+                    () =>
+                    {
+                        owner.ShowTempSpeech(giftLine);
+                        GiftBundleAwarded?.Invoke("선물꾸러미");
+                    });
+            }
+            else
+            {
+                owner.ShowTempSpeech(thanks);
+            }
             return true;
         }
 
@@ -240,21 +182,48 @@ namespace Yoegoe.Characters
         {
             if (offeringIcon == null)
             {
-                var go = new GameObject(owner.name + "_ReqOffering");
+                var go = new GameObject(owner.name + "_ReqBowl");
                 offeringIcon = go.AddComponent<SpriteRenderer>();
                 offeringIcon.sortingOrder = 1210;
             }
-            offeringIcon.sprite = OfferingRequest != null ? OfferingRequest.icon : null;
+            offeringIcon.sprite = BowlSprite();
             offeringIcon.color = Color.white;
-            offeringIcon.transform.localScale = Vector3.one * 0.45f;
-            offeringIcon.gameObject.SetActive(offeringIcon.sprite != null);
-            if (offeringIcon.sprite == null)
+            offeringIcon.transform.localScale = Vector3.one * 0.18f; // 20px · 16ppu → 폭 약 0.22
+            offeringIcon.gameObject.SetActive(true);
+        }
+
+        static Sprite s_bowl;
+        /// <summary>그릇 말풍선 — 흰 말풍선 안에 밥그릇 (코드로 그린 임시 그림, 아트가 오면 교체).</summary>
+        static Sprite BowlSprite()
+        {
+            if (s_bowl != null) return s_bowl;
+            const int W = 20, H = 18;
+            var tex = new Texture2D(W, H, TextureFormat.RGBA32, false) { filterMode = FilterMode.Point };
+            var clear = new Color(0, 0, 0, 0);
+            var bubble = new Color(1f, 0.98f, 0.92f, 0.95f);
+            var edge = new Color(0.35f, 0.25f, 0.18f, 1f);
+            var bowl = new Color(0.62f, 0.32f, 0.2f, 1f);
+            var rice = Color.white;
+            var px = new Color[W * H];
+            for (int y = 0; y < H; y++)
+            for (int x = 0; x < W; x++)
             {
-                offeringIcon.sprite = WhiteSprite();
-                offeringIcon.color = new Color(1f, 0.85f, 0.4f, 0.95f);
-                offeringIcon.transform.localScale = Vector3.one * 0.25f;
-                offeringIcon.gameObject.SetActive(true);
+                Color c = clear;
+                // 말풍선 몸통 (y 4..17) + 꼬리 (아래 가운데)
+                bool body = y >= 4 && x >= 1 && x <= W - 2 && !((x == 1 || x == W - 2) && (y == 4 || y == H - 1));
+                bool tail = y < 4 && Mathf.Abs(x - W / 2) <= y - 1;
+                if (body || tail) c = bubble;
+                if (body && (x == 1 || x == W - 2 || y == 4 || y == H - 1)) c = edge;
+                // 그릇 (y 6..10), 밥 (y 11..13)
+                int cx = W / 2;
+                if (y >= 6 && y <= 10 && Mathf.Abs(x - cx + 0.5f) <= 3.5f + (y - 6) * 0.6f) c = bowl;
+                if (y >= 11 && y <= 13 && Mathf.Abs(x - cx + 0.5f) <= 5.5f - (y - 11) * 1.5f) c = rice;
+                px[y * W + x] = c;
             }
+            tex.SetPixels(px);
+            tex.Apply();
+            s_bowl = Sprite.Create(tex, new Rect(0, 0, W, H), new Vector2(0.5f, 0.2f), 16f);
+            return s_bowl;
         }
 
         void UpdateVisualPositions()
@@ -271,22 +240,14 @@ namespace Yoegoe.Characters
 
         void HideMonologueIfAny() => owner.HideMonologueForRequest();
 
-        static Sprite s_white;
-        static Sprite WhiteSprite()
-        {
-            if (s_white != null) return s_white;
-            var tex = new Texture2D(4, 4, TextureFormat.RGBA32, false);
-            var px = new Color[16];
-            for (int i = 0; i < 16; i++) px[i] = Color.white;
-            tex.SetPixels(px);
-            tex.Apply();
-            s_white = Sprite.Create(tex, new Rect(0, 0, 4, 4), new Vector2(0.5f, 0.5f), 4f);
-            return s_white;
-        }
 
         public void DestroyVisuals()
         {
-            if (offeringIcon != null) Object.Destroy(offeringIcon.gameObject);
+            if (offeringIcon != null)
+            {
+                if (Application.isPlaying) Object.Destroy(offeringIcon.gameObject);
+                else Object.DestroyImmediate(offeringIcon.gameObject); // 에디터 테스트
+            }
             offeringIcon = null;
         }
     }

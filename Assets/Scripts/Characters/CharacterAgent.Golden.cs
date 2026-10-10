@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using Yoegoe.Core;
+using Yoegoe.Data;
 
 namespace Yoegoe.Characters
 {
@@ -9,8 +10,9 @@ namespace Yoegoe.Characters
     // 오프라인 정산(OfflineSimulator)에는 반영하지 않는다(최대 5분).
     public partial class CharacterAgent
     {
-        public const float GoldenBuffSeconds = 5f * 60f;
-        public const float GoldenSpeedMultiplier = 2f;
+        // 시트 game_settings
+        public static float GoldenBuffSeconds => GameSettings.GoldenBuffSeconds;
+        public static float GoldenSpeedMultiplier => GameSettings.GoldenSpeedMul;
 
         static readonly Color GoldenTint = new Color(1f, 0.84f, 0.3f, 1f);
         bool goldenTinted;

@@ -11,8 +11,9 @@ namespace Yoegoe.Cooking
     {
         public const int GridSize = 5;
         public const int EmptyCellCount = 5;
-        public const float BaseSeconds = 15f;
-        public const float AdExtendSeconds = 15f;
+        /// <summary>부적 없는 판 제한시간 · 광고 연장 — 시트 game_settings.</summary>
+        public static float BaseSeconds => GameSettings.CookBaseSeconds;
+        public static float AdExtendSeconds => GameSettings.CookAdExtendSeconds;
         /// <summary>판에 올라가는 재료 최대 개수(25칸 − 빈칸 5). 이보다 적으면 시작 전 확인 팝업.</summary>
         public const int FullBoardMaterials = GridSize * GridSize - EmptyCellCount;
         /// <summary>이보다 적으면 어떤 레시피도 못 만들어 시작 불가.</summary>
@@ -29,10 +30,15 @@ namespace Yoegoe.Cooking
         public bool Finished { get; private set; }
         public CookingCharmType PreCharm { get; private set; }
         public bool AllowDiagonal => PreCharm == CookingCharmType.Diagonal;
-        public bool AllowAdExtend =>
-            PreCharm != CookingCharmType.Recycle && PreCharm != CookingCharmType.Double;
+        /// <summary>광고 연장 가능 — 시트 charms 탭 adExtend (비면 회수·몰빵만 불가).</summary>
+        public bool AllowAdExtend => PreCharm == CookingCharmType.None
+            || CharmDropRates.AdExtendOr(PreCharm,
+                PreCharm != CookingCharmType.Recycle && PreCharm != CookingCharmType.Double);
         /// <summary>나가리 버튼: 사전 부적 없이 시작한 판 + 나가리 부적을 가지고 있을 때만 (쓰면 1개 소모).</summary>
         public bool ShowNagari => Running && PreCharm == CookingCharmType.None && HasNagariCharm;
+        /// <summary>손님에게 요리를 건넨 뒤엔 그 판에서 부적(나가리)을 쓸 수 없다 — 버튼에 X.</summary>
+        public bool CharmsLocked => GuestOrder != null && GuestOrder.Fulfilled;
+        public bool CanUseNagari => ShowNagari && !CharmsLocked;
         static bool HasNagariCharm =>
             Yoegoe.Economy.GameEconomy.Instance != null
             && Yoegoe.Economy.GameEconomy.Instance.GetCharmCount(CookingCharmType.Cancel) > 0;
@@ -52,6 +58,8 @@ namespace Yoegoe.Cooking
 
         /// <summary>선호 공양물 조합이 가능할 때 나타나는 주문 요괴. 없으면 null.</summary>
         public CookingGuestOrder GuestOrder { get; private set; }
+        /// <summary>테스트용 — 손님 주문을 직접 꽂는다.</summary>
+        public void SetGuestOrderForTest(CookingGuestOrder order) => GuestOrder = order;
         /// <summary>제자리 조리 중(익는 중·김·식음).</summary>
         public IReadOnlyList<CookingCookJob> ActiveCooks => cooks;
         public int PerfectCollectCount { get; private set; }
@@ -114,11 +122,15 @@ namespace Yoegoe.Cooking
             Changed?.Invoke();
         }
 
-        static float ResolveLimit(CookingCharmType charm) => charm switch
+        /// <summary>제한시간 — 시트 charms 탭 seconds (비면 아래 기본값).</summary>
+        static float ResolveLimit(CookingCharmType charm) =>
+            charm == CookingCharmType.None ? BaseSeconds : CharmDropRates.SecondsOr(charm, DefaultLimit(charm));
+
+        static float DefaultLimit(CookingCharmType charm) => charm switch
         {
             CookingCharmType.PlusFive => BaseSeconds + 5f,
-            CookingCharmType.Recycle => BaseSeconds - 4f,
-            CookingCharmType.Double => 7f,
+            CookingCharmType.Recycle => 12f,
+            CookingCharmType.Double => 10f,
             _ => BaseSeconds
         };
 
@@ -461,17 +473,16 @@ namespace Yoegoe.Cooking
                 && !GuestOrder.Fulfilled && !GuestOrder.Failed
                 && GuestOrder.Matches(recipe);
 
+            int baseQty = PreCharm == CookingCharmType.Double ? 2 : 1;
+            int qty = baseQty * (perfect ? 2 : 1);
             if (deliveredToGuest)
             {
-                // 주문 배달: 인벤 미지급(퍼펙트여도 음식 ×2 없음). 친밀도·기력만 배율 적용.
+                // 주문 배달 (v1.3): 완성품 하나가 요괴에게 가고 나머지는 창고로 (김 2개 → 1개 창고).
                 GuestOrder.Deliver(perfect);
+                qty -= 1;
             }
-            else
-            {
-                int baseQty = PreCharm == CookingCharmType.Double ? 2 : 1;
-                int qty = baseQty * (perfect ? 2 : 1);
+            if (qty > 0)
                 AddResult(recipe, qty, job.Golden);
-            }
 
             if (CookingCodex.Discover(recipe.Id) && !NewlyDiscovered.Contains(recipe.Id))
                 NewlyDiscovered.Add(recipe.Id);
@@ -567,7 +578,7 @@ namespace Yoegoe.Cooking
 
         public void CancelNagari()
         {
-            if (!ShowNagari || Finished) return;
+            if (!CanUseNagari || Finished) return;
             if (!Yoegoe.Economy.GameEconomy.Instance.TrySpendCharm(CookingCharmType.Cancel)) return;
             // 결과 취소 + 재료 전량 반환
             Results.Clear();

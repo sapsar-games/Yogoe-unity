@@ -71,7 +71,7 @@ namespace Yoegoe.Tests.EditMode
         [Test]
         public void LevelUpRaisingCapacity_KeepsOverflowItems_AndReinterprets()
         {
-            // 활터 Lv9 오버플로우 10/9 → Lv10 기본 보관 10 → 10/10 (삭제 없음, 계속 정지)
+            // 사냥 목적지 Lv9 오버플로우 10/9 → Lv10 기본 보관 10 → 10/10 (삭제 없음, 계속 정지)
             var s = new PropStorage.State { Stored = 10, OverflowJudged = true };
             Assert.IsTrue(PropStorage.IsHalted(s, PropStorage.Capacity(9, 10)));
             Assert.AreEqual(10, s.Stored);
@@ -84,12 +84,10 @@ namespace Yoegoe.Tests.EditMode
         {
             Assert.IsTrue(PropCatalog.TryGet("옹달샘", out var well));
             Assert.AreEqual(PropResourceType.Water, well.ResourceType);
-            Assert.AreEqual(30f, well.cycleMinutes, 0.001f);
-            Assert.AreEqual(6, well.baseCapacity);
+            Assert.AreEqual(15f, well.cycleMinutes, 0.001f); // v1.2: 모든 기물 15분에 1개 · 보관 15
+            Assert.AreEqual(15, well.baseCapacity);
 
-            Assert.IsTrue(PropCatalog.TryGet("갯바위", out var rock));
-            Assert.AreEqual(PropResourceType.Yeopjeon, rock.ResourceType);
-            Assert.AreEqual(1, rock.baseCapacity);
+            Assert.IsFalse(PropCatalog.TryGet("갯바위", out _)); // v1.2 삭제
 
             Assert.IsTrue(PropCatalog.TryGet("화덕", out var oven));
             Assert.IsFalse(oven.upgradable);
@@ -100,7 +98,7 @@ namespace Yoegoe.Tests.EditMode
         {
             Assert.AreEqual((int)CookingIngredientId.Rice, PropCatalog.RollDrop(PropResourceType.Gather, 0f));
             Assert.AreEqual((int)CookingIngredientId.Rice, PropCatalog.RollDrop(PropResourceType.Gather, 0.385f));
-            Assert.AreEqual((int)CookingIngredientId.RedBean, PropCatalog.RollDrop(PropResourceType.Gather, 0.985f));
+            Assert.AreEqual((int)CookingIngredientId.Grain, PropCatalog.RollDrop(PropResourceType.Gather, 0.985f));
             int golden = PropCatalog.RollDrop(PropResourceType.Gather, 0.999f);
             Assert.IsTrue(PropCatalog.IsSpecialCode(golden));
             Assert.AreEqual(SpecialItemId.GoldenRice, PropCatalog.SpecialOf(golden));
@@ -191,15 +189,6 @@ namespace Yoegoe.Tests.EditMode
             Assert.IsFalse(prop.HasGoldenPending);
         }
 
-        [Test]
-        public void Rock_FullStorage_HaltsProduction()
-        {
-            MakeProp(PropResourceType.Yeopjeon, 60f, 1);
-            // 1개(60분) + 판정 사이클(60분) 이후엔 멈춘다
-            float worked = prop.ProduceWhileStaying(10 * 3600f, 0f, false);
-            Assert.IsTrue(prop.IsStorageHalted);
-            Assert.AreEqual(2 * 3600f, worked, 0.01f);
-        }
 
         [Test]
         public void MeritPile_StopsAtCapacityMinutes()
@@ -287,10 +276,10 @@ namespace Yoegoe.Tests.EditMode
 
             OfflineSimulator.Simulate(data, now);
 
-            // 6개(3시간) + 판정 사이클(30분)만 일함 → 기력 210분 / 10분 = 21 소모
-            Assert.GreaterOrEqual(data.props[0].storedResources, 6);
+            // v1.2: 15개(15분×15) + 판정 사이클(15분)만 일함 → 기력 240분 / 10분 = 24 소모
+            Assert.GreaterOrEqual(data.props[0].storedResources, 15);
             Assert.IsTrue(data.props[0].overflowJudged);
-            Assert.AreEqual(75f - 21f, data.agents[0].stamina, 0.05f);
+            Assert.AreEqual(75f - 24f, data.agents[0].stamina, 0.05f);
             Assert.AreEqual(ActionState.Staying, data.agents[0].state);
         }
     }

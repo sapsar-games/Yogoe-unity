@@ -30,6 +30,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from export_yut_bubbles import fetch_sheet_csv  # noqa: E402
+from sheets_config import sheet_id_for  # noqa: E402
 from import_yut_bubbles_csv import _post_json  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -54,6 +55,12 @@ LINE_TYPES = {
     "request_gift": "requestGiftLines",
     "golden_find": "goldenFindLines",
     "greeting": "greetingLines",
+    # v1.2 시연 대사 세트
+    "go_hunt": "goHuntLines", "go_gather": "goGatherLines", "go_spring": "goSpringLines", "go_altar": "goAltarLines",
+    "work_hunt": "workHuntLines", "work_gather": "workGatherLines", "work_spring": "workSpringLines",
+    "work_altar": "workAltarLines",
+    "full": "fullLines", "full_idle": "fullIdleLines", "tired": "tiredLines", "home": "homeLines",
+    "hungry": "hungryLines", "fed": "fedLines", "gold": "goldLines", "offer": "offerLines",
 }
 
 
@@ -205,6 +212,11 @@ NOTE_KEYS: dict[str, list[str]] = {
     "props": ["propId"],
     "prop_drop_tables": ["table", "ingredient"],
     "prop_settings": ["key"],
+    "destinations": ["id"],
+    "charms": ["id"],
+    "game_settings": ["key"],
+    "spirit_lines": ["kind", "type", "text_ko"],
+    "ingredients": ["id"],
     "attendance": ["day"],
     "yut_fortune": ["gua"],
 }
@@ -216,7 +228,7 @@ def keep_sheet_notes(config: dict, tab: str, rows: list[dict]) -> None:
     if not keys or not config.get("sheet_id"):
         return
     try:
-        existing = read_csv_text(fetch_sheet_csv(config["sheet_id"], tab), keys, tab)
+        existing = read_csv_text(fetch_sheet_csv(sheet_id_for(config, tab), tab), keys, tab)
     except Exception as e:  # 탭이 아직 없거나 네트워크 문제
         print(f"경고: [{tab}] 기존 note를 못 읽었습니다 ({e})", file=sys.stderr)
         return
@@ -233,8 +245,8 @@ def push_tab(config: dict, tab: str, headers: list[str], rows: list[dict]) -> No
     body = [[r.get(h, "") for h in headers] for r in rows]
     desc = description_row(tab, len(headers))
     payload = {"tab": tab, "headers": desc or headers, "rows": ([headers] + body) if desc else body}
-    if config.get("sheet_id"):
-        payload["spreadsheetId"] = config["sheet_id"]
+    if sheet_id_for(config, tab):
+        payload["spreadsheetId"] = sheet_id_for(config, tab)
     if config.get("write_token"):
         payload["token"] = config["write_token"]
     raw = _post_json(config["write_url"], json.dumps(payload, ensure_ascii=False).encode("utf-8"))
@@ -282,7 +294,7 @@ def main() -> int:
             if not config.get("sheet_id"):
                 print("config 에 sheet_id 가 없습니다.", file=sys.stderr)
                 return 1
-            texts[tab] = fetch_sheet_csv(config["sheet_id"], tab)
+            texts[tab] = fetch_sheet_csv(sheet_id_for(config, tab), tab)
 
     chars = read_csv_text(texts[TAB_CHARACTERS], ["id"], TAB_CHARACTERS)
     prefs = read_csv_text(texts[TAB_PREFS], ["character_id", "offering_id"], TAB_PREFS)

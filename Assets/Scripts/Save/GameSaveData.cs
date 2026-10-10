@@ -23,6 +23,9 @@ namespace Yoegoe.Save
         /// <summary>진행 중이던 윷놀이 매치(있을 때만). null이면 매치 없음 — 앱을 껐다 켜거나
         /// 나갔다 들어와도 보드 상태(말 위치·완주 여부)를 그대로 이어간다.</summary>
         public YutMatchSave yutMatch;
+
+        /// <summary>나루터 혼령 줄 · 기억 조각 (v2). 없던 세이브는 빈 줄에서 지금부터 시작.</summary>
+        public Yoegoe.Economy.SpiritPier.PierSave pier;
     }
 
     [Serializable]
@@ -144,8 +147,10 @@ namespace Yoegoe.Save
         public float cycleProgressSeconds;
         /// <summary>이번 만창 사이클 오버플로우 판정 완료(=정지) 여부.</summary>
         public bool overflowJudged;
-        /// <summary>활터·약초밭 보관 재료 (CookingIngredientId 정수, 1개당 1칸).</summary>
+        /// <summary>사냥·채집 목적지 보관 재료 (CookingIngredientId 정수, 1개당 1칸).</summary>
         public int[] pendingIngredients = Array.Empty<int>();
+        /// <summary>v1.3 사냥터·채집터에서 고른 목적지 id (비면 예전 표).</summary>
+        public string destinationId = "";
     }
 
     [Serializable]

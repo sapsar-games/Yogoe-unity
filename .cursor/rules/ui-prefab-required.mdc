@@ -12,10 +12,13 @@ alwaysApply: true
    - UI: `Assets/Prefabs/UI/<Name>.prefab`
    - 맵: `Assets/Prefabs/Map/<Name>.prefab`
    - 기물: `Assets/Prefabs/Props/<Name>.prefab`
+   - 부트스트랩/매니저: `Assets/Prefabs/Bootstrap/<Name>.prefab` (`Main`, `PropManager`)
 3. Main 씬에 Prefab 인스턴스를 배치한다. **위치·스케일은 Scene 뷰에서 드래그** (Play 모드 배치 금지 — 저장 안 됨).
 4. 스크립트는 Prefab 컴포넌트 + **직렬화된 참조**로만 동작. Play에서는 바운드·상태 배선만.
 5. 동적 콘텐츠(리스트 셀, 말풍선, 수거 라벨 등)만 코드 생성 허용.
 
 초기 배치: 메뉴 `Yoegoe/Place Map & Props In Main Scene`.  
+부트스트랩 Prefab: 메뉴 `Yoegoe/Bake Bootstrap Prefabs (Main · PropManager)`.  
 참고 UI: `ShopScreen`, `DetailScreen`, `YutScreen`, `GameHud`, `GongyangganScreen`, `AttendanceScreen`.  
-참고 맵/기물: `Background_Overview`, `Background_Playfield`, `Prop_*`.
+참고 맵/기물: `Background_Overview`, `Background_Playfield`, `Prop_*`.  
+참고 부트스트랩: `Main`, `PropManager`.

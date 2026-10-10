@@ -1,0 +1,53 @@
+key,value,note
+foodStamina,10,음식 한 그릇 기력
+offeringStamina,15,공양물 기력 (선호 공양물도 같음)
+offeringIntimacy,1,공양물 친밀도
+preferredIntimacy,5,선호 공양물 친밀도
+foodRequestMargin,10,"기력이 (최대 기력 − 이 값) 이하면 그릇 말풍선(배고픔), 높아지면 사라짐"
+requestFulfillBonus,0,그릇 말풍선(배고픔)을 없앤 그릇에 더하는 기력 (v1.3: 0) → 요구 채우면 기력 +10
+guestPerfectStaminaMul,2,주문 요괴 · 김 오를 때 기력 = 공양물 기력 × 이 값 → 기력 +30
+guestPerfectIntimacyMul,2,주문 요괴 · 김 오를 때 친밀도 = 선호 친밀도 × 이 값 → 친밀도 +10
+guestCoolStaminaMul,2,주문 요괴 · 식은 뒤 기력 = 공양물 기력 × 이 값 → 기력 +30
+guestCoolIntimacyMul,1,주문 요괴 · 식은 뒤 친밀도 = 선호 친밀도 × 이 값 → 친밀도 +5
+spiritPiecesFood,1,혼령에게 음식을 주면 받는 기억 조각 (나루터)
+spiritPiecesOffering,2,혼령에게 공양물을 주면 받는 기억 조각 (나루터)
+spiritIntervalMinutes,20,나루터 · 혼령이 오는 간격(분). 줄이 다 차 있으면 시간이 멈춤
+spiritQueueMax,5,나루터 · 줄 최대 인원
+spiritStayMinutes,180,나루터 · 혼령이 기다리는 시간(분). 지나면 떠남
+uiTextScale,1,글자 · 화면(HUD·팝업) 글자 기준 배율 — 플레이어 설정(작게~아주 크게)이 여기에 곱해짐
+worldTextScale,1,글자 · 맵 글자(기물 이름표·보관 숫자) 기준 배율
+bubbleTextScale,0.75,글자 · 요괴 말풍선 기준 배율
+bubbleMaxChars,12,"글자 · 요괴 말풍선 한 줄 최대 글자 수 (넘으면 줄바꿈, 최대 3줄)"
+cookBaseSeconds,15,요리판 · 부적 없는 판 제한시간(초) — 부적 판은 charms 탭 seconds
+cookAdExtendSeconds,15,요리판 · 광고 연장 시간(초)
+cookFoodSeconds,1.5,요리판 · 음식이 익는 시간(초)
+cookOfferingSeconds,2.1,요리판 · 공양물이 익는 시간(초)
+cookSteamSeconds,0.5,요리판 · 김 오르는 시간(초) — 이때 꺼내면 2개
+staminaDrainMinutes,10,일하는 동안 기력 1이 닳는 시간(분)
+faintHours,18,기력 0으로 놀다가 기절하기까지(시간)
+requestIntervalMinMinutes,3,(v1.3 그릇 말풍선 이후 안 씀)
+requestIntervalMaxMinutes,5,(v1.3 그릇 말풍선 이후 안 씀)
+requestShowSeconds,60,(v1.3 그릇 말풍선 이후 안 씀 — 기력이 오르면 사라짐)
+goldenBuffMinutes,5,황금 요리 효과 시간(분)
+goldenSpeedMul,2,황금 요리 효과 · 이동·생산 배수
+shopOfferingPrice,10,상점 · 공양물 가격(엽전)
+shopHyangPrice,20,상점 · 향 가격(엽전)
+shopRerollMeritMinutes,5,상점 · 진열 리셋 비용 = 떡절구 분당 공덕 × 이 값
+yutTokenMax,5,윷 토큰 최대
+yutTokenRegenMinutes,30,윷 토큰 1개 충전 시간(분)
+yutTokenBuyCost,10,윷 토큰 사기 · 엽전
+yutTokenBuyAmount,5,윷 토큰 사기 · 받는 토큰 수
+chestOfferingWeight,50,윷 보물상자 · 공양물 확률(비율)
+chestAdTicketWeight,30,윷 보물상자 · 광고보상권 확률(비율)
+chestHyangWeight,5,윷 보물상자 · 향 확률(비율)
+chestYeopjeonWeight,15,윷 보물상자 · 엽전 확률(비율)
+chestYeopjeonAmount,3,윷 보물상자 · 엽전이 나오면 몇 개
+giftChance,0.2,선물꾸러미 확률 (0.2 = 20%)
+giftPityMisses,4,선물꾸러미 · 이만큼 연속 빈손이면 다음은 확정
+startMerit,1000,새 게임 · 시작 공덕
+startYeopjeon,100,새 게임 · 시작 엽전
+startHyang,2,새 게임 · 시작 향
+startWater,0,새 게임 · 시작 물
+startYutToken,5,새 게임 · 시작 윷 토큰
+startMaterialEach,5,새 게임 · 재료 종류마다 시작 개수
+startIntimacy,50,새 게임 · 시작 요괴(옥토끼·삼족오) 친밀도

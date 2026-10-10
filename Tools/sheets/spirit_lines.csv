@@ -1,0 +1,13 @@
+kind,type,text_ko,note
+woman,ask,‘{dish}’ 주세요.,v1.3 시연
+woman,thanks,고마워요.,v1.3 시연
+woman,bye,…배가 떠나네요.,v1.3 시연
+man,ask,‘{dish}’ 주시오.,v1.3 시연
+man,thanks,고맙소.,v1.3 시연
+man,bye,…배가 떠나는구려.,v1.3 시연
+elder,ask,‘{dish}’ 한 그릇 주게.,v1.3 시연
+elder,thanks,고맙네.,v1.3 시연
+elder,bye,…배가 떠나는군.,v1.3 시연
+child,ask,‘{dish}’ 줘!,v1.3 시연
+child,thanks,고마워!,v1.3 시연
+child,bye,배 간다…,v1.3 시연

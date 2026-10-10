@@ -88,8 +88,8 @@ namespace Yoegoe.Characters
         /// <summary>
         /// 음식·공양물 공양. 물이면 <see cref="TryFeedWater"/>로.
         /// - 기절 중엔 막힘(물로만)
-        /// - 기력 가득: 친밀도가 오를 때만 허용(음식·친밀도 100이면 막힘). 음식 요구가 떠 있으면 허용
-        /// - 요구한 음식이면 +12·친밀도 0 (요구 완료)
+        /// - 기력 가득: 친밀도가 오를 때만 허용(음식·친밀도 100이면 막힘)
+        /// - 그릇 말풍선(배고픔)이 이번 그릇으로 풀리면 requestFulfillBonus 추가 · 선물꾸러미 판정
         /// - 선호 공양물은 성공하면 영구 공개
         /// - 황금음식: 효과는 같은 음식과 같고 + 5분 황금 버프. 버프가 목적이라 기력이 가득이어도 먹일 수 있다
         /// </summary>
@@ -114,11 +114,11 @@ namespace Yoegoe.Characters
             if (eco == null || !eco.TrySpendOffering(offering, 1)) return new FeedResult(FeedBlock.NoItem);
 
             bool fulfilled = false;
+            // 그릇 말풍선(배고픔)을 이번 그릇으로 풀면 보너스 + 고맙다는 말·선물꾸러미 (v1.3)
             if (Requests.TryHandleFeed(offering, false, preferred, out int reqStamina, out float reqIntimacy, out _))
             {
                 staminaGain = reqStamina;
                 intimacyGain = reqIntimacy;
-                if (intimacyGain > 0f) kind = OfferingKind.Preferred;
                 fulfilled = true;
             }
 

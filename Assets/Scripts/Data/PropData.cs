@@ -54,6 +54,20 @@ namespace Yoegoe.Data
         [Header("공양간")]
         [Tooltip("탭하면 공양간(요리) 화면을 연다. 화덕.")]
         public bool opensGongyanggan;
+
+        [Tooltip("탭하면 나루터 화면을 연다 (v1.3). 요괴가 앉지 않는 시설.")]
+        public bool opensPier;
+
+        [Header("v1.3 제단")]
+        [Tooltip("공덕을 버드나무로 보내지 않고 이 기물을 눌러 바로 받는다 (북제단·남제단).")]
+        public bool collectByTap;
+
+        [Tooltip("공덕 보관량이 레벨마다 몇 배로 늘어나는지 (제단 1.1). 시트 props capacityGrowth 가 덮어쓴다.")]
+        public double capacityGrowth = 1.0;
+
+        [Header("v1.3 목적지 (사냥·채집)")]
+        [Tooltip("비어 있지 않으면 이 기물의 목적지가 고정된다 (시트 destinations id). 보내기 창에서 목적지 선택 없음.")]
+        public string fixedDestinationId;
     }
 }
 

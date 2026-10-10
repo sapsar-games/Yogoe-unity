@@ -1,7 +1,8 @@
-propId,displayName,resourceType,cycleMinutes,baseCapacity,meritPerMinute,levelGrowth,meritCapacityMinutes,intimacyBonus,ownerMultiplier,upgradable,upgradeBaseCost,upgradeCostMultiplier,note
-떡절구,떡절구,Merit,0,0,100,1.1,30,FALSE,1,TRUE,500,1.15,
-옹달샘,옹달샘,Water,30,6,0,1,0,FALSE,1,TRUE,500,1.15,
-갯바위,갯바위,Yeopjeon,60,1,0,1,0,FALSE,1,TRUE,500,1.15,
-활터,활터,Hunt,20,9,0,1,0,FALSE,1,TRUE,500,1.15,
-약초밭,약초밭,Gather,20,9,0,1,0,FALSE,1,TRUE,500,1.15,
-화덕,화덕,None,0,0,0,1,0,FALSE,1,FALSE,500,1.15,
+propId,displayName,resourceType,cycleMinutes,baseCapacity,meritPerMinute,levelGrowth,meritCapacityMinutes,capacityGrowth,intimacyBonus,ownerMultiplier,upgradable,upgradeBaseCost,upgradeCostMultiplier,note
+떡절구,떡절구,Merit,0,0,100,1.1,30,1,FALSE,1,TRUE,500,1.15,
+옹달샘,옹달샘,Water,15,15,0,1,0,1,FALSE,1,TRUE,500,1.15,v1.2: 15분에 1개 · 보관 15
+활터,사냥터,Hunt,15,15,0,1,0,1,FALSE,1,TRUE,500,1.15,v1.2: 사냥터 · 15분에 1개 · 보관 15
+약초밭,채집터,Gather,15,15,0,1,0,1,FALSE,1,TRUE,500,1.15,v1.2: 채집터 · 15분에 1개 · 보관 15
+화덕,화덕,None,0,0,0,1,0,1,FALSE,1,FALSE,500,1.15,
+북제단,북제단,Merit,0,0,20,1,180,1.1,FALSE,1,TRUE,500,1.15,v1.3 — 15분에 공덕 300(분당 20) · 보관 3시간 치 · 레벨마다 보관 ×1.1 · 눌러서 받기 (공덕량은 시연값)
+남제단,남제단,Merit,0,0,20,1,180,1.1,FALSE,1,TRUE,500,1.15,v1.3 — 15분에 공덕 300(분당 20) · 보관 3시간 치 · 레벨마다 보관 ×1.1 · 눌러서 받기 (공덕량은 시연값)

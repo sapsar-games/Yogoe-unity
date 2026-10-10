@@ -21,6 +21,8 @@ namespace Yoegoe.Economy
             public double MeritPerMinute;
             public double LevelGrowth;
             public float MeritCapacityMinutes;
+            /// <summary>공덕 보관량 레벨당 배수 (v1.3 제단 1.1, 나머지 1).</summary>
+            public double CapacityGrowth;
             public bool IntimacyBonus;
             public double OwnerMultiplier;
             public float CycleMinutes;
@@ -32,6 +34,7 @@ namespace Yoegoe.Economy
                 MeritPerMinute = e.meritPerMinute,
                 LevelGrowth = e.levelGrowth > 0 ? e.levelGrowth : 1.0,
                 MeritCapacityMinutes = e.meritCapacityMinutes,
+                CapacityGrowth = e.capacityGrowth > 0 ? e.capacityGrowth : 1.0,
                 IntimacyBonus = e.intimacyBonus,
                 OwnerMultiplier = e.ownerMultiplier > 0 ? e.ownerMultiplier : 1.0,
                 CycleMinutes = e.cycleMinutes,
@@ -44,6 +47,7 @@ namespace Yoegoe.Economy
                 MeritPerMinute = d.baseProductionPerMinute,
                 LevelGrowth = d.levelGrowth > 0 ? d.levelGrowth : 1.0,
                 MeritCapacityMinutes = d.meritCapacityMinutes,
+                CapacityGrowth = d.capacityGrowth > 0 ? d.capacityGrowth : 1.0,
                 IntimacyBonus = d.intimacyBonus,
                 OwnerMultiplier = d.ownerMultiplier > 0 ? d.ownerMultiplier : 1.0,
                 CycleMinutes = d.cycleMinutes,
@@ -59,7 +63,7 @@ namespace Yoegoe.Economy
         }
 
         public static bool IsResource(PropResourceType t) =>
-            t == PropResourceType.Water || t == PropResourceType.Yeopjeon
+            t == PropResourceType.Water
             || t == PropResourceType.Hunt || t == PropResourceType.Gather;
 
         /// <summary>공덕 기물의 레벨 기준 분당 산출(보정 전). 공덕 기물이 아니면 0.</summary>
@@ -76,9 +80,12 @@ namespace Yoegoe.Economy
             return perMin;
         }
 
-        /// <summary>공덕 보관(만창) = 보정 전 분당 × MeritCapacityMinutes. 0 이하면 무제한.</summary>
+        /// <summary>공덕 보관(만창) = 보정 전 분당 × MeritCapacityMinutes × capacityGrowth^(L−1). 0 이하면 무제한.</summary>
         public static double MeritCapacity(in Config c, int level) =>
-            c.MeritCapacityMinutes > 0f ? BaseMeritPerMinute(c, level) * c.MeritCapacityMinutes : double.PositiveInfinity;
+            c.MeritCapacityMinutes > 0f
+                ? BaseMeritPerMinute(c, level) * c.MeritCapacityMinutes
+                  * ProductionFormula.LevelMultiplier(level, c.CapacityGrowth > 0 ? c.CapacityGrowth : 1.0)
+                : double.PositiveInfinity;
 
         public static int ResourceCapacity(in Config c, int level) => PropStorage.Capacity(c.BaseCapacity, level);
 
@@ -96,11 +103,11 @@ namespace Yoegoe.Economy
 
         /// <summary>
         /// 앉은 요괴가 dt초 머무는 동안의 생산. 반환 = 실제로 일한 초(이만큼만 기력이 닳는다, 만창이면 0).
-        /// meritAdded = 공덕 더미에 더할 양. 활터·약초밭은 뽑힌 드롭 코드를 onDrop으로 넘긴다.
+        /// meritAdded = 공덕 더미에 더할 양. 사냥·채집 목적지는 뽑힌 드롭 코드를 onDrop으로 넘긴다.
         /// </summary>
         public static float Produce(in Config c, int level, float intimacy, bool ownerOnEndingProp,
             double pendingMerit, ref PropStorage.State storage, float dt,
-            Func<float> random01, Action<int> onDrop, out double meritAdded)
+            Func<float> random01, Action<int> onDrop, out double meritAdded, string destinationId = null)
         {
             meritAdded = 0;
             if (dt <= 0f) return 0f;
@@ -128,7 +135,7 @@ namespace Yoegoe.Economy
                     () =>
                     {
                         if (dropsIngredients)
-                            onDrop?.Invoke(PropCatalog.RollDrop(type, random01()));
+                            onDrop?.Invoke(PropCatalog.RollDrop(type, destinationId, random01()));
                     });
             }
 

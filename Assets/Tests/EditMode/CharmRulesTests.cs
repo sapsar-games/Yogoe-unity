@@ -59,6 +59,53 @@ namespace Yoegoe.Tests.EditMode
         }
 
         [Test]
+        public void Nagari_LockedAfterGuestDelivery()
+        {
+            var s = StartedBoard();
+            eco.AddCharm(CookingCharmType.Cancel, 1);
+            Assert.IsTrue(s.CanUseNagari);
+
+            var guest = new CookingGuestOrder(null, "Gorani", "고라니", "baekseolgi", "백설기");
+            s.SetGuestOrderForTest(guest);
+            guest.Deliver(perfect: true);
+
+            Assert.IsTrue(s.CharmsLocked);
+            Assert.IsTrue(s.ShowNagari, "버튼은 보이되(X 표시)");
+            Assert.IsFalse(s.CanUseNagari, "쓸 수는 없음");
+            s.CancelNagari();
+            Assert.IsFalse(s.Finished);
+            Assert.AreEqual(1, eco.GetCharmCount(CookingCharmType.Cancel), "소모 안 됨");
+        }
+
+        [Test]
+        public void FaintedGuest_WakesWithStaminaOnly()
+        {
+            OfferingCatalog.Build(null);
+            var go = new GameObject("Gorani");
+            try
+            {
+                var agent = go.AddComponent<Yoegoe.Characters.CharacterAgent>();
+                agent.Data = ScriptableObject.CreateInstance<CharacterData>();
+                agent.Data.id = CharacterId.Gorani;
+                agent.Stats.Intimacy = 10f;
+                agent.Stats.Stamina = 0f;
+                agent.Stats.State = ActionState.Fainted;
+
+                var guest = new CookingGuestOrder(agent, "Gorani", "고라니", "baekseolgi", "백설기");
+                guest.Deliver(perfect: true);
+
+                Assert.IsTrue(guest.RevivedFromFaint);
+                Assert.AreNotEqual(ActionState.Fainted, agent.Stats.State, "깨어남");
+                Assert.AreEqual(guest.StaminaGain, agent.Stats.Stamina, 0.001f, "기력 1 단계 없이 받은 만큼");
+                Assert.Greater(guest.StaminaGain, 1);
+                Assert.AreEqual(10f, agent.Stats.Intimacy, 0.001f, "친밀도 없음");
+                Assert.AreEqual(0f, guest.IntimacyGain);
+                Object.DestroyImmediate(agent.Data);
+            }
+            finally { Object.DestroyImmediate(go); }
+        }
+
+        [Test]
         public void DropRates_FollowSheetWeights()
         {
             CharmDropRates.LoadFromJson("{\"charms\":[{\"id\":\"Cancel\",\"weight\":1},{\"id\":\"Double\",\"weight\":0}]}");

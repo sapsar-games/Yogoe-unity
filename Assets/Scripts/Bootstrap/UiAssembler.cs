@@ -105,6 +105,33 @@ namespace Yoegoe.Bootstrap
             gift.font = cfg.hudFont;
             giftGO.SetActive(true);
 
+            var pierGO = new GameObject("PierScreen");
+            pierGO.SetActive(false);
+            var pier = pierGO.AddComponent<PierScreen>();
+            pier.font = cfg.hudFont;
+            pierGO.SetActive(true);
+
+            var panelGO = new GameObject("PropPanel");
+            panelGO.SetActive(false);
+            var propPanel = panelGO.AddComponent<PropPanel>();
+            propPanel.font = cfg.hudFont;
+            panelGO.SetActive(true);
+
+            var feedGO = new GameObject("FeedPopup");
+            feedGO.SetActive(false);
+            var feed = feedGO.AddComponent<FeedPopup>();
+            feed.font = cfg.hudFont;
+            feedGO.SetActive(true);
+
+            var settingsGO = new GameObject("SettingsPopup");
+            settingsGO.SetActive(false);
+            var settings = settingsGO.AddComponent<SettingsPopup>();
+            settings.font = cfg.hudFont;
+            settingsGO.SetActive(true);
+
+            if (Object.FindAnyObjectByType<UiTextScaler>() == null)
+                new GameObject("UiTextScaler").AddComponent<UiTextScaler>();
+
             var dualGO = new GameObject("DualActionPopup");
             dualGO.SetActive(false);
             var dual = dualGO.AddComponent<DualActionPopup>();
@@ -132,14 +159,15 @@ namespace Yoegoe.Bootstrap
             var detail = Object.FindAnyObjectByType<DetailScreen>(FindObjectsInactive.Include);
             if (detail != null) detail.Close();
 
+            // persist: false — 세이브 불러오기 전에 호출되므로 여기서 저장하면 안 됨(기본값으로 진짜 세이브를 덮어씀).
             var shop = Object.FindAnyObjectByType<ShopScreen>(FindObjectsInactive.Include);
-            if (shop != null) shop.Close();
+            if (shop != null) shop.Close(persist: false);
 
             var gongyanggan = Object.FindAnyObjectByType<GongyangganScreen>(FindObjectsInactive.Include);
             if (gongyanggan != null) gongyanggan.Close();
 
             var yut = Object.FindAnyObjectByType<YutScreen>(FindObjectsInactive.Include);
-            if (yut != null) yut.Close();
+            if (yut != null) yut.Close(persist: false);
 
             var attendance = Object.FindAnyObjectByType<AttendanceScreen>(FindObjectsInactive.Include);
             if (attendance != null) attendance.Close();

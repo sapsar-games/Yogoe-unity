@@ -13,8 +13,8 @@ namespace Yoegoe.Save
     {
         public static float MaxOfflineSeconds = 18f * 60f * 60f;
 
-        private const float StaminaDrainPerSecond = 1f / 600f; // 10분당 1
-        private const float FaintThresholdSeconds = 18f * 60f * 60f;
+        private static float StaminaDrainPerSecond => Yoegoe.Data.GameSettings.StaminaDrainPerSecond; // 시트 game_settings
+        private static float FaintThresholdSeconds => Yoegoe.Data.GameSettings.FaintThresholdSeconds;
         private const float PlayDurationSeconds = 1f * 60f;
 
         public struct Result
@@ -174,7 +174,7 @@ namespace Yoegoe.Save
             var ingredients = new System.Collections.Generic.List<int>(prop.pendingIngredients ?? Array.Empty<int>());
             float worked = PropProduction.Produce(ConfigFor(prop), prop.level, agent.intimacy,
                 IsOwnerOnEndingProp(agent, prop), prop.pendingMerit.ToBigNumber().ToDouble(), ref st, dt,
-                () => UnityEngine.Random.value, ingredients.Add, out double meritAdded);
+                () => UnityEngine.Random.value, ingredients.Add, out double meritAdded, prop.destinationId);
 
             if (meritAdded > 0)
                 prop.pendingMerit = BigNumberSave.From(prop.pendingMerit.ToBigNumber() + (BigNumber)meritAdded);

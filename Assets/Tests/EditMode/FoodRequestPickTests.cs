@@ -37,7 +37,7 @@ namespace Yoegoe.Tests.EditMode
         public void OwnedFood_ComesFirst()
         {
             eco.AddMaterial(CookingIngredientId.Rice, 5);
-            eco.AddMaterial(CookingIngredientId.RedBean, 5);
+            eco.AddMaterial(CookingIngredientId.Grain, 5);
             eco.AddOffering(OfferingCatalog.Find("kimchi"), 1);
             for (int k = 0; k < 20; k++)
                 Assert.AreEqual("kimchi", CharacterRequestState.PickFoodRequest(eco).offeringId);
@@ -48,7 +48,7 @@ namespace Yoegoe.Tests.EditMode
         {
             eco.AddOffering(OfferingCatalog.Find("yukjeon"), 3); // 공양물 — 요구 대상 아님
             eco.AddMaterial(CookingIngredientId.Rice, 1);
-            eco.AddMaterial(CookingIngredientId.RedBean, 1); // 쌀+팥 = 팥떡만
+            eco.AddMaterial(CookingIngredientId.Grain, 1); // 쌀+팥 = 팥떡만
             for (int k = 0; k < 20; k++)
                 Assert.AreEqual("patteok", CharacterRequestState.PickFoodRequest(eco).offeringId);
         }

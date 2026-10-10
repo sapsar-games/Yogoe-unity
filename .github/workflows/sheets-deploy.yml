@@ -1,0 +1,79 @@
+name: Sheets → Deploy
+
+# 기획 시트 메뉴 「한폭요괴 → 게임에 반영」(Tools/YutBubblesSheetsWrite.gs)이 부른다.
+# 시트 전체를 가져와 검사 → 바뀐 JSON 커밋 → Build & Deploy WebGL 실행. 단계마다 시트 deploy_status 탭에 기록.
+on:
+  workflow_dispatch:
+    inputs:
+      requester:
+        description: 누른 사람 (시트에서 자동)
+        required: false
+        default: ''
+
+concurrency:
+  group: sheets-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Pull sheets
+        id: pull
+        run: |
+          set +e
+          python3 Tools/pull_all_sheets.py 2>&1 | tee pull.log
+          echo "code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: Commit changed data
+        id: commit
+        run: |
+          git add Assets/Resources Tools/sheets
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name "sheets-bot"
+          git config user.email "sheets-bot@users.noreply.github.com"
+          WHO="${{ github.event.inputs.requester }}"
+          git commit -m "chore(sheets): 기획 시트 반영${WHO:+ ($WHO)}"
+          git push origin HEAD:main
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Start build & deploy
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run build-and-deploy.yml --ref main
+
+      - name: Report
+        if: always()
+        run: |
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          CODE="${{ steps.pull.outputs.code }}"
+          if [ "${{ steps.commit.outputs.changed }}" = "true" ]; then
+            if [ "$CODE" = "0" ]; then RESULT="빌드 중"; else RESULT="빌드 중 (일부 탭 오류)"; fi
+            DETAIL="커밋 ${{ steps.commit.outputs.sha }} · 약 10분 뒤 '배포 완료'"
+          elif [ "${{ steps.pull.outcome }}" = "success" ] && [ "$CODE" = "0" ]; then
+            RESULT="바뀐 내용 없음"; DETAIL="게임 데이터가 시트와 같아요 — 배포하지 않았어요"
+          elif [ -n "$CODE" ] && [ "$CODE" != "0" ]; then
+            RESULT="시트 오류"; DETAIL="오류 난 탭은 반영하지 않았어요"
+          else
+            RESULT="실패"; DETAIL="반영 중 문제가 생겼어요 — 개발자에게 링크를 보내 주세요"
+          fi
+          python3 Tools/report_deploy_status.py --result "$RESULT" --detail "$DETAIL" --log pull.log --link "$RUN_URL"

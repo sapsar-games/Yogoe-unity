@@ -12,14 +12,14 @@ namespace Yoegoe.Cooking
         Water = 0,   // 물
         Chili,       // 고추
         Rice,        // 쌀
-        RedBean,     // 팥
+        Grain,       // 잡곡 (구 팥 RedBean)
         Fruit,       // 과실
         Namul,       // 산나물
         Herb,        // 약재
         Honey,       // 꿀
         Boar,        // 멧돼지고기
         Bird,        // 새고기
-        Fish,        // 물고기
+        Seafood,     // 해산물 (구 물고기 Fish)
         Egg,         // 새알
         Oil,         // 기름
         Count
@@ -71,9 +71,10 @@ namespace Yoegoe.Cooking
     /// <summary>판 위에서 익는 중인 요리 하나.</summary>
     public sealed class CookingCookJob
     {
-        public const float FoodSeconds = 1.5f;
-        public const float OfferingSeconds = 2.1f;
-        public const float SteamSeconds = 0.5f;
+        // 익는 시간 · 김 시간 — 시트 game_settings
+        public static float FoodSeconds => GameSettings.CookFoodSeconds;
+        public static float OfferingSeconds => GameSettings.CookOfferingSeconds;
+        public static float SteamSeconds => GameSettings.CookSteamSeconds;
 
         public readonly int Id;
         public readonly CookingRecipe Recipe;

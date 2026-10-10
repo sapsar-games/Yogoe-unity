@@ -53,15 +53,15 @@ namespace Yoegoe.Characters
                     pendingIngredients.Add(code);
                     if (PropCatalog.IsSpecialCode(code) && Occupant != null) goldenFinder = Occupant;
                 },
-                out double meritAdded);
+                out double meritAdded, DestinationId);
             float worked = producedSeconds / speed;
 
             if (meritAdded > 0)
             {
                 AddToMeritPile(meritAdded);
-                // 가끔 공덕꽃잎이 버드나무로 날아가 붙는다 (연출)
+                // 가끔 공덕꽃잎이 버드나무로 날아가 붙는다 (연출) — 제단은 버드나무를 거치지 않으므로 없음
                 petalTimer += worked;
-                if (petalTimer >= nextPetalAt && worked < 60f)
+                if (!CollectsByTap && petalTimer >= nextPetalAt && worked < 60f)
                 {
                     petalTimer = 0f;
                     nextPetalAt = UnityEngine.Random.Range(15f, 35f);
@@ -91,7 +91,6 @@ namespace Yoegoe.Characters
             switch (type)
             {
                 case PropResourceType.Water: GameEconomy.Instance.AddWater(n); break;
-                case PropResourceType.Yeopjeon: GameEconomy.Instance.AddYeopjeon(n); break;
                 default:
                     foreach (var code in pendingIngredients)
                     {

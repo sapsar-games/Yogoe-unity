@@ -3,8 +3,10 @@
 
 시트 = 윷 말풍선 시트(Tools/yut_bubbles_sheets.config.json 의 sheet_id)의 탭 1개:
   ingredients  id, name, description, note
-               한 줄 = 재료 1개 (재료 13 + 황금쌀·황금꿀). 게임에 들어가는 건 description 뿐.
-               id·name 은 코드와 연결된 참고용 — 바꾸지 마세요. (요리 설명은 recipes 탭 description)
+               한 줄 = 재료 1개 (재료 13 + 황금쌀·황금꿀 + v1.2 황금 재료 6종).
+               name = 게임에 보이는 재료 이름 (비우면 기본 이름), description = 요리책 설명.
+               id 는 코드와 연결 — 바꾸지 마세요. 이름을 바꾸면 recipes 탭 재료 칸도 새 이름으로.
+               (요리 설명은 recipes 탭 description)
 
 사용법:
   python3 Tools/export_ingredients.py            # 시트 → ingredients.json   (npm run ingredients)
@@ -23,14 +25,18 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from export_characters import load_config, push_tab, read_csv_text, write_csv  # noqa: E402
 from export_yut_bubbles import fetch_sheet_csv  # noqa: E402
-from recipes_data import INGREDIENTS, ROOT  # noqa: E402
+from sheets_config import sheet_id_for  # noqa: E402
+from recipes_data import DEFAULT_INGREDIENTS, ROOT, current_id  # noqa: E402
 
 TAB = "ingredients"
 HEADERS = ["id", "name", "description", "note"]
 JSON_PATH = ROOT / "Assets" / "Resources" / "ingredients.json"
 CSV_PATH = ROOT / "Tools" / "sheets" / "ingredients.csv"
 # 재료 칸 = CookingIngredientId 순서 + 특수 수집품 (CodexScreen 재료 칸 순서와 같다)
-CELLS = INGREDIENTS + [("GoldenRice", "황금쌀"), ("GoldenHoney", "황금꿀")]
+CELLS = DEFAULT_INGREDIENTS + [("GoldenRice", "황금쌀"), ("GoldenHoney", "황금꿀")]
+# v1.2 황금 재료 6종 — 시트에 먼저 들어온 id. 게임 쪽 황금 개편 전까지는 설명만 보관한다.
+CELLS += [("GoldenNamul", "황금 산나물"), ("GoldenHerb", "황금 약재"), ("GoldenChili", "황금 고추"),
+          ("GoldenFish", "황금 해산물"), ("GoldenBird", "황금 새고기"), ("GoldenEgg", "황금 새알")]
 
 
 def rows_to_json(rows: list[dict]) -> tuple[dict, list[str]]:
@@ -38,7 +44,7 @@ def rows_to_json(rows: list[dict]) -> tuple[dict, list[str]]:
     errors, seen, out = [], set(), []
     for r in rows:
         where = f"[{TAB}] {r['_row']}행"
-        iid = r.get("id", "")
+        iid = current_id(r.get("id", ""))
         if iid not in known:
             errors.append(f"{where}: 모르는 id '{iid}' (코드의 재료 id만)")
             continue
@@ -46,16 +52,18 @@ def rows_to_json(rows: list[dict]) -> tuple[dict, list[str]]:
             errors.append(f"{where}: id 중복 ({iid})")
             continue
         seen.add(iid)
-        out.append({"id": iid, "name": known[iid], "description": r.get("description", "")})
+        name = (r.get("name") or "").strip() or known[iid]
+        out.append({"id": iid, "name": name, "description": r.get("description", "")})
     return {"ingredients": out}, errors
 
 
 def json_rows() -> list[dict]:
-    desc = {}
+    desc, names = {}, {}
     if JSON_PATH.exists():
         for e in json.loads(JSON_PATH.read_text(encoding="utf-8")).get("ingredients", []):
             desc[e["id"]] = e.get("description", "")
-    return [{"id": i, "name": n, "description": desc.get(i, "")} for i, n in CELLS]
+            names[e["id"]] = e.get("name", "")
+    return [{"id": i, "name": names.get(i) or n, "description": desc.get(i, "")} for i, n in CELLS]
 
 
 def main() -> int:
@@ -84,7 +92,7 @@ def main() -> int:
         if not config.get("sheet_id"):
             print("config 에 sheet_id 가 없습니다.", file=sys.stderr)
             return 1
-        text = fetch_sheet_csv(config["sheet_id"], TAB)
+        text = fetch_sheet_csv(sheet_id_for(config, TAB), TAB)
     data, errors = rows_to_json(read_csv_text(text, ["id"], TAB))
     if errors:
         print("시트 오류 — ingredients.json 을 쓰지 않았습니다:", file=sys.stderr)

@@ -112,3 +112,28 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  # 기획 시트 deploy_status 탭에 결과 기록 (시트 메뉴 「게임에 반영」으로 시작한 배포든 코드 푸시든)
+  report-status:
+    needs: [build-webgl, deploy-pages]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: Tools
+
+      - name: Report
+        run: |
+          SHA="${GITHUB_SHA::7}"
+          MSG="$(git log -1 --format=%s | cut -c1-60)"
+          if [ "${{ needs.deploy-pages.result }}" = "success" ]; then
+            python3 Tools/report_deploy_status.py --result "배포 완료" \
+              --detail "커밋 $SHA · $MSG — 게임을 새로고침해서 확인하세요" \
+              --link "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+          else
+            python3 Tools/report_deploy_status.py --result "배포 실패" \
+              --detail "커밋 $SHA · $MSG — 개발자에게 링크를 보내 주세요" \
+              --link "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          fi

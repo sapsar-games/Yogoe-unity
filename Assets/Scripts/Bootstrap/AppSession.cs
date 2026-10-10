@@ -51,6 +51,7 @@ namespace Yoegoe.Bootstrap
             lastActiveUtc = now;
 
             GameEconomy.Instance?.EnsureYutTokenFresh(now);
+            AdvancePier(now);
 
             if (gap >= WallClockCatchUpThresholdSeconds)
             {
@@ -61,6 +62,14 @@ namespace Yoegoe.Bootstrap
 
             Greeting.Tick(AttendanceScreen.IsOpen);
             TickAutoSave();
+        }
+
+        /// <summary>나루터 혼령 줄 — 지난 시간만큼 도착·떠남 (오프라인 포함).</summary>
+        static void AdvancePier(DateTime now)
+        {
+            var eco = GameEconomy.Instance;
+            if (eco == null) return;
+            SpiritPier.Advance(now, () => SpiritPier.BuildOrderPool(eco), UnityEngine.Random.Range);
         }
 
         void TickAutoSave()
@@ -123,6 +132,7 @@ namespace Yoegoe.Bootstrap
             lastActiveUtc = now;
 
             GameEconomy.Instance?.EnsureYutTokenFresh(now);
+            AdvancePier(now);
 
             if (gap < WallClockCatchUpThresholdSeconds) return;
 

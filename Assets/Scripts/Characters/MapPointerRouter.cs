@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Yoegoe.Core;
+using Yoegoe.Data;
 using Yoegoe.Debugging;
 using Yoegoe.Economy;
 using Yoegoe.UI;
@@ -15,7 +16,8 @@ namespace Yoegoe.Characters
     /// 캐릭터: 길게 누르기(또는 임계 이동) → 들어올림 드래그.
     /// 맵: 임계 이동 후 패닝. 두 손가락 핀치·마우스 휠 → 줌.
     /// 캐릭터 탭: 더블탭이면 상세, 단일탭(더블탭 창 만료 후)이면 혼잣말.
-    /// 기물: 탭 → 수거, 길게 누르기 → 개별 업그레이드 팝업. 기물 위에 앉은 요괴는 요괴가 우선.
+    /// 기물: 탭 → 수거(쌓인 게 없거나 2초 안에 다시 탭하면 기물 창 = 업그레이드 팝업, v1.2 시연),
+    /// 길게 누르기 → 개별 업그레이드 팝업. 기물 위에 앉은 요괴는 요괴가 우선.
     ///
     /// 설계 원칙(반복된 회귀 버그를 겪고 정리함): "무엇을 눌렀는지"는 press 시점에 딱 한 번만
     /// 정한다(<see cref="PressTarget"/>). Hold·Release는 그 판정을 다시 계산하지 않고 그대로
@@ -31,6 +33,12 @@ namespace Yoegoe.Characters
         /// UI(GameHud)가 구독해서 실제 DetailScreen을 연다 — 이 클래스는 UI를 모른다.
         /// </summary>
         public static event System.Action<CharacterAgent, string> CharacterDetailRequested;
+
+        /// <summary>기물 창 요청 (v1.3) — (기물, 미리 골라 둘 요괴 · 탭이면 null). UI(PropPanel)가 구독한다.</summary>
+        public static event System.Action<PropSlot, CharacterAgent> PropPanelRequested;
+
+        /// <summary>먹이기 창 요청 (v1.3) — 그릇 말풍선 탭, 노는 요괴 탭. UI(FeedPopup)가 구독한다.</summary>
+        public static event System.Action<CharacterAgent> FeedRequested;
 
         /// <summary>
         /// 잠긴 기물 탭·자물쇠 위 앉히기 시도 → 구매 팝업 요청.
@@ -68,13 +76,16 @@ namespace Yoegoe.Characters
         [Tooltip("보관 라벨(***·숫자) 탭 여유(월드). 라벨 탭도 본체 탭과 같은 수거.")]
         public float pileLabelTapPadding = 0.18f;
 
+        [Tooltip("수거한 뒤 이 시간 안에 같은 기물을 다시 탭하면 기물 창(업그레이드 팝업)을 연다 (v1.2 시연 2초).")]
+        public float propReopenSeconds = 2f;
+
         [Tooltip("자물쇠(미건립) 탭 여유. 0이면 bounds 안만 — 초가집처럼 작고 캐릭터와 겹치면 구매가 잘 안 됨.")]
         public float lockTapRadius = 0.28f;
 
         private enum Phase { Idle, Pending, MapDrag, CharacterDrag, PinchZoom }
 
         /// <summary>press 시점에 딱 한 번 정해지는 "무엇을 눌렀는지". Hold/Release는 이 값만 본다.</summary>
-        public enum PressTarget { Empty, LockedProp, Prop, Character, GongyangganProp, Willow }
+        public enum PressTarget { Empty, LockedProp, Prop, Character, GongyangganProp, Willow, PropLevelTag, PierProp }
 
         /// <summary>길게 누르기로 이미 처리(업그레이드 팝업)한 press — release에서 탭으로 다시 처리하지 않는다.</summary>
         private bool pressConsumed;
@@ -88,6 +99,10 @@ namespace Yoegoe.Characters
         private CharacterAgent pressCharacter;
         private CharacterAgent dragCharacter;
         private PropSlot pressProp;
+
+        /// <summary>마지막으로 탭 수거한 기물과 시각 — 2초 안에 다시 탭하면 기물 창.</summary>
+        private PropSlot lastCollectedProp;
+        private float lastCollectedTime = -999f;
 
         /// <summary>첫 탭 후 더블탭 대기 중인 캐릭터. 창이 지나면 혼잣말.</summary>
         private CharacterAgent pendingMonologueTap;
@@ -109,10 +124,11 @@ namespace Yoegoe.Characters
             FlushPendingMonologueTapIfDue();
 
             if (CeremonyGate.BlocksWorldInput) return;
-            // 윷은 풀스크린 UI인데 보드 칸 Image가 raycast를 안 먹는 구멍이 있어,
-            // 휠/핀치가 IsBlockingUi를 통과해 본맵 카메라로 새는 경우가 있다.
-            if (YutScreen.Instance != null && YutScreen.Instance.IsOpen) return;
-            if (GongyangganScreen.Instance != null && GongyangganScreen.Instance.IsOpen) return;
+            // 풀스크린 UI가 열려 있으면 전부 차단 (UiBlockGate — 화면이 스스로 등록/해제).
+            // 일부 풀스크린 UI는 보드 칸 Image가 raycast를 안 먹는 구멍이 있어,
+            // 휠/핀치가 IsBlockingUi(per-tap 레이캐스트) 판정을 통과해 본맵 카메라로 새는 경우가
+            // 있어서 여기서 Update() 맨 앞에 통째로 막는다.
+            if (UiBlockGate.IsBlocking) return;
 
             // 핀치·휠은 단일 포인터 제스처보다 우선
             if (TryHandlePinchZoom()) return;
@@ -244,6 +260,18 @@ namespace Yoegoe.Characters
             lastScreen = screenPos;
             pressUnscaledTime = Time.unscaledTime;
             pressCharacter = FindNearestCharacter(screenPos);
+            // ▲ 레벨업 딱지 — 요괴보다 먼저 (딱지는 작아서 겹치면 딱지를 누른 것으로)
+            var tagged = FindLevelTagAt(screenPos);
+            if (tagged != null)
+            {
+                pressProp = tagged;
+                dragCharacter = null;
+                pressCharacter = null;
+                pressConsumed = false;
+                pressTarget = PressTarget.PropLevelTag;
+                phase = Phase.Pending;
+                return;
+            }
             pressProp = FindNearestPileLabel(screenPos);
             if (pressProp == null) pressProp = FindNearestProp(screenPos);
             dragCharacter = null;
@@ -251,6 +279,9 @@ namespace Yoegoe.Characters
             pressTarget = ClassifyPress(pressCharacter != null, pressProp != null,
                 pressProp != null && pressProp.IsBuilt,
                 pressProp != null && pressProp.data != null && pressProp.data.opensGongyanggan);
+            // 나루터(요괴가 앉지 않는 시설) — 누르면 나루터 화면 (v1.3)
+            if (pressTarget == PressTarget.Prop && pressProp != null && pressProp.data != null && pressProp.data.opensPier)
+                pressTarget = PressTarget.PierProp;
             // 공덕 버드나무: 요괴·기물이 아닌 곳에서만 (드래그 방해 안 하게)
             if (pressTarget == PressTarget.Empty && IsOverWillow(screenPos))
                 pressTarget = PressTarget.Willow;
@@ -383,10 +414,20 @@ namespace Yoegoe.Characters
                         break;
 
                     case PressTarget.Prop:
-                        // 기물 본체·보관 라벨 탭 → 쌓인 자원 수거
+                        // 기물 본체·보관 라벨 탭 → 쌓인 자원 수거.
+                        // 쌓인 게 없거나, 방금(2초 안) 수거한 기물을 다시 탭하면 기물 창 (v1.2 시연).
                         CancelPendingMonologueTap();
-                        if (pressProp.HasPendingCollectible && pressProp.TryCollect())
-                            Yoegoe.Save.GameSaveBridge.RequestSave();
+                        HandlePropTap(pressProp);
+                        break;
+
+                    case PressTarget.PierProp:
+                        CancelPendingMonologueTap();
+                        PierScreen.Instance?.Open();
+                        break;
+
+                    case PressTarget.PropLevelTag:
+                        CancelPendingMonologueTap();
+                        PropPanelRequested?.Invoke(pressProp, null);
                         break;
 
                     case PressTarget.Willow:
@@ -404,6 +445,21 @@ namespace Yoegoe.Characters
             {
                 CancelPendingMonologueTap();
                 var prop = FindDropProp(dragCharacter, screenPos);
+                // 목적지 선택이 필요한 사냥·채집만 기물 창(요괴 미리 선택). 고정 목적지는 바로 착석.
+                var dropTarget = prop != null ? prop : FindAnyDestinationPropAt(dragCharacter, screenPos);
+                if (dropTarget != null && dropTarget.NeedsDestinationPick && !dropTarget.IsOccupied)
+                {
+                    var who = dragCharacter;
+                    who.EndPlayerDrag(null, showFloorMark: false);
+                    PropPanelRequested?.Invoke(dropTarget, who);
+                    phase = Phase.Idle;
+                    pressTarget = PressTarget.Empty;
+                    pressCharacter = null;
+                    dragCharacter = null;
+                    pressProp = null;
+                    pressConsumed = false;
+                    return;
+                }
                 // 건립된 기물에 못 앉히면 — 자물쇠 위에 놓았는지 보고 구매 팝업(탭과 동일 경로).
                 // 건설 확정 시 이 요괴를 자동 앉히도록 함께 넘긴다.
                 bool purchasePrompted = false;
@@ -425,6 +481,25 @@ namespace Yoegoe.Characters
             dragCharacter = null;
             pressProp = null;
             pressConsumed = false;
+        }
+
+        void HandlePropTap(PropSlot prop)
+        {
+            if (prop == null) return;
+            bool reopen = prop == lastCollectedProp
+                          && Time.unscaledTime - lastCollectedTime <= propReopenSeconds;
+            if (!reopen && prop.HasPendingCollectible && prop.TryCollect())
+            {
+                lastCollectedProp = prop;
+                lastCollectedTime = Time.unscaledTime;
+                Yoegoe.Save.GameSaveBridge.RequestSave();
+                return;
+            }
+            lastCollectedProp = null;
+            // 떡절구(버드나무로 가는 공덕)는 v1.3에서도 '지금 그대로' — 탭은 수거만, 레벨업은 길게 누르기로.
+            if (prop.ResourceType == PropResourceType.Merit && !prop.CollectsByTap) return;
+            // 보관함이 비었으면(또는 방금 받았으면) 기물 창 — 보내기 / 일하는 중 / 레벨업 (v1.3)
+            PropPanelRequested?.Invoke(prop, null);
         }
 
         /// <summary>
@@ -455,11 +530,12 @@ namespace Yoegoe.Characters
             if (pendingMonologueTap != null && pendingMonologueTap != agent)
                 FlushPendingMonologueTap();
 
-            // 공양물 요구 말풍선 탭 → 즉시 상세(강조)
+            // 그릇 말풍선(배고픔) 탭 → 바로 먹이기 창 (v1.3)
             if (agent.HasOfferingRequest)
             {
                 CancelPendingMonologueTap();
-                OpenCharacterDetail(agent);
+                agent.SayCatalogLine(e => e.hungryLines);
+                FeedRequested?.Invoke(agent);
                 return;
             }
 
@@ -481,10 +557,13 @@ namespace Yoegoe.Characters
             if (agent == null) return;
             if (agent.HasOfferingRequest)
             {
-                OpenCharacterDetail(agent);
+                FeedRequested?.Invoke(agent);
                 return;
             }
             agent.OnTapped();
+            // 노는(일하지 않는) 요괴를 누르면 혼잣말 + 먹이기 창 (v1.3). 일하는 중은 일 대사만, 기절은 "..."만.
+            if (agent.Stats.State != ActionState.Staying && agent.Stats.State != ActionState.Fainted)
+                FeedRequested?.Invoke(agent);
         }
 
         void CancelPendingMonologueTap()
@@ -559,6 +638,29 @@ namespace Yoegoe.Characters
             if (d > characterHitRadiusFallback) return false;
             score = d;
             return true;
+        }
+
+        PropSlot FindLevelTagAt(Vector2 screenPos)
+        {
+            if (targetCamera == null || PropManager.Instance == null) return null;
+            float depth = -targetCamera.transform.position.z;
+            Vector3 w = targetCamera.ScreenToWorldPoint(new Vector3(screenPos.x, screenPos.y, depth));
+            foreach (var p in PropManager.Instance.AllProps)
+                if (p != null && p.HitLevelTag(w, 0.12f)) return p;
+            return null;
+        }
+
+        /// <summary>요괴를 놓은 자리의 사냥터·채집터 (친밀도·점유와 상관없이) — 기물 창으로 보낼 때.</summary>
+        private PropSlot FindAnyDestinationPropAt(CharacterAgent agent, Vector2 screenPos)
+        {
+            if (targetCamera == null || PropManager.Instance == null || agent == null) return null;
+            float depth = -targetCamera.transform.position.z;
+            Vector3 fingerWorld = targetCamera.ScreenToWorldPoint(new Vector3(screenPos.x, screenPos.y, depth));
+            fingerWorld.z = 0f;
+            var p = PropManager.Instance.FindNearestProp(agent.transform.position, propDropRadius);
+            if (p == null || !p.IsBuilt || !p.HasDestinations)
+                p = PropManager.Instance.FindNearestProp(fingerWorld, propDropRadius);
+            return p != null && p.IsBuilt && p.HasDestinations ? p : null;
         }
 
         private PropSlot FindDropProp(CharacterAgent agent, Vector2 screenPos)

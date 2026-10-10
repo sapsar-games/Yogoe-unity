@@ -1,7 +1,7 @@
-id,name,weight,note
-PlusFive,+5초,1,
-Diagonal,대각선,1,
-Clairvoyance,천리안,1,
-Recycle,회수,1,
-Double,몰빵,1,
-Cancel,나가리,1,
+id,name,weight,seconds,adExtend,note
+PlusFive,+5초,1,20,TRUE,
+Diagonal,대각선,1,15,TRUE,
+Clairvoyance,천리안,1,15,TRUE,
+Recycle,회수,1,12,FALSE,
+Double,몰빵,1,10,FALSE,
+Cancel,나가리,1,,,

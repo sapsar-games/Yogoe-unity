@@ -2,7 +2,8 @@
     "name": "Yoegoe.UI.Editor",
     "rootNamespace": "Yoegoe.UI.EditorTools",
     "references": [
-        "Yoegoe.Runtime"
+        "Yoegoe.Runtime",
+        "Yoegoe.Bootstrap.Editor"
     ],
     "includePlatforms": [
         "Editor"

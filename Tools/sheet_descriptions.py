@@ -21,18 +21,42 @@ MARK = "※"
 
 _LINES: dict[str, list[str]] = {
     "charms": [
-        "※ 윷 말 완주 보상 부적 확률",
+        "※ 요리 부적 — 완주 보상 확률 · 제한시간 · 광고 연장",
         "- 한 줄 = 부적 1종. 말 1개가 완주할 때 weight 비율로 1개가 나옴 (전부 1이면 6종 균등, 0 = 안 나옴)",
         "- 예: 몰빵 weight 0.5, 나머지 1 → 몰빵 9%, 나머지 각 18%",
+        "- seconds = 그 부적을 끼고 시작한 판의 제한시간(초). 부적 없는 판은 15초",
+        "- adExtend = 시간이 끝났을 때 '광고 보고 15초 더' 가능 (TRUE/FALSE)",
+        "- 나가리는 판 중간에 쓰는 부적이라 seconds·adExtend 칸은 비워 두기",
         "- 나가리도 소모품 — 가진 개수만큼만 요리 중 쓸 수 있음",
         "- id 는 코드와 연결되니 바꾸지 마세요",
         "- 수정 후: npm run charms (또는 npm run sheets)",
+    ],
+    "deploy_status": [
+        "※ 게임 반영 기록 (자동 — 손대지 마세요)",
+        "- 시트 메뉴 「한폭요괴 → 게임에 반영」을 누르면 시트 검사 → 커밋 → 빌드 → 배포 단계마다 맨 위에 한 줄씩 적혀요",
+        "- '배포 완료'가 뜨면 link 의 게임을 새로고침해서 확인 (요청부터 약 12분)",
+        "- '시트 오류'면 detail 의 탭·행을 고치고 다시 누르세요. 오류 난 탭만 빼고 나머지는 반영돼요",
+    ],
+    "spirit_lines": [
+        "※ 나루터 혼령 대사",
+        "- kind: woman(여자) · man(남자) · elder(노인) · child(어린이)",
+        "- type: ask = 주문 ({dish} 자리에 요리 이름 — 꼭 넣기) · thanks = 대접받았을 때 · bye = 그냥 떠날 때",
+        "- 같은 kind·type 을 여러 줄 쓰면 그중 랜덤",
+        "- 수정 후: 메뉴 「한폭요괴 → 게임에 반영」 (개발: npm run spirits)",
+    ],
+    "game_settings": [
+        "※ 게임 전역 수치 — 기력·친밀도 · 주문 요괴 · 요리판 시간 · 음식 요구 · 황금 요리 · 상점·윷 · 선물꾸러미 · 새 게임 시작값",
+        "- 한 줄 = 값 하나. key 는 코드와 연결 — 바꾸지 마세요",
+        "- value 를 비우면 코드 기본값(v1.3 기획서)",
+        "- 주문 요괴 보상은 배수 — 공양물 기력·선호 친밀도를 바꾸면 따라 바뀜 (note 의 → 값은 push 할 때 계산)",
+        "- start* = 새 게임에만 적용 (이미 하고 있는 세이브는 그대로)",
+        "- 수정 후: 메뉴 「한폭요괴 → 게임에 반영」 (개발: npm run settings)",
     ],
     "recipes": [
         "※ 공양간 레시피 (요리판에서 실제로 쓰는 조합)",
         "- 한 줄 = 조합 1개. 같은 id 를 여러 줄 쓰면 같은 요리의 다른 조합 (예: 고기죽 = 쌀+새고기 / 쌀+멧돼지고기)",
         "- kind: 음식(재료 2개) / 공양물(재료 3개)",
-        "- 재료는 한글 이름: 물 고추 쌀 팥 과실 산나물 약재 꿀 멧돼지고기 새고기 물고기 새알 기름 (순서 상관없음, 같은 재료 2번 가능)",
+        "- 재료는 ingredients 탭 name 의 한글 이름 (순서 상관없음, 같은 재료 2번 가능)",
         "- id 는 영문 — 이미 있는 요리의 id 를 바꾸면 그 요리 인벤·도감 기록이 사라짐",
         "- 같은 재료 조합이 두 요리에 있으면 오류",
         "- description = 요리책 상세 설명. 요리마다 한 줄에만 쓰고 같은 id 의 다른 줄은 비워 두세요 (비면 효과만 나옴)",
@@ -40,10 +64,11 @@ _LINES: dict[str, list[str]] = {
     ],
     "ingredients": [
         "※ 요리책 재료 칸 설명",
-        "- 한 줄 = 재료 1개 (재료 13 + 황금쌀·황금꿀)",
-        "- 게임에 들어가는 건 description 뿐 — 요리책에서 재료 칸을 눌렀을 때 상세 팝업에 나옴",
-        "- id·name 은 코드와 연결된 참고용 (바꾸지 마세요). 요리 설명은 recipes 탭 description",
-        "- 수정 후: npm run ingredients",
+        "- 한 줄 = 재료 1개 (재료 13 + 황금쌀·황금꿀 + 황금 재료 6종)",
+        "- name = 게임에 보이는 재료 이름 (비우면 기본 이름). description = 요리책에서 재료 칸을 눌렀을 때 상세 설명",
+        "- id 는 코드와 연결 — 바꾸지 마세요. 요리 설명은 recipes 탭 description",
+        "- 이름을 바꾸면 recipes 탭 재료 칸도 새 이름으로 (직전 기본 이름도 당분간 받아 줌)",
+        "- 수정 후: npm run ingredients → npm run recipes (또는 npm run sheets)",
     ],
     "characters": [
         "※ 캐릭터 기본 정보",
@@ -69,22 +94,41 @@ _LINES: dict[str, list[str]] = {
         "    request_gift = 선물꾸러미 줄 때",
         "    golden_find = 황금 재료 수거 ({item} 자리에 황금쌀/황금꿀)",
         "    greeting = 접속 인사 (앱을 켜거나 5분 넘게 비웠다 돌아왔을 때, 놀고 있던 요괴)",
+        "    go_hunt · go_gather · go_spring · go_altar = 사냥터·채집터·옹달샘·제단에 보낼(앉힐) 때",
+        "    work_hunt · work_gather · work_spring · work_altar = 일하는 중에 눌렀을 때",
+        "    full = 보관함이 차서 옮겨 갈 때 ({d} 자리에 옮겨 갈 기물) / full_idle = 찼는데 갈 곳이 없어 놀 때",
+        "    tired = 일하다 기력이 다 닳았을 때",
+        "    home · hungry · fed · gold · offer = 불러들일 때 · 배고플 때 · 음식 · 황금 요리 · 공양물 받을 때 (아직 게임에서 안 씀)",
         "- 수정 후: npm run characters",
     ],
     "props": [
         "※ 기물별 산출",
-        "- resourceType: Merit(공덕) / Water(물) / Yeopjeon(엽전) / Hunt(사냥 재료) / Gather(채집 재료) / None(없음)",
+        "- resourceType: Merit(공덕) / Water(물) / Hunt(사냥 재료) / Gather(채집 재료) / None(없음)",
         "- 자원 기물: cycleMinutes = 1개 만드는 주기(분, 레벨 무관) / baseCapacity = Lv1 보관 (10레벨마다 +1)",
-        "- 공덕 기물: 분당 meritPerMinute × levelGrowth^(레벨−1) / meritCapacityMinutes분치 쌓이면 만창",
+        "- 공덕 기물: 분당 meritPerMinute × levelGrowth^(레벨−1) / meritCapacityMinutes분치 × capacityGrowth^(레벨−1) 쌓이면 만창",
+        "  (제단: 분당 20 = 15분에 300 · 180분치 = 3시간 · 레벨마다 보관 ×1.1 / 떡절구: 레벨마다 생산 ×1.1, capacityGrowth 1)",
         "- intimacyBonus(친밀도 보정), upgradable(레벨업 가능) = TRUE / FALSE",
+        "- propId 는 기물 에셋과 연결 — 바꾸지 마세요 (활터 = 사냥터, 약초밭 = 채집터. 보이는 이름은 displayName)",
+        "- 에셋이 아직 없는 기물(북제단·남제단)은 값만 저장되고, 기물이 맵에 생기면 적용",
         "- 수정 후: npm run props",
     ],
     "prop_drop_tables": [
-        "※ 활터(Hunt) · 약초밭(Gather) 재료 확률",
-        "- weight = 확률 % (표마다 합 100 권장)",
-        "- ingredient: Rice 쌀 / Namul 산나물 / Fruit 과실 / Chili 고추 / Herb 약재 / RedBean 팥",
-        "              Egg 새알 / Oil 기름 / Fish 물고기 / Boar 멧돼지고기 / Bird 새고기 / Honey 꿀",
+        "※ 재료 확률 표",
+        "- table = destinations 탭의 목적지 id (v1.2 — 사냥터·채집터 보내기 팝업이 생기면 사용)",
+        "         Hunt / Gather = 지금 게임의 사냥터·채집터 표 (보내기 팝업이 생기면 지울 예정)",
+        "- weight = 확률 % (표마다 합 100 권장). 목적지 표에는 황금 재료를 넣지 말고 destinations 탭 goldenChance 로",
+        "- ingredient: Rice 쌀 / Namul 산나물 / Fruit 과실 / Chili 고추 / Herb 약재 / Grain 잡곡",
+        "              Egg 새알 / Oil 기름 / Seafood 해산물 / Boar 멧돼지고기 / Bird 새고기 / Honey 꿀",
         "              GoldenRice 황금쌀 / GoldenHoney 황금꿀",
+        "- 수정 후: npm run props",
+    ],
+    "destinations": [
+        "※ 사냥터·채집터 목적지 (v1.2)",
+        "- 한 줄 = 목적지 1곳. 나오는 재료와 확률은 prop_drop_tables 탭 (table = 이 id)",
+        "- prop: Hunt(사냥터) / Gather(채집터)",
+        "- rarity = 희귀도 표시(하·중·상), minIntimacy = 들어갈 수 있는 친밀도 (모자라면 '거기는 가기 싫어')",
+        "- goldenChance = 재료가 하나 나올 때 황금 버전으로 바뀔 확률 % (0 = 안 나옴)",
+        "- id 는 영문 — prop_drop_tables 와 연결되니 바꿀 땐 둘 다",
         "- 수정 후: npm run props",
     ],
     "prop_settings": [
@@ -150,14 +194,16 @@ def main() -> int:
     from export_characters import load_config
     from export_yut_bubbles import fetch_sheet_csv
     from import_yut_bubbles_csv import _post_json
+    from sheets_config import sheet_id_for
 
     config = load_config()
-    sid, url = config.get("sheet_id"), config.get("write_url")
-    if not sid or not url:
+    url = config.get("write_url")
+    if not config.get("sheet_id") or not url:
         print("config 에 sheet_id / write_url 필요", file=sys.stderr)
         return 1
 
     for tab, desc in DESCRIPTIONS.items():
+        sid = sheet_id_for(config, tab)
         rows = list(csv.reader(io.StringIO(fetch_sheet_csv(sid, tab))))
         while rows and rows[0] and rows[0][0].startswith(MARK):
             rows.pop(0)  # 기존 설명 교체

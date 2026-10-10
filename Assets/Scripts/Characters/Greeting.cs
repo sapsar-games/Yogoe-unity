@@ -11,8 +11,8 @@ namespace Yoegoe.Characters
     /// </summary>
     public static class Greeting
     {
-        /// <summary>이보다 오래 비웠다 돌아오면 다시 인사한다 (앱 재실행은 항상).</summary>
-        public const float AwaySecondsForGreeting = 5f * 60f;
+        /// <summary>이보다 오래 비웠다 돌아오면 다시 인사한다 (앱 재실행은 항상, 시트 game_settings).</summary>
+        public static float AwaySecondsForGreeting => GameSettings.AwaySecondsForGreeting;
         /// <summary>화면이 뜬 뒤 첫 인사까지 잠깐 쉼 + 요괴끼리 순서대로 말하게 하는 간격.</summary>
         const float FirstDelaySeconds = 1.2f;
         const float StaggerSeconds = 0.7f;

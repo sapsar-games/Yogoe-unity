@@ -27,11 +27,17 @@ namespace Yoegoe.Data
         public OfferingData[] startingOfferings;
         public int startingOfferingCountEach = 0;
 
+        static StartingStateSettings runtime;
+
+        /// <summary>에셋 사본에 시트 game_settings 의 start* 값을 입힌 것 (에셋 원본은 건드리지 않는다).</summary>
         public static StartingStateSettings Get()
         {
+            if (runtime != null) return runtime;
             var loaded = Resources.Load<StartingStateSettings>("StartingStateSettings");
-            if (loaded != null) return loaded;
-            return CreateInstance<StartingStateSettings>();
+            runtime = loaded != null ? Instantiate(loaded) : CreateInstance<StartingStateSettings>();
+            runtime.hideFlags = HideFlags.DontSave;
+            GameSettings.ApplyStart(runtime);
+            return runtime;
         }
     }
 }

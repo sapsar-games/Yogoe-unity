@@ -74,7 +74,9 @@ namespace Yoegoe.Characters
         {
             if (!monologueShowing || bubbleTextMesh == null) return;
             float spriteTop = spriteRenderer != null ? spriteRenderer.bounds.extents.y : 0.3f;
-            Vector3 bubblePos = transform.position + Vector3.up * (spriteTop + 0.55f);
+            // 말풍선 아랫변을 머리 위에 고정 — 여러 줄이 돼도 아래로 늘어나 머리를 가리지 않게
+            float halfH = bubbleBg != null ? bubbleBg.transform.localScale.y * 0.5f : 0.25f;
+            Vector3 bubblePos = transform.position + Vector3.up * (spriteTop + 0.1f + halfH); //머리 위에서 약간 떠 있을 수 있게
             bubbleTextMesh.transform.position = bubblePos;
             if (bubbleBg != null) bubbleBg.transform.position = bubblePos;
         }
@@ -94,6 +96,10 @@ namespace Yoegoe.Characters
             if (!CanTapMonologue) return;
             // 인사·요구 감사 같은 임시 대사 중엔 끝까지 보여 준다 (뒤에 선물꾸러미 등이 이어질 수 있음)
             if (tempSpeechRoutine != null) return;
+            // 일하는 중 탭 → 그 기물의 일 대사 (v1.2 시연). 없으면 혼잣말.
+            if (Stats.State == ActionState.Staying && currentProp != null
+                && TrySayCatalogLine(e => e.WorkLinesFor(currentProp.ResourceType)))
+                return;
             if (Data == null || Data.monologueLines == null || Data.monologueLines.Length == 0) return;
             // 떠 있으면 다음 대사로 바뀌고 10초 다시 (6-4)
             ShowMonologue();
@@ -105,6 +111,7 @@ namespace Yoegoe.Characters
             showingFaintedEllipsis = true;
             EnsureBubble();
             bubbleTextMesh.text = FaintedBubbleText;
+            ApplyBubbleScale();
             bubbleTextMesh.gameObject.SetActive(true);
             bubbleBg.gameObject.SetActive(true);
 
@@ -113,7 +120,7 @@ namespace Yoegoe.Characters
             {
                 renderer.sortingOrder = 1001;
                 Bounds bounds = renderer.bounds;
-                bubbleBg.transform.localScale = new Vector3(bounds.size.x + 0.3f, bounds.size.y + 0.18f, 1f);
+                bubbleBg.transform.localScale = new Vector3(bounds.size.x + BubblePadX * UiTextScale.Bubble, bounds.size.y + BubblePadY * UiTextScale.Bubble, 1f);
             }
 
             monologueShowing = true;
@@ -124,7 +131,8 @@ namespace Yoegoe.Characters
         private void ShowMonologue()
         {
             EnsureBubble();
-            bubbleTextMesh.text = PickMonologueLine();
+            bubbleTextMesh.text = WrapBubbleText(PickMonologueLine());
+            ApplyBubbleScale();
             bubbleTextMesh.gameObject.SetActive(true);
             bubbleBg.gameObject.SetActive(true);
 
@@ -133,7 +141,7 @@ namespace Yoegoe.Characters
             var renderer = bubbleTextMesh.GetComponent<MeshRenderer>();
             renderer.sortingOrder = 1001; // 상태 점(1000)보다 위
             Bounds bounds = renderer.bounds;
-            bubbleBg.transform.localScale = new Vector3(bounds.size.x + 0.3f, bounds.size.y + 0.18f, 1f);
+            bubbleBg.transform.localScale = new Vector3(bounds.size.x + BubblePadX * UiTextScale.Bubble, bounds.size.y + BubblePadY * UiTextScale.Bubble, 1f);
 
             monologueShowing = true;
             monologueTimer = MonologueDisplaySeconds;
@@ -182,7 +190,22 @@ namespace Yoegoe.Characters
             return world.x >= b.min.x && world.x <= b.max.x && world.y >= b.min.y && world.y <= b.max.y;
         }
 
-        /// <summary>요구 완료 등 짧은 대사.</summary>
+        /// <summary>시트 character_lines 대사 한 줄 (먹이기 창·음식 요구 등 밖에서 부를 때).</summary>
+        public bool SayCatalogLine(System.Func<CharacterCatalog.Entry, string[]> select, string d = null) =>
+            TrySayCatalogLine(select, d);
+
+        /// <summary>시트 character_lines 에서 고른 한 줄을 말한다. {d} 는 d 로 바꾼다. 대사가 없으면 false.</summary>
+        bool TrySayCatalogLine(System.Func<CharacterCatalog.Entry, string[]> select, string d = null)
+        {
+            if (Data == null || select == null) return false;
+            if (!CharacterCatalog.TryGet(Data.id, out var entry) || entry == null) return false;
+            string line = CharacterCatalog.PickLine(select(entry), null);
+            if (string.IsNullOrEmpty(line)) return false;
+            if (d != null) line = line.Replace("{d}", d);
+            ShowTempSpeech(line);
+            return true;
+        }
+
         /// <summary>delay초 뒤 한 줄 말한다 (접속 인사 등 여러 요괴가 순서대로 말할 때).</summary>
         public void SayAfter(float delay, string line)
         {
@@ -232,7 +255,8 @@ namespace Yoegoe.Characters
         IEnumerator TempSpeechRoutine(string line, float duration, bool hideAtEnd)
         {
             EnsureBubble();
-            bubbleTextMesh.text = line;
+            bubbleTextMesh.text = WrapBubbleText(line);
+            ApplyBubbleScale();
             bubbleTextMesh.gameObject.SetActive(true);
             bubbleBg.gameObject.SetActive(true);
             var renderer = bubbleTextMesh.GetComponent<MeshRenderer>();
@@ -240,7 +264,7 @@ namespace Yoegoe.Characters
             {
                 renderer.sortingOrder = 1001;
                 Bounds bounds = renderer.bounds;
-                bubbleBg.transform.localScale = new Vector3(bounds.size.x + 0.3f, bounds.size.y + 0.18f, 1f);
+                bubbleBg.transform.localScale = new Vector3(bounds.size.x + BubblePadX * UiTextScale.Bubble, bounds.size.y + BubblePadY * UiTextScale.Bubble, 1f);
             }
             monologueShowing = true;
             monologueTimer = duration;
@@ -251,7 +275,9 @@ namespace Yoegoe.Characters
                 if (bubbleTextMesh != null)
                 {
                     float spriteTop = spriteRenderer != null ? spriteRenderer.bounds.extents.y : 0.3f;
-                    Vector3 bubblePos = transform.position + Vector3.up * (spriteTop + 0.55f);
+                    // 말풍선 아랫변을 머리 위에 고정 — 여러 줄이 돼도 아래로 늘어나 머리를 가리지 않게
+            float halfH = bubbleBg != null ? bubbleBg.transform.localScale.y * 0.5f : 0.25f;
+            Vector3 bubblePos = transform.position + Vector3.up * (spriteTop + 0.3f + halfH);
                     bubbleTextMesh.transform.position = bubblePos;
                     if (bubbleBg != null) bubbleBg.transform.position = bubblePos;
                 }
@@ -275,6 +301,55 @@ namespace Yoegoe.Characters
             return sharedBubbleSprite;
         }
 
+        // 말풍선 크기 — 글자 크기 · 여백 · 한 줄 최대 글자 수 (긴 대사가 한 줄로 늘어나 말풍선이 커지지 않게)
+        // 배율·한 줄 글자 수 = 시트 game_settings(bubbleTextScale · bubbleMaxChars) × 설정 화면 글자 크기 (UiTextScale)
+        const float BubbleCharacterSize = 0.019f; //대략 20px
+        const float BubblePadX = 0.2f;
+        const float BubblePadY = 0.12f;
+        static int BubbleMaxCharsPerLine => UiTextScale.BubbleMaxChars;
+        const int BubbleMaxLines = 3;
+
+        /// <summary>말풍선 글자 배율 적용 — 배경은 이 크기에 맞춰 그리므로 UiTextScaler 가 아니라 여기서 직접.</summary>
+        void ApplyBubbleScale()
+        {
+            if (bubbleTextMesh != null)
+                bubbleTextMesh.characterSize = BubbleCharacterSize * UiTextScale.Bubble;
+        }
+
+        /// <summary>한 줄이 BubbleMaxCharsPerLine 을 넘으면 띄어쓰기 자리에서 나눈다 (띄어쓰기가 없으면 글자 수로).</summary>
+        public static string WrapBubbleText(string text)
+        {
+            if (string.IsNullOrEmpty(text) || text.Length <= BubbleMaxCharsPerLine || text.Contains("\n")) return text;
+            int lines = Mathf.Min(BubbleMaxLines, Mathf.CeilToInt(text.Length / (float)BubbleMaxCharsPerLine));
+            int target = Mathf.CeilToInt(text.Length / (float)lines);
+            var sb = new System.Text.StringBuilder(text.Length + lines);
+            int start = 0;
+            for (int l = 1; l < lines && start < text.Length; l++)
+            {
+                int ideal = start + target;
+                if (ideal >= text.Length) break;
+                // ideal 에서 가장 가까운 띄어쓰기
+                int cut = -1;
+                for (int d = 0; d <= target / 2 && cut < 0; d++)
+                {
+                    if (ideal - d > start && text[ideal - d] == ' ') cut = ideal - d;
+                    else if (ideal + d < text.Length && text[ideal + d] == ' ') cut = ideal + d;
+                }
+                if (cut < 0)
+                {
+                    sb.Append(text, start, ideal - start).Append('\n');
+                    start = ideal;
+                }
+                else
+                {
+                    sb.Append(text, start, cut - start).Append('\n');
+                    start = cut + 1;
+                }
+            }
+            sb.Append(text, start, text.Length - start);
+            return sb.ToString();
+        }
+
         private void EnsureBubble()
         {
             if (bubbleTextMesh != null) return;
@@ -288,7 +363,7 @@ namespace Yoegoe.Characters
 
             var textGo = new GameObject(gameObject.name + "_Bubble");
             bubbleTextMesh = textGo.AddComponent<TextMesh>();
-            bubbleTextMesh.characterSize = 0.045f;
+            bubbleTextMesh.characterSize = BubbleCharacterSize;
             bubbleTextMesh.fontSize = UiFonts.Size(48);
             bubbleTextMesh.anchor = TextAnchor.MiddleCenter;
             bubbleTextMesh.alignment = TextAlignment.Center;

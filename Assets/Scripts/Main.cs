@@ -12,6 +12,7 @@ namespace Yoegoe
 {
     /// <summary>
     /// Main 씬 진입점. 카메라·맵·기물·캐릭터·HUD를 조립한다.
+    /// Prefab: Assets/Prefabs/Bootstrap/Main.prefab
     /// 화면 크기: ArtScaleSettings.asset / 시작 재화·스탯: StartingStateSettings.asset
     /// 기물 밸런스: Data/Props/*.asset / 비주얼·배치: Prefabs/Props + Main 씬
     /// UI 색·글자: UiStyleSettings.asset
@@ -115,6 +116,7 @@ namespace Yoegoe
         IEnumerator Start()
         {
             yield return null;
+            BootSanityCheck.Run(hudFont);
             UiAssembler.ForceCloseOverlayScreens();
             GameSaveBridge.TryLoadSimulateAndApply(hudFont);
 

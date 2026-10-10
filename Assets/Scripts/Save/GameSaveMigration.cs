@@ -12,7 +12,7 @@ namespace Yoegoe.Save
     /// </summary>
     public static class GameSaveMigration
     {
-        public const int CurrentVersion = 1;
+        public const int CurrentVersion = 2;
 
         public static void MigrateToCurrent(GameSaveData data)
         {
@@ -26,8 +26,8 @@ namespace Yoegoe.Save
                 return;
             }
 
-            // 다음 스키마 변경 예시:
-            // if (data.version < 2) { /* v1 -> v2 보정 */ data.version = 2; }
+            // v2: 나루터(pier) 추가 — 값 보정 없음. 비어 있으면 SpiritPier.ResetFromSave가 지금부터 시작한다.
+            if (data.version < 2) data.version = 2;
 
             data.version = CurrentVersion;
         }

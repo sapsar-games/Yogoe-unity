@@ -32,8 +32,8 @@ namespace Yoegoe.UI
         RectTransform batchFxFrom;
         Vector3? batchFxFromWorld;
 
-        const int BuyCostYeopjeon = 10;
-        const int BuyGrantTokens = 5;
+        static int BuyCostYeopjeon => Yoegoe.Data.GameSettings.YutTokenBuyCost; // 시트 game_settings
+        static int BuyGrantTokens => Yoegoe.Data.GameSettings.YutTokenBuyAmount;
         const int AdGrantTokens = 1;
         const float AdWatchSeconds = 0.8f;
 

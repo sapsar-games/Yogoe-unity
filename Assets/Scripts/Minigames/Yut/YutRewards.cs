@@ -71,23 +71,28 @@ namespace Yoegoe.Minigames.Yut
             Yoegoe.Economy.IngredientDraw.Roll(count);
 
         /// <summary>
-        /// 보물상자 — 공양물 50% · 광고보상권 30% · 향 5% · 엽전 3개 15%.
+        /// 보물상자 — 공양물 50% · 광고보상권 30% · 향 5% · 엽전 3개 15% (비율·엽전 수 = 시트 game_settings).
         /// </summary>
         public static YutSquareReward RollTreasure(IReadOnlyList<OfferingData> offeringPool)
         {
-            float r = UnityEngine.Random.value;
-            if (r < 0.50f)
+            float wO = UnityEngine.Mathf.Max(0f, GameSettings.ChestOfferingWeight);
+            float wA = UnityEngine.Mathf.Max(0f, GameSettings.ChestAdTicketWeight);
+            float wH = UnityEngine.Mathf.Max(0f, GameSettings.ChestHyangWeight);
+            float wY = UnityEngine.Mathf.Max(0f, GameSettings.ChestYeopjeonWeight);
+            float total = wO + wA + wH + wY;
+            float r = total > 0f ? UnityEngine.Random.value * total : 0f;
+            if (total <= 0f || r < wO)
             {
                 var offering = offeringPool != null && offeringPool.Count > 0
                     ? offeringPool[UnityEngine.Random.Range(0, offeringPool.Count)]
                     : null;
                 return new YutSquareReward(YutSquareRewardKind.Offering, offering, 1);
             }
-            if (r < 0.80f)
+            if (r < wO + wA)
                 return new YutSquareReward(YutSquareRewardKind.AdTicket, null, 1);
-            if (r < 0.85f)
+            if (r < wO + wA + wH)
                 return new YutSquareReward(YutSquareRewardKind.Hyang, null, 1);
-            return new YutSquareReward(YutSquareRewardKind.Yeopjeon, null, 3);
+            return new YutSquareReward(YutSquareRewardKind.Yeopjeon, null, GameSettings.ChestYeopjeonAmount);
         }
 
         /// <summary>지급 전 미리보기용 문구(배율 1 기준).</summary>
