@@ -562,7 +562,9 @@ namespace Yoegoe.Characters
             }
             agent.OnTapped();
             // 노는(일하지 않는) 요괴를 누르면 혼잣말 + 먹이기 창 (v1.3). 일하는 중은 일 대사만, 기절은 "..."만.
-            if (agent.Stats.State != ActionState.Staying && agent.Stats.State != ActionState.Fainted)
+            // 옥토끼는 먹이기 대상이 아니다 (v1.2 시연).
+            if (agent.Stats.State != ActionState.Staying && agent.Stats.State != ActionState.Fainted
+                && (agent.Data == null || agent.Data.id != CharacterId.Rabbit))
                 FeedRequested?.Invoke(agent);
         }
 

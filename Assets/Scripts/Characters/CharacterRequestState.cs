@@ -57,6 +57,8 @@ namespace Yoegoe.Characters
         {
             if (owner == null || owner.Stats == null) return false;
             if (owner.Stats.State == ActionState.Fainted) return false;
+            // 옥토끼는 먹이기·요구 대상이 아니다 (v1.2 시연) — 친밀도·기력 고정 NPC.
+            if (owner.Data != null && owner.Data.id == CharacterId.Rabbit) return false;
             return true;
         }
 

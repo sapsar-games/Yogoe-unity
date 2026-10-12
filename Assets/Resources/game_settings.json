@@ -207,6 +207,22 @@
     {
       "key": "startIntimacy",
       "value": 50.0
+    },
+    {
+      "key": "wanderRetrySeconds",
+      "value": 30
+    },
+    {
+      "key": "haltedRecheckSeconds",
+      "value": 2
+    },
+    {
+      "key": "awaySecondsForGreeting",
+      "value": 300
+    },
+    {
+      "key": "dropMarkSeconds",
+      "value": 2
     }
   ]
 }

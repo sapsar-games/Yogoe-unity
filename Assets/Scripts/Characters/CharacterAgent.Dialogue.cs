@@ -96,14 +96,38 @@ namespace Yoegoe.Characters
             if (!CanTapMonologue) return;
             // 인사·요구 감사 같은 임시 대사 중엔 끝까지 보여 준다 (뒤에 선물꾸러미 등이 이어질 수 있음)
             if (tempSpeechRoutine != null) return;
-            // 일하는 중 탭 → 그 기물의 일 대사 (v1.2 시연). 없으면 혼잣말.
+            // 일하는 중 탭 → 그 기물의 일 대사 + 현황 토스트 (v1.2 시연). 대사가 없으면 혼잣말.
             if (Stats.State == ActionState.Staying && currentProp != null
                 && TrySayCatalogLine(e => e.WorkLinesFor(currentProp.ResourceType)))
+            {
+                WorldToast.Show(BuildWorkStatusToast());
                 return;
+            }
             if (Data == null || Data.monologueLines == null || Data.monologueLines.Length == 0) return;
             // 떠 있으면 다음 대사로 바뀌고 10초 다시 (6-4)
             ShowMonologue();
         }
+
+        /// <summary>일하는 중 탭 토스트 — "○○ · 어디에서 사냥 중 · 보관함 n/15 · 기력 n" (v1.2 시연).</summary>
+        string BuildWorkStatusToast()
+        {
+            string place = currentProp.DisplayName;
+            string verb = WorkVerb(currentProp.ResourceType);
+            string storage = currentProp.IsResourceProp
+                ? $"보관함 {currentProp.StoredResources}/{currentProp.ResourceCapacity}"
+                : $"공덕 {currentProp.PendingMerit.ToDisplayString()}";
+            string agentName = Data != null ? Data.displayName : "요괴";
+            return $"{agentName} · {place}에서 {verb} 중 · {storage} · 기력 {Mathf.FloorToInt(Stats.Stamina)}";
+        }
+
+        static string WorkVerb(PropResourceType t) => t switch
+        {
+            PropResourceType.Hunt => "사냥",
+            PropResourceType.Gather => "채집",
+            PropResourceType.Water => "물 긷기",
+            PropResourceType.Merit => "공양",
+            _ => "일",
+        };
 
         /// <summary>기절 중 머리 위 말풍선. 탭하면 같은 문구로 갱신.</summary>
         void ShowFaintedEllipsis()

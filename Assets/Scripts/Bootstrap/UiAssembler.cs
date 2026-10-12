@@ -123,6 +123,12 @@ namespace Yoegoe.Bootstrap
             feed.font = cfg.hudFont;
             feedGO.SetActive(true);
 
+            var toastGO = new GameObject("WorldToast");
+            toastGO.SetActive(false);
+            var toast = toastGO.AddComponent<WorldToast>();
+            toast.font = cfg.hudFont;
+            toastGO.SetActive(true);
+
             var settingsGO = new GameObject("SettingsPopup");
             settingsGO.SetActive(false);
             var settings = settingsGO.AddComponent<SettingsPopup>();

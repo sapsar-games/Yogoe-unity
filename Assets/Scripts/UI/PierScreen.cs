@@ -137,7 +137,11 @@ namespace Yoegoe.UI
             var s = SpiritPier.Find(spiritId);
             Close();
             GongyangganScreen.Resolve()?.Open();
-            if (s != null) Debug.Log($"[Pier] {DishName(s.DishId)} 을(를) 지어서 나루터로 돌아오세요");
+            if (s != null)
+            {
+                string dish = DishName(s.DishId);
+                WorldToast.Show($"{dish}{Josa(dish, "을", "를")} 지어서 나루터로 돌아오세요");
+            }
         }
 
         // ---------------- 화면 ----------------
