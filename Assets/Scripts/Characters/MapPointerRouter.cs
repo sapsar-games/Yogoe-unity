@@ -318,7 +318,13 @@ namespace Yoegoe.Characters
                 switch (pressTarget)
                 {
                     case PressTarget.LockedProp:
-                        // 자물쇠 탭은 캐릭터·지도 드래그로 절대 전환되지 않는다 — release에서 구매 판정.
+                        // 자물쇠 위에서 시작해도 충분히 움직이면 지도 패닝 — 가만히 떼야 구매 판정.
+                        if (moved > dragThresholdPixels)
+                        {
+                            phase = Phase.MapDrag;
+                            ResolveMapDrag();
+                            if (mapDrag != null) mapDrag.ApplyScreenDelta(screenPos - pressStartScreen);
+                        }
                         return;
 
                     case PressTarget.GongyangganProp:
