@@ -12,6 +12,8 @@ namespace Yoegoe.Cooking
     public static class CookingCodex
     {
         static readonly HashSet<string> discovered = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        /// <summary>엽전 보상을 이미 받은 결과물 id — 나가리로 discovered가 풀려도 다시 받지 않는다(레시피마다 한 번).</summary>
+        static readonly HashSet<string> claimed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         static List<string> productIds;
         static int productIdsVersion = -1;
 
@@ -65,6 +67,22 @@ namespace Yoegoe.Cooking
             if (discovered.Remove(Canonical(id))) Changed?.Invoke();
         }
 
+        /// <summary>발견했지만 엽전 보상을 아직 안 받은 칸인지 (19장: 새 레시피 칸 → 엽전 1개).</summary>
+        public static bool HasUnclaimedReward(string id)
+        {
+            id = Canonical(id);
+            return discovered.Contains(id) && !claimed.Contains(id);
+        }
+
+        /// <summary>엽전 보상 받기 — 레시피마다 한 번뿐. 받을 게 있었으면 true(호출 쪽이 엽전을 지급).</summary>
+        public static bool TryClaimReward(string id)
+        {
+            id = Canonical(id);
+            if (!discovered.Contains(id) || !claimed.Add(id)) return false;
+            Changed?.Invoke();
+            return true;
+        }
+
         /// <summary>결과물의 조합(여러 개면 " / "로) — "쌀 + 팥".</summary>
         public static string ComboText(string id)
         {
@@ -99,5 +117,15 @@ namespace Yoegoe.Cooking
         }
 
         public static string[] CaptureToSave() => discovered.ToArray();
+
+        public static void ResetClaimedFromSave(IEnumerable<string> ids)
+        {
+            claimed.Clear();
+            if (ids != null)
+                foreach (var id in ids)
+                    if (IsProduct(id)) claimed.Add(Canonical(id));
+        }
+
+        public static string[] CaptureClaimedToSave() => claimed.ToArray();
     }
 }

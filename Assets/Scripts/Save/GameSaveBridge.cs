@@ -125,6 +125,7 @@ namespace Yoegoe.Save
             data.economy.charms = GameEconomy.Instance.CaptureCharmCounts();
             Attendance.CaptureToSave(out data.economy.attendanceNextDayIndex, out data.economy.attendanceLastHandledDayKey);
             data.economy.codexDiscovered = Yoegoe.Cooking.CookingCodex.CaptureToSave();
+            data.economy.codexClaimed = Yoegoe.Cooking.CookingCodex.CaptureClaimedToSave();
             data.economy.lockedSlotUnlocked = CharacterSummon.LockedSlotUnlocked;
 
             // Props
@@ -298,6 +299,7 @@ namespace Yoegoe.Save
             Attendance.ResetFromSave(e.attendanceNextDayIndex, e.attendanceLastHandledDayKey);
             CharacterSummon.ResetFromSave(e.lockedSlotUnlocked);
             Yoegoe.Cooking.CookingCodex.ResetFromSave(e.codexDiscovered);
+            Yoegoe.Cooking.CookingCodex.ResetClaimedFromSave(e.codexClaimed);
         }
 
         static OfferingCountSave[] CaptureOfferings(GameEconomy eco)

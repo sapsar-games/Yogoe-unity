@@ -88,7 +88,8 @@ namespace Yoegoe.UI
                 string name = CookingRecipeCatalog.DisplayName(id);
                 int n = eco != null ? eco.GetMaterialCount(id) : 0;
                 string ingId = id.ToString();
-                AddCell(ingredients, name, n, known: true, () => ShowDetail(name, "요리 재료", CodexDescriptions.Get(ingId)));
+                AddCell(ingredients, name, n, known: true, unclaimed: false,
+                    () => ShowDetail(name, "요리 재료", CodexDescriptions.Get(ingId)));
             }
             foreach (SpecialItemId special in System.Enum.GetValues(typeof(SpecialItemId)))
             {
@@ -97,7 +98,7 @@ namespace Yoegoe.UI
                 string specialId = special.ToString();
                 string baseName = CookingSession.TryBaseOf(special, out var baseIng)
                     ? CookingRecipeCatalog.DisplayName(baseIng) : name;
-                AddCell(ingredients, name, n, known: true,
+                AddCell(ingredients, name, n, known: true, unclaimed: false,
                     () => ShowDetail(name, $"요리판에서 {baseName} 칸으로 쓰여요",
                         JoinDesc(CodexDescriptions.Get(specialId), "이게 들어간 음식은 황금음식이 돼요.")));
             }
@@ -117,8 +118,9 @@ namespace Yoegoe.UI
                 }
                 var grid = recipe.Kind == CookingResultKind.Food ? foods : offerings;
                 string id = productId;
-                AddCell(grid, known ? recipe.DisplayName : "?", known ? n : -1, known,
-                    known ? () => ShowRecipeDetail(id) : (System.Action)null);
+                bool unclaimed = known && CookingCodex.HasUnclaimedReward(id);
+                AddCell(grid, known ? recipe.DisplayName : "?", known ? n : -1, known, unclaimed,
+                    known ? () => OnProductCellTapped(id) : (System.Action)null);
             }
         }
 
@@ -142,7 +144,7 @@ namespace Yoegoe.UI
             return (RectTransform)gridGO.transform;
         }
 
-        void AddCell(RectTransform parent, string name, int count, bool known, System.Action onClick)
+        void AddCell(RectTransform parent, string name, int count, bool known, bool unclaimed, System.Action onClick)
         {
             var cell = new GameObject("Cell_" + name, typeof(RectTransform));
             cell.transform.SetParent(parent, false);
@@ -153,6 +155,30 @@ namespace Yoegoe.UI
                 var b = cell.AddComponent<Button>();
                 b.targetGraphic = bg;
                 b.onClick.AddListener(() => onClick());
+            }
+
+            if (unclaimed)
+            {
+                var badgeGO = new GameObject("RewardBadge", typeof(RectTransform));
+                badgeGO.transform.SetParent(cell.transform, false);
+                var brt = (RectTransform)badgeGO.transform;
+                brt.anchorMin = brt.anchorMax = new Vector2(1f, 1f);
+                brt.pivot = new Vector2(1f, 1f);
+                brt.anchoredPosition = new Vector2(-4, -4);
+                brt.sizeDelta = new Vector2(40, 40);
+                var badgeBg = badgeGO.AddComponent<Image>();
+                badgeBg.color = new Color(1f, 0.82f, 0.25f, 1f);
+                badgeBg.raycastTarget = false;
+
+                var badgeTextGO = new GameObject("Label", typeof(RectTransform));
+                badgeTextGO.transform.SetParent(badgeGO.transform, false);
+                var btrt = (RectTransform)badgeTextGO.transform;
+                btrt.anchorMin = Vector2.zero;
+                btrt.anchorMax = Vector2.one;
+                btrt.offsetMin = btrt.offsetMax = Vector2.zero;
+                var badgeText = badgeTextGO.AddComponent<Text>();
+                StyleText(badgeText, 22, new Color(0.25f, 0.16f, 0.02f), TextAnchor.MiddleCenter);
+                badgeText.text = "+1";
             }
 
             var nameGO = new GameObject("Name", typeof(RectTransform));
@@ -187,6 +213,18 @@ namespace Yoegoe.UI
             t.raycastTarget = false;
             t.horizontalOverflow = HorizontalWrapMode.Wrap;
             t.verticalOverflow = VerticalWrapMode.Overflow;
+        }
+
+        /// <summary>요리책 칸 탭 — 처음 보는 엽전 보상이 있으면 먼저 받고(19장), 상세 팝업은 그대로 연다.</summary>
+        void OnProductCellTapped(string productId)
+        {
+            if (CookingCodex.TryClaimReward(productId))
+            {
+                GameEconomy.Instance?.AddYeopjeon(1);
+                WorldToast.Show("엽전 1개 받았어요!");
+                Rebuild(); // 배지 떼기
+            }
+            ShowRecipeDetail(productId);
         }
 
         void ShowRecipeDetail(string productId)

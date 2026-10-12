@@ -35,12 +35,14 @@ namespace Yoegoe.Tests.EditMode
                 eco.TrySpendMaterial(id, eco.GetMaterialCount(id));
             }
             CookingCodex.ResetFromSave(null);
+            CookingCodex.ResetClaimedFromSave(null);
         }
 
         [TearDown]
         public void TearDown()
         {
             CookingCodex.ResetFromSave(null);
+            CookingCodex.ResetClaimedFromSave(null);
             Object.DestroyImmediate(ecoGO);
         }
 
@@ -99,6 +101,31 @@ namespace Yoegoe.Tests.EditMode
             Assert.AreEqual(0, CookingCodex.DiscoveredCount);
             CookingCodex.ResetFromSave(saved);
             Assert.AreEqual(1, CookingCodex.DiscoveredCount);
+        }
+
+        [Test]
+        public void ClaimReward_OncePerRecipe_SurvivesForgetAndSaveRoundTrip()
+        {
+            Assert.IsFalse(CookingCodex.HasUnclaimedReward(FoodId), "아직 발견 전");
+            Assert.IsFalse(CookingCodex.TryClaimReward(FoodId));
+
+            CookingCodex.Discover(FoodId);
+            Assert.IsTrue(CookingCodex.HasUnclaimedReward(FoodId));
+            Assert.IsTrue(CookingCodex.TryClaimReward(FoodId), "처음 받기");
+            Assert.IsFalse(CookingCodex.HasUnclaimedReward(FoodId), "받은 뒤엔 배지 없음");
+            Assert.IsFalse(CookingCodex.TryClaimReward(FoodId), "레시피마다 한 번뿐");
+
+            // 나가리로 발견이 풀려도, 다시 발견해도 한 번 받은 건 또 안 준다.
+            CookingCodex.Forget(FoodId);
+            CookingCodex.Discover(FoodId);
+            Assert.IsFalse(CookingCodex.HasUnclaimedReward(FoodId));
+            Assert.IsFalse(CookingCodex.TryClaimReward(FoodId));
+
+            var saved = CookingCodex.CaptureClaimedToSave();
+            CookingCodex.ResetClaimedFromSave(null);
+            Assert.IsTrue(CookingCodex.HasUnclaimedReward(FoodId), "세이브 리셋하면 다시 받을 수 있어야(검증용)");
+            CookingCodex.ResetClaimedFromSave(saved);
+            Assert.IsFalse(CookingCodex.HasUnclaimedReward(FoodId), "불러오면 받은 기록 유지");
         }
 
         [Test]

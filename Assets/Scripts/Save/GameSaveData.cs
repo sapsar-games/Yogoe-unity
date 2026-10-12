@@ -121,6 +121,9 @@ namespace Yoegoe.Save
 
         /// <summary>요리책 발견한 결과물 id.</summary>
         public string[] codexDiscovered;
+
+        /// <summary>요리책 엽전 보상을 이미 받은 결과물 id (19장 — 레시피마다 한 번).</summary>
+        public string[] codexClaimed;
     }
 
     [Serializable]
