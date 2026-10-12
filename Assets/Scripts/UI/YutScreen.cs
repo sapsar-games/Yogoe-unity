@@ -15,7 +15,7 @@ using Yoegoe.Save;
 namespace Yoegoe.UI
 {
     /// <summary>
-    /// 윷놀이 진입점(11장). 윷 토큰 소모 → 옥토끼+현재 슬롯의 혼 전원 vs 이무기(말 1개) →
+    /// 윷놀이 진입점(11장). 윷 토큰 소모 → 현재 슬롯의 혼 전원(옥토끼 제외 — v1.3 NPC화) vs 이무기(말 1개) →
     /// 완주 시 부적 지급까지의 최소 완결 루프. 화면/입력은 YutMiniGame, 규칙은 YutMatch가 담당.
     /// </summary>
     public partial class YutScreen : MonoBehaviour, IYutChallengeHost, IYutSquareRewardHost
@@ -211,8 +211,9 @@ namespace Yoegoe.UI
                 return;
             }
 
+            // 옥토끼는 NPC화(v1.3) — 말로 뛰지 않는다. 대신 동(東) 완주 줄에 고정으로 앉아 던지기마다 해설만 한다.
             var agents = CharacterAgent.All
-                .Where(a => a != null && a.Stats != null)
+                .Where(a => a != null && a.Stats != null && (a.Data == null || a.Data.id != CharacterId.Rabbit))
                 .ToList();
 
             if (agents.Count == 0)
@@ -1024,6 +1025,8 @@ namespace Yoegoe.UI
             var finishedIds = new List<string>();
             foreach (var p in match.PlayerPieces)
                 if (p.Finished) finishedIds.Add(p.Id);
+            // 옥토끼는 말로 뛰지 않지만(NPC화) 항상 동 줄에 있는 것으로 쳐서 해설 말풍선 자리를 유지한다.
+            finishedIds.Add(nameof(CharacterId.Rabbit));
             miniGame.ShowFinishedPieces(finishedIds);
 
             var opp = match.OpponentPiece;

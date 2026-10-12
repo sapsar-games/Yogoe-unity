@@ -104,10 +104,13 @@ namespace Yoegoe.Characters
         private void ApplyDefaultStatsFromData()
         {
             var start = StartingStateSettings.Get();
-            Stats.Intimacy = start.startingIntimacy;
+            // 옥토끼는 NPC화(v1.3) — 친밀도 100 고정(바뀌는 경로 없음: 먹이기·윷 모두 제외).
+            Stats.Intimacy = IsRabbit ? 100f : start.startingIntimacy;
             // 최대·시작 기력 = 25 + 친밀도
             Stats.Stamina = MaxStaminaFromIntimacy(Stats.Intimacy);
         }
+
+        bool IsRabbit => Data != null && Data.id == CharacterId.Rabbit;
 
         /// <summary>소환 직후 — 친밀도 0, 기력 1 (Docs/00 §2·§9).</summary>
         public void ApplyFreshSummon()
@@ -250,7 +253,8 @@ namespace Yoegoe.Characters
                 currentProp = null;
             }
 
-            Stats.Intimacy = intimacy;
+            // 옥토끼는 NPC화(v1.3) — 옛 세이브에 남은 값과 상관없이 매번 100으로 되돌린다.
+            Stats.Intimacy = IsRabbit ? 100f : intimacy;
             Stats.Stamina = stamina;
             Stats.State = state;
             Stats.StateTimer = stateTimer;

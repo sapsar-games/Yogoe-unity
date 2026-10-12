@@ -16,6 +16,8 @@ namespace Yoegoe.Characters
         StaminaAndIntimacyFull,
         /// <summary>기절 — 물로만 깨어난다.</summary>
         FaintedNeedsWater,
+        /// <summary>NPC(옥토끼) — 공양 대상이 아니다 (v1.3 NPC화).</summary>
+        NotFeedable,
     }
 
     /// <summary>공양 한 번의 결과.</summary>
@@ -73,6 +75,7 @@ namespace Yoegoe.Characters
         /// </summary>
         public FeedResult TryFeedWater(OfferingData waterData = null, GameEconomy economy = null)
         {
+            if (IsRabbit) return new FeedResult(FeedBlock.NotFeedable);
             var eco = economy != null ? economy : GameEconomy.Instance;
             if (eco == null || eco.Water < 1) return new FeedResult(FeedBlock.NoItem);
             if (IsStaminaFull) return new FeedResult(FeedBlock.StaminaFull);
@@ -97,6 +100,7 @@ namespace Yoegoe.Characters
         {
             if (offering == null) return new FeedResult(FeedBlock.NoItem);
             if (offering.IsWater) return TryFeedWater(offering, economy);
+            if (IsRabbit) return new FeedResult(FeedBlock.NotFeedable);
             if (Stats.State == ActionState.Fainted) return new FeedResult(FeedBlock.FaintedNeedsWater);
 
             var eco = economy != null ? economy : GameEconomy.Instance;

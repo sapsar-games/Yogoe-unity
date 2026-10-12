@@ -542,6 +542,7 @@ namespace Yoegoe.UI
             FeedBlock.StaminaFull => "기력이 가득 찼어요",
             FeedBlock.StaminaAndIntimacyFull => "기력·친밀도가 모두 가득 찼어요",
             FeedBlock.FaintedNeedsWater => "기절한 요괴는 물로만 깨어나요",
+            FeedBlock.NotFeedable => "먹이기 대상이 아니에요",
             _ => "",
         };
 
