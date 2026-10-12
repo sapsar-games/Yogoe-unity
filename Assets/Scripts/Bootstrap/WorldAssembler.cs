@@ -186,6 +186,11 @@ namespace Yoegoe.Bootstrap
             return go;
         }
 
+
+        /// <summary>
+        /// 맵 배경 크기에 맞춰 카메라 Ortho·패닝 한도를 연결한다.
+        /// 짧은 축은 화면에 맞추고, 긴 축(세로맵이면 위아래)만 드래그로 본다.
+        /// </summary>
         static void WireCameraPan(
             Config cfg,
             GameObject overviewGo, Sprite overview,
@@ -194,6 +199,8 @@ namespace Yoegoe.Bootstrap
             var cam = Camera.main;
             if (cam == null || !cam.orthographic) return;
 
+            // 1) 패닝 콘텐츠 = Overview 우선, 없으면 Playfield.
+            //    panW/H = 월드에서 맵이 차지하는 가로·세로, panCenter = 맵 중심.
             float panW = 0f, panH = 0f;
             Vector2 panCenter = Vector2.zero;
 
@@ -215,18 +222,25 @@ namespace Yoegoe.Bootstrap
             }
             else return;
 
+            // 2) 현재 카메라가 보는 화면 월드 크기.
+            //    orthoSize = 세로 절반 → camHeight = ortho*2, camWidth = height * aspect.
             float camHeight = cam.orthographicSize * 2f;
             float camWidth = camHeight * cam.aspect;
             var drag = cam.GetComponent<MapCameraDrag>();
             if (drag == null) drag = cam.gameObject.AddComponent<MapCameraDrag>();
 
+            // 3) 맵이 화면보다 얼마나 큰지(한쪽만 남아야 그 축으로 드래그 가능).
+            //    halfExtra ≈ 0 이면 그 축은 화면 안에 다 들어감 → 패닝 여유 없음.
             float halfExtraW = Mathf.Max(0f, panW / 2f - camWidth / 2f);
             float halfExtraH = Mathf.Max(0f, panH / 2f - camHeight / 2f);
 
+            // 4) 가로·세로 모두 화면 안에 들어가면(드래그할 게 없음)
+            //    Ortho를 줄여 짧은 축이 화면에 딱 맞게 줌인한다.
+            //    Min(가로맞춤, 세로맞춤) → 먼저 닿는 축에 맞춤, 긴 축은 밖으로 남아 패닝.
             if (halfExtraW <= 0.01f && halfExtraH <= 0.01f)
             {
-                float orthoByW = (panW / 1.2f) / (2f * Mathf.Max(0.01f, cam.aspect));
-                float orthoByH = (panH / 1.2f) / 2f;
+                float orthoByW = panW / (2f * Mathf.Max(0.01f, cam.aspect)); // 가로가 화면 가로에 맞을 때
+                float orthoByH = panH / 2f;                                   // 세로가 화면 세로에 맞을 때
                 float newOrtho = Mathf.Min(orthoByW, orthoByH);
                 if (newOrtho > 0.1f && newOrtho < cam.orthographicSize)
                 {
@@ -236,9 +250,12 @@ namespace Yoegoe.Bootstrap
                 }
             }
 
+            // 5) MapCameraDrag에 맵 반폭·반높이 전달 → Clamp로 카메라가 맵 밖으로 안 나감.
             drag.SetContentRect(panCenter, panW * 0.5f, panH * 0.5f);
+            // 핀치 줌: 최소 1.4(최대 확대), 최대 ≈ 현재 ortho(시작보다 멀리 못 감).
             drag.SetOrthoLimits(1.4f, Mathf.Max(cam.orthographicSize * 1.05f, cam.orthographicSize));
 
+            // 6) 터치/드래그 입력이 drag를 쓰도록 연결 + 인트로가 홈 ortho/위치를 기억.
             var router = cam.GetComponent<MapPointerRouter>();
             if (router != null) router.mapDrag = drag;
 

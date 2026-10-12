@@ -103,3 +103,8 @@ InitTestScene*.unity*
 .DS_Store
 **/__pycache__/
 *.py[cod]
+
+# graphify knowledge graph (local agent cache)
+/graphify-out/
+
+.cursor/
