@@ -79,16 +79,41 @@ namespace Yoegoe.Cooking
             public BoardItem(CookingIngredientId id, bool golden) { Id = id; Golden = golden; }
         }
 
-        /// <summary>판에서 쌀·꿀 칸으로 쓰이는 황금 수집품.</summary>
+        /// <summary>판에서 쌀·꿀 칸으로 쓰이는 황금 수집품 (황금쌀·황금꿀은 기존 보유분 호환용으로 유지).
+        /// v1.3: 산나물·약재·고추·해산물·새고기·새알 6종이 새 황금 재료.</summary>
         public static bool TryGoldenOf(CookingIngredientId id, out SpecialItemId golden)
         {
             switch (id)
             {
                 case CookingIngredientId.Rice: golden = SpecialItemId.GoldenRice; return true;
                 case CookingIngredientId.Honey: golden = SpecialItemId.GoldenHoney; return true;
+                case CookingIngredientId.Chili: golden = SpecialItemId.GoldenChili; return true;
+                case CookingIngredientId.Namul: golden = SpecialItemId.GoldenNamul; return true;
+                case CookingIngredientId.Herb: golden = SpecialItemId.GoldenHerb; return true;
+                case CookingIngredientId.Bird: golden = SpecialItemId.GoldenBird; return true;
+                case CookingIngredientId.Seafood: golden = SpecialItemId.GoldenFish; return true;
+                case CookingIngredientId.Egg: golden = SpecialItemId.GoldenEgg; return true;
                 default: golden = default; return false;
             }
         }
+
+        /// <summary><see cref="TryGoldenOf"/>의 역방향 — 황금 수집품이 판에서 어느 재료 칸으로 들어가는지.</summary>
+        public static bool TryBaseOf(SpecialItemId golden, out CookingIngredientId id)
+        {
+            switch (golden)
+            {
+                case SpecialItemId.GoldenRice: id = CookingIngredientId.Rice; return true;
+                case SpecialItemId.GoldenHoney: id = CookingIngredientId.Honey; return true;
+                case SpecialItemId.GoldenChili: id = CookingIngredientId.Chili; return true;
+                case SpecialItemId.GoldenNamul: id = CookingIngredientId.Namul; return true;
+                case SpecialItemId.GoldenHerb: id = CookingIngredientId.Herb; return true;
+                case SpecialItemId.GoldenBird: id = CookingIngredientId.Bird; return true;
+                case SpecialItemId.GoldenFish: id = CookingIngredientId.Seafood; return true;
+                case SpecialItemId.GoldenEgg: id = CookingIngredientId.Egg; return true;
+                default: id = default; return false;
+            }
+        }
+
         public int MaterialsOnBoard => SpentOnBoard.Count;
         public bool IsShortBoard => MaterialsOnBoard < FullBoardMaterials;
         public bool CanStart => !Running && !Finished && MaterialsOnBoard >= MinMaterialsToCook;
@@ -267,7 +292,7 @@ namespace Yoegoe.Cooking
                 foreach (var kv in goldenOnBoard)
                 {
                     if (eco.GetSpecialItemCount(kv.Key) < kv.Value) return false;
-                    var baseId = kv.Key == SpecialItemId.GoldenRice ? CookingIngredientId.Rice : CookingIngredientId.Honey;
+                    if (!TryBaseOf(kv.Key, out var baseId)) continue;
                     need[baseId] -= kv.Value;
                 }
                 foreach (var kv in need)

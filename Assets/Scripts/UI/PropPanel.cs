@@ -394,6 +394,12 @@ namespace Yoegoe.UI
                     : CookingRecipeCatalog.DisplayName((CookingIngredientId)code));
                 sb.Append(' ').Append(w.ToString("0"));
             }
+            var dest = PropCatalog.FindDestination(destId);
+            if (dest != null && dest.goldenChance > 0f)
+            {
+                if (sb.Length > 0) sb.Append(" · ");
+                sb.Append($"황금 {dest.goldenChance:0.#}%");
+            }
             return sb.ToString();
         }
 

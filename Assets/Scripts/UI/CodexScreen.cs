@@ -90,13 +90,15 @@ namespace Yoegoe.UI
                 string ingId = id.ToString();
                 AddCell(ingredients, name, n, known: true, () => ShowDetail(name, "요리 재료", CodexDescriptions.Get(ingId)));
             }
-            foreach (var special in new[] { SpecialItemId.GoldenRice, SpecialItemId.GoldenHoney })
+            foreach (SpecialItemId special in System.Enum.GetValues(typeof(SpecialItemId)))
             {
-                string name = special == SpecialItemId.GoldenRice ? "황금쌀" : "황금꿀";
+                string name = CodexDescriptions.SpecialItemName(special);
                 int n = eco != null ? eco.GetSpecialItemCount(special) : 0;
                 string specialId = special.ToString();
+                string baseName = CookingSession.TryBaseOf(special, out var baseIng)
+                    ? CookingRecipeCatalog.DisplayName(baseIng) : name;
                 AddCell(ingredients, name, n, known: true,
-                    () => ShowDetail(name, "요리판에서 " + (special == SpecialItemId.GoldenRice ? "쌀" : "꿀") + " 칸으로 쓰여요",
+                    () => ShowDetail(name, $"요리판에서 {baseName} 칸으로 쓰여요",
                         JoinDesc(CodexDescriptions.Get(specialId), "이게 들어간 음식은 황금음식이 돼요.")));
             }
 

@@ -125,8 +125,7 @@ namespace Yoegoe.Characters
             speaker.ShowTempSpeech(line.Replace("{item}", SpecialItemName(item)));
         }
 
-        public static string SpecialItemName(SpecialItemId item) =>
-            item == SpecialItemId.GoldenHoney ? "황금꿀" : "황금쌀";
+        public static string SpecialItemName(SpecialItemId item) => CodexDescriptions.SpecialItemName(item);
 
         /// <summary>세이브용 자원 보관 스냅샷.</summary>
         public void CaptureStorage(out int stored, out float cycleProgress, out bool overflowJudged, out int[] ingredients)

@@ -36,6 +36,19 @@ namespace Yoegoe.Data
             return ingredientNames.TryGetValue(id, out var n) ? n : null;
         }
 
+        /// <summary>황금 수집품 이름 — ingredients.json에 있으면 그 이름, 없으면(황금쌀·황금꿀 — 개편 전 보유분) 고정 이름.</summary>
+        public static string SpecialItemName(SpecialItemId item)
+        {
+            string name = IngredientName(item.ToString());
+            if (!string.IsNullOrEmpty(name)) return name;
+            return item switch
+            {
+                SpecialItemId.GoldenRice => "황금쌀",
+                SpecialItemId.GoldenHoney => "황금꿀",
+                _ => item.ToString(),
+            };
+        }
+
         /// <summary>재료 설명 다시 읽기 (테스트·핫리로드).</summary>
         public static void LoadIngredientsFromJson(string json)
         {

@@ -52,7 +52,7 @@ namespace Yoegoe.Data
             public string name;
             public string rarity;        // 하 · 중 · 상
             public float minIntimacy;    // 입장 친밀도
-            public float goldenChance;   // 황금 확률 % (황금 재료 개편 전까지 안 씀)
+            public float goldenChance;   // 황금 확률 % — 이 목적지에서 뽑힌 재료를 그 황금 버전으로 승급 (ApplyGoldenUpgrade)
 
             public PropResourceType PropType =>
                 Enum.TryParse(prop, true, out PropResourceType t) ? t : PropResourceType.None;
@@ -193,6 +193,20 @@ namespace Yoegoe.Data
                     list.Add((code, d.weight));
                 }
             }
+        }
+
+        /// <summary>
+        /// 목적지 goldenChance(%)만큼 확률로 일반 재료를 그 황금 버전으로 승급 (v1.3 황금재료 개편 — 절벽의 약초골·파도치는 섬 전용).
+        /// 이미 특수 코드거나 목적지가 없거나 goldenChance가 0이면 그대로.
+        /// </summary>
+        public static int ApplyGoldenUpgrade(int code, string destinationId, float random01)
+        {
+            if (IsSpecialCode(code)) return code;
+            var dest = FindDestination(destinationId);
+            if (dest == null || dest.goldenChance <= 0f) return code;
+            if (random01 >= dest.goldenChance / 100f) return code;
+            if (!CookingSession.TryGoldenOf((CookingIngredientId)code, out var golden)) return code;
+            return SpecialCodeBase + (int)golden;
         }
 
         static Destination FindDestInList(string id)

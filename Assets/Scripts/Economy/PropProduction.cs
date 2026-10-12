@@ -135,7 +135,11 @@ namespace Yoegoe.Economy
                     () =>
                     {
                         if (dropsIngredients)
-                            onDrop?.Invoke(PropCatalog.RollDrop(type, destinationId, random01()));
+                        {
+                            int code = PropCatalog.RollDrop(type, destinationId, random01());
+                            code = PropCatalog.ApplyGoldenUpgrade(code, destinationId, random01());
+                            onDrop?.Invoke(code);
+                        }
                     });
             }
 
