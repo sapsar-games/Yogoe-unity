@@ -73,15 +73,9 @@ namespace Yoegoe.UI
             public Image StatusTagBg;
             public Image StaminaFill;
             public RectTransform StaminaFillRt;
-            public GameObject BatchButtonRoot;
-            public Text BatchButtonLabel;
             public string LastNameLabel;
             public string LastDisplayName;
             public ActionState LastStatusState = (ActionState)(-1);
-            public bool LastBatchVisible;
-            public string LastBatchLabel;
-            public BigNumber LastBatchAmount;
-            public bool HasLastBatchAmount;
             public float LastStaminaRatio = -1f;
             public ActionState LastStaminaState = (ActionState)(-1);
         }
@@ -449,16 +443,30 @@ namespace Yoegoe.UI
             return desiredExtras;
         }
 
+        static readonly List<CharacterAgent> slotBarAgents = new List<CharacterAgent>(8);
+
+        /// <summary>슬롯 바에 칩으로 보일 요괴 — 옥토끼는 NPC라 뺀다(기획 7-2 · v1.3).</summary>
+        static List<CharacterAgent> SlotBarAgents()
+        {
+            slotBarAgents.Clear();
+            var all = CharacterAgent.All;
+            for (int i = 0; i < all.Count; i++)
+                if (all[i].Data == null || all[i].Data.id != CharacterId.Rabbit)
+                    slotBarAgents.Add(all[i]);
+            return slotBarAgents;
+        }
+
         private void RefreshSlotBar()
         {
+            var agents = SlotBarAgents();
             var extras = DesiredExtraSlots();
-            int agentCount = CharacterAgent.All.Count;
+            int agentCount = agents.Count;
             bool mismatched = slotChips.Count != agentCount + extras.Count;
             for (int i = 0; !mismatched && i < slotChips.Count; i++)
             {
                 var chip = slotChips[i];
                 mismatched = i < agentCount
-                    ? chip.IsSummonSlot || chip.Agent != CharacterAgent.All[i]
+                    ? chip.IsSummonSlot || chip.Agent != agents[i]
                     : !chip.IsSummonSlot || chip.Extra != extras[i - agentCount];
             }
             if (mismatched) RebuildSlotBar();
@@ -504,7 +512,6 @@ namespace Yoegoe.UI
                 }
 
                 RefreshStatusTag(chip);
-                RefreshBatchButton(chip);
             }
         }
 
@@ -524,32 +531,12 @@ namespace Yoegoe.UI
             if (chip.StatusTagBg != null) chip.StatusTagBg.color = badge.Color;
         }
 
-        /// <summary>옥토끼 슬롯 위 일괄 수거 버튼 — 버드나무 만땅 팝업에서 받지 않은 대기분.</summary>
-        private static void RefreshBatchButton(SlotChip chip)
-        {
-            if (chip.BatchButtonRoot == null || chip.BatchButtonLabel == null) return;
-            bool show = GameEconomy.Instance.HasPendingBatchMerit;
-            if (show != chip.LastBatchVisible)
-            {
-                chip.LastBatchVisible = show;
-                chip.BatchButtonRoot.SetActive(show);
-            }
-            if (!show) return;
-
-            var amount = GameEconomy.Instance.PendingBatchMerit;
-            if (chip.HasLastBatchAmount && amount.Equals(chip.LastBatchAmount)) return;
-            chip.HasLastBatchAmount = true;
-            chip.LastBatchAmount = amount;
-            chip.LastBatchLabel = "일괄 수거\n" + amount.ToDisplayString() + "\n(광고×2)";
-            chip.BatchButtonLabel.text = chip.LastBatchLabel;
-        }
-
         private void RebuildSlotBar()
         {
             foreach (Transform child in slotBarRoot) Destroy(child.gameObject);
             slotChips.Clear();
 
-            foreach (var agent in CharacterAgent.All)
+            foreach (var agent in SlotBarAgents())
             {
                 var chipGO = new GameObject("Slot_" + (agent.Data != null ? agent.Data.displayName : "?"));
                 var chipRt = SetupRect(chipGO, slotBarRoot, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
@@ -586,33 +573,6 @@ namespace Yoegoe.UI
                 tagText.raycastTarget = false;
                 tagGO.SetActive(false);
 
-                GameObject batchRoot = null;
-                Text batchLabel = null;
-                // 기획 7-2: 옥토끼 슬롯 위에만 앱 재시작 일괄 수거
-                if (agent.Data != null && agent.Data.id == CharacterId.Rabbit)
-                {
-                    batchRoot = new GameObject("BatchCollect");
-                    SetupRect(batchRoot, chipRt, new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0.5f, 0f),
-                        new Vector2(0, 30), new Vector2(148, 56));
-                    var batchBg = batchRoot.AddComponent<Image>();
-                    batchBg.color = C.hudBatchCollect;
-                    var batchBtn = batchRoot.AddComponent<Button>();
-                    batchBtn.targetGraphic = batchBg;
-                    var batchRt = batchRoot.GetComponent<RectTransform>();
-                    batchBtn.onClick.AddListener(() => OnBatchCollectClicked(batchRt));
-                    var batchLabelGO = new GameObject("Label");
-                    SetupRect(batchLabelGO, batchRoot.transform, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f),
-                        Vector2.zero, Vector2.zero);
-                    batchLabel = batchLabelGO.AddComponent<Text>();
-                    batchLabel.font = font;
-                    batchLabel.fontSize = UiFonts.Caption;
-                    batchLabel.alignment = TextAnchor.MiddleCenter;
-                    batchLabel.color = Color.white;
-                    batchLabel.raycastTarget = false;
-                    batchLabel.text = "일괄 수거";
-                    batchRoot.SetActive(false);
-                }
-
                 var nameGO = new GameObject("Name");
                 SetupRect(nameGO, chipRt, new Vector2(0, 1), new Vector2(1, 1), new Vector2(0.5f, 1f),
                     new Vector2(0, -6), new Vector2(-10, 26));
@@ -645,9 +605,7 @@ namespace Yoegoe.UI
                     StatusTagRoot = tagGO,
                     StatusTagBg = tagBg,
                     StaminaFill = barFill,
-                    StaminaFillRt = barFillRt,
-                    BatchButtonRoot = batchRoot,
-                    BatchButtonLabel = batchLabel
+                    StaminaFillRt = barFillRt
                 });
             }
 
@@ -697,27 +655,6 @@ namespace Yoegoe.UI
                 Extra = extra,
                 NameText = nameText
             });
-        }
-
-        private void OnBatchCollectClicked(RectTransform from)
-        {
-            // 버드나무 만땅 팝업을 받지 않고 닫은 일괄 대기분
-            if (!GameEconomy.Instance.HasPendingBatchMerit) return;
-            if (DualActionPopup.Instance != null)
-                DualActionPopup.Instance.OpenBatch(from);
-            else
-                ClaimBatchWithoutPopup(from);
-        }
-
-        /// <summary>팝업 없을 때 폴백 (1배).</summary>
-        void ClaimBatchWithoutPopup(RectTransform from)
-        {
-            var before = GameEconomy.Instance.MeritPile;
-            if (!GameEconomy.Instance.TryClaimBatchMerit(1)) return;
-            var after = GameEconomy.Instance.MeritPile;
-            GameSaveBridge.SaveFromWorld();
-            BeginMeritCountUp(before, after);
-            if (from != null) PlayMeritCollectFx(from);
         }
 
         /// <summary>공덕 HUD 숫자를 from→to로 단계적으로 올린다 (일괄 수거 연출).</summary>

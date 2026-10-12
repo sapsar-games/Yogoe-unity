@@ -116,10 +116,17 @@ namespace Yoegoe.Characters
             return b.Contains(world);
         }
 
-        /// <summary>탭: 만땅이면 광고 2배 팝업으로, 아니면 바로 지갑으로.</summary>
+        /// <summary>탭: 만땅이면 광고 2배 팝업으로, 아니면 바로 지갑으로.
+        /// 기물엔 쌓인 게 없어도 전에 받지 않고 닫은 일괄 대기분(7-2, 앱 재시작 포함)이 남아 있으면
+        /// 그걸 다시 팝업으로 띄운다 — 슬롯 바에 따로 버튼을 안 둬도 버드나무 탭 하나로 전부 해결.</summary>
         public void OnTapped()
         {
-            if (!HasMerit || GameEconomy.Instance == null) return;
+            if (GameEconomy.Instance == null) return;
+            if (!HasMerit)
+            {
+                if (GameEconomy.Instance.HasPendingBatchMerit) FullTapped?.Invoke(CanopyCenter());
+                return;
+            }
             BigNumber total = BigNumber.Zero;
             bool full = IsFull;
             foreach (var p in MeritProps())
