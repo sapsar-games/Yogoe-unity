@@ -17,6 +17,7 @@ namespace Yoegoe.UI
         public Font font;
 
         GameObject root;
+        public bool IsOpen => root != null && root.activeSelf;
         Text titleText;
         Text bodyText;
         Text hintText;

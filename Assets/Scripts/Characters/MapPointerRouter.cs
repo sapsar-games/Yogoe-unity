@@ -130,6 +130,17 @@ namespace Yoegoe.Characters
             // 있어서 여기서 Update() 맨 앞에 통째로 막는다.
             if (UiBlockGate.IsBlocking) return;
 
+            // 화면 감상(30초 무입력 숨김) 상태에선 첫 탭이 UI 복귀만 하고 다른 동작으로 안 이어진다 (v1.3 §7).
+            if (GameHud.Instance != null && GameHud.Instance.IsUiHidden)
+            {
+                if (TryReadPointer(out _, out bool hiddenPressed))
+                {
+                    if (hiddenPressed && !wasPressed) GameHud.Instance.ConsumeWakeTapIfHidden();
+                    wasPressed = hiddenPressed;
+                }
+                return;
+            }
+
             // 핀치·휠은 단일 포인터 제스처보다 우선
             if (TryHandlePinchZoom()) return;
             TryHandleScrollZoom();

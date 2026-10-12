@@ -18,6 +18,7 @@ namespace Yoegoe.UI
         public Sprite openChestSprite;
 
         GameObject root;
+        public bool IsOpen => root != null && root.activeSelf;
         GameObject closedView;
         GameObject openView;
         Text titleText;

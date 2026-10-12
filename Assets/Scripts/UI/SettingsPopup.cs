@@ -19,6 +19,8 @@ namespace Yoegoe.UI
         readonly List<Image> levelButtons = new List<Image>();
         Text previewText;
 
+        public bool IsOpen => root != null && root.activeSelf;
+
         static readonly Color BoxColor = new Color(0.14f, 0.1f, 0.08f, 0.98f);
         static readonly Color TextColor = new Color(1f, 0.95f, 0.85f);
         static readonly Color ButtonOff = new Color(0.32f, 0.25f, 0.19f, 1f);
