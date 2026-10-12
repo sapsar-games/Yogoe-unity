@@ -26,7 +26,7 @@ MonoBehaviour:
   upgradable: 1
   upgradeBaseCost: 500
   upgradeCostMultiplier: 1.15
-  isPrebuilt: 0
+  isPrebuilt: 1
   isEndingProp: 0
   owner: 0
   hasUniqueEndingAnimation: 0

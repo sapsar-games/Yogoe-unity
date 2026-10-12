@@ -567,9 +567,17 @@ namespace Yoegoe.Characters
                 return;
             }
             agent.OnTapped();
-            // 노는(일하지 않는) 요괴를 누르면 혼잣말 + 먹이기 창 (v1.3). 일하는 중은 일 대사만, 기절은 "..."만.
+            // 노는(일하지 않는) 요괴를 누르면 혼잣말 + 먹이기 창 (v1.3). 기절은 "..."만.
             // 옥토끼는 먹이기 대상이 아니다 (v1.2 시연).
-            if (agent.Stats.State != ActionState.Staying && agent.Stats.State != ActionState.Fainted
+            if (agent.Stats.State == ActionState.Staying)
+            {
+                // 일하는 중은 일 대사 + 기물 창(현황·불러들이기) — 둘 다 같은 탭 (08문서 ❓1 해소).
+                // 떡절구는 예외(기물 본체 탭과 동일하게 그대로 둠) — 수거는 버드나무, 레벨업은 길게 누르기.
+                var workProp = agent.CurrentProp;
+                if (workProp != null && !(workProp.ResourceType == PropResourceType.Merit && !workProp.CollectsByTap))
+                    PropPanelRequested?.Invoke(workProp, null);
+            }
+            else if (agent.Stats.State != ActionState.Fainted
                 && (agent.Data == null || agent.Data.id != CharacterId.Rabbit))
                 FeedRequested?.Invoke(agent);
         }
