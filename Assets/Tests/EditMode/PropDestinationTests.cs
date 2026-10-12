@@ -35,7 +35,7 @@ namespace Yoegoe.Tests.EditMode
         [Test]
         public void SaveKeepsDestination()
         {
-            var json = JsonUtility.ToJson(new PropSave { propId = "활터", destinationId = "BeeForest" });
+            var json = JsonUtility.ToJson(new PropSave { propId = "꿀벌의 숲", destinationId = "BeeForest" });
             Assert.AreEqual("BeeForest", JsonUtility.FromJson<PropSave>(json).destinationId);
         }
     }

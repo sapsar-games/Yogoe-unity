@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using Yoegoe.Core;
 using Yoegoe.Data;
+using Yoegoe.UI;
 
 namespace Yoegoe.Characters
 {
