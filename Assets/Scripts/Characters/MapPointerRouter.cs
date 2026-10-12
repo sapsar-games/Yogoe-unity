@@ -462,9 +462,11 @@ namespace Yoegoe.Characters
             {
                 CancelPendingMonologueTap();
                 var prop = FindDropProp(dragCharacter, screenPos);
-                // 목적지 선택이 필요한 사냥·채집만 기물 창(요괴 미리 선택). 고정 목적지는 바로 착석.
+                // 사냥·채집은 기물 창(요괴 미리 선택, "해당 목적지로 보낼까요?" 확인 — v1.2 시연).
+                // 목적지가 기물마다 고정(6개 개별 기물, 05 C문서)이라도 드래그는 항상 이 확인을 거친다 —
+                // 바로 착석은 옹달샘·북제단·남제단(HasDestinations가 false인 기물)만.
                 var dropTarget = prop != null ? prop : FindAnyDestinationPropAt(dragCharacter, screenPos);
-                if (dropTarget != null && dropTarget.NeedsDestinationPick && !dropTarget.IsOccupied)
+                if (dropTarget != null && dropTarget.HasDestinations && !dropTarget.IsOccupied)
                 {
                     var who = dragCharacter;
                     who.EndPlayerDrag(null, showFloorMark: false);
