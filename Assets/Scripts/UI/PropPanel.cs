@@ -16,12 +16,19 @@ namespace Yoegoe.UI
     /// - 빈 기물: (사냥터·채집터) 목적지 3곳 → 보낼 요괴 → [보내기] · 레벨업
     /// - 일하는 중: 요괴 · 어디서 · 보관함 · 기력 → [불러들이기] [받기 n개] · 레벨업
     /// 친밀도가 모자란 요괴를 고르면 "거기는 가기 싫어." 하고 필요한 친밀도를 보여 준다.
-    /// 코드로만 만든다(프리팹 없음).
+    /// 셸은 Prefab(Assets/Prefabs/UI/PropPanel.prefab), 목적지·요괴 칸 등 동적 콘텐츠만 코드로 만든다.
     /// </summary>
     public class PropPanel : MonoBehaviour
     {
         public static PropPanel Instance { get; private set; }
         public Font font;
+
+        [SerializeField] GameObject root;
+        [SerializeField] RectTransform body;
+        [SerializeField] Text titleText;
+        [SerializeField] Text subText;
+        [SerializeField] Button dimButton;
+        [SerializeField] Button closeButton;
 
         PropSlot prop;
         string selectedDest;
@@ -29,11 +36,6 @@ namespace Yoegoe.UI
         CharacterAgent refusing;
         float refuseUntil;
 
-        GameObject root;
-        RectTransform box, body;
-        Text titleText, subText;
-
-        static readonly Color BoxColor = new Color(0.14f, 0.1f, 0.08f, 0.98f);
         static readonly Color TextColor = new Color(1f, 0.95f, 0.85f);
         static readonly Color DimText = new Color(0.85f, 0.78f, 0.66f);
         static readonly Color CardOff = new Color(0.27f, 0.21f, 0.16f, 1f);
@@ -48,7 +50,14 @@ namespace Yoegoe.UI
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            if (root != null) root.SetActive(false);
             MapPointerRouter.PropPanelRequested += Open;
+        }
+
+        void Start()
+        {
+            Wire(dimButton, Close);
+            Wire(closeButton, Close);
         }
 
         void OnDestroy()
@@ -57,13 +66,19 @@ namespace Yoegoe.UI
             MapPointerRouter.PropPanelRequested -= Open;
         }
 
+        static void Wire(Button b, UnityEngine.Events.UnityAction action)
+        {
+            if (b == null) return;
+            b.onClick.RemoveAllListeners();
+            b.onClick.AddListener(action);
+        }
+
         public bool IsOpen => root != null && root.activeSelf;
 
         /// <summary>기물 창 열기. preselect = 끌어다 놓은 요괴(미리 골라 둠).</summary>
         public void Open(PropSlot target, CharacterAgent preselect)
         {
-            if (target == null || !target.IsBuilt || !target.AcceptsWorkers) return;
-            EnsureBuilt();
+            if (target == null || !target.IsBuilt || !target.AcceptsWorkers || root == null) return;
             prop = ResolveOpenTarget(target);
             prop.ApplyFixedDestination();
             var dests = PropCatalog.DestinationsFor(prop.ResourceType);
@@ -130,16 +145,24 @@ namespace Yoegoe.UI
         string WhyNot(CharacterAgent a, out bool refuse)
         {
             refuse = false;
-            if (a.Stats.State == ActionState.Fainted) return "기절했어요\n물로 깨워 주세요";
+            var s = a.Stats;
             var busy = a.CurrentProp;
-            if (a.Stats.State == ActionState.Staying && busy != null && busy != prop) return busy.DisplayName + "에서\n일하는 중";
-            if (a.Stats.Stamina < 1f) return "지쳐서 쉬는 중\n먹여 주세요";
-            if (prop.data != null && prop.data.isEndingProp && prop.data.owner != a.Data.id) return "이 기물은\n못 써요";
             var d = Dest;
-            if (d != null && a.Stats.Intimacy + 0.001f < d.minIntimacy)
+
+            bool fainted = s.State == ActionState.Fainted;
+            bool workingElsewhere = s.State == ActionState.Staying && busy != null && busy != prop;
+            bool exhausted = s.Stamina < 1f;
+            bool endingLocked = prop.data != null && prop.data.isEndingProp && prop.data.owner != a.Data.id;
+            bool intimacyTooLow = d != null && s.Intimacy + 0.001f < d.minIntimacy;
+
+            if (fainted) return "기절했어요\n물로 깨워 주세요";
+            if (workingElsewhere) return busy.DisplayName + "에서\n일하는 중";
+            if (exhausted) return "지쳐서 쉬는 중\n먹여 주세요";
+            if (endingLocked) return "이 기물은\n못 써요";
+            if (intimacyTooLow)
             {
                 refuse = true;
-                return $"친밀도 {Mathf.FloorToInt(a.Stats.Intimacy)}/{d.minIntimacy:0}\n누르면 물어봐요";
+                return $"친밀도 {Mathf.FloorToInt(s.Intimacy)}/{d.minIntimacy:0}\n누르면 물어봐요";
             }
             return null;
         }
@@ -219,7 +242,7 @@ namespace Yoegoe.UI
 
         void Rebuild()
         {
-            if (prop == null || body == null) return;
+            if (prop == null || body == null || titleText == null || subText == null) return;
             for (int i = body.childCount - 1; i >= 0; i--) Destroy(body.GetChild(i).gameObject);
 
             lastOccupied = prop.IsOccupied;
@@ -457,51 +480,12 @@ namespace Yoegoe.UI
             return (c - 0xAC00) % 28 != 0 ? withBatchim : without;
         }
 
-        // ---------------- 만들기 ----------------
+        // ---------------- 동적 칸 (body 안) ----------------
 
-        void EnsureBuilt()
+        Font FontOrBuiltin()
         {
-            if (root != null) return;
             if (font == null) font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-
-            var canvasGO = new GameObject("Canvas_PropPanel");
-            canvasGO.transform.SetParent(transform, false);
-            var canvas = canvasGO.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = 870;
-            var scaler = canvasGO.AddComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1080, 1920);
-            scaler.matchWidthOrHeight = 0.5f;
-            canvasGO.AddComponent<GraphicRaycaster>();
-
-            root = new GameObject("Panel", typeof(RectTransform));
-            var rootRt = (RectTransform)root.transform;
-            rootRt.SetParent(canvasGO.transform, false);
-            rootRt.anchorMin = Vector2.zero; rootRt.anchorMax = Vector2.one;
-            rootRt.offsetMin = rootRt.offsetMax = Vector2.zero;
-            var dim = root.AddComponent<Image>();
-            dim.color = new Color(0f, 0f, 0f, 0.55f);
-            var dimBtn = root.AddComponent<UnityEngine.UI.Button>();
-            dimBtn.transition = Selectable.Transition.None;
-            dimBtn.onClick.AddListener(Close);
-
-            box = Rect("Box", rootRt, Vector2.zero, new Vector2(940, 1360));
-            box.gameObject.AddComponent<Image>().color = BoxColor;
-            box.gameObject.AddComponent<UnityEngine.UI.Button>().transition = Selectable.Transition.None;
-
-            titleText = TextIn(box, "", new Vector2(0, 620), 44, TextColor, FontStyle.Bold, new Vector2(700, 70));
-            subText = TextIn(box, "", new Vector2(0, 560), 26, DimText, FontStyle.Normal, new Vector2(800, 44));
-            var x = Rect("Close", box, new Vector2(415, 625), new Vector2(80, 80));
-            var xi = x.gameObject.AddComponent<Image>();
-            xi.color = new Color(0.35f, 0.27f, 0.2f);
-            var xb = x.gameObject.AddComponent<UnityEngine.UI.Button>();
-            xb.targetGraphic = xi;
-            xb.onClick.AddListener(Close);
-            TextIn(x, "X", Vector2.zero, 36, TextColor, FontStyle.Bold, new Vector2(80, 80));
-
-            body = Rect("Body", box, Vector2.zero, new Vector2(940, 1360));
-            root.SetActive(false);
+            return font;
         }
 
         static RectTransform Rect(string name, Transform parent, Vector2 pos, Vector2 size)
@@ -518,7 +502,7 @@ namespace Yoegoe.UI
         Text TextIn(Transform parent, string msg, Vector2 pos, int size, Color color, FontStyle style = FontStyle.Normal, Vector2? box = null)
         {
             var t = Rect("Text", parent, pos, box ?? new Vector2(860, 50)).gameObject.AddComponent<Text>();
-            t.font = font;
+            t.font = FontOrBuiltin();
             t.fontSize = UiFonts.Size(size);
             t.fontStyle = style;
             t.alignment = TextAnchor.MiddleCenter;

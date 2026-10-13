@@ -17,27 +17,27 @@ namespace Yoegoe.UI
     /// - 목록: 많은 순. 황금 요리는 따로 한 칸. 혼령이 청한 요리는 '혼령' 표시(직접 누르면 먹일 수 있음)
     /// - 짧게 누르면 한 그릇, 0.3초 넘게 누르면 0.3초마다 한 그릇씩 — 기력이 가득 차거나 떨어지면 멈춤.
     ///   누른 채 손가락이 움직이면 스크롤로 보고 멈춤.
-    /// 코드로만 만든다(프리팹 없음).
+    /// 셸은 Prefab(Assets/Prefabs/UI/FeedPopup.prefab), 음식 칸 목록만 동적 콘텐츠로 코드로 만든다.
     /// </summary>
     public class FeedPopup : MonoBehaviour
     {
         public static FeedPopup Instance { get; private set; }
         public Font font;
 
+        [SerializeField] GameObject root;
+        [SerializeField] Text titleText, subText, giText, statusText, anyLabel, emptyText;
+        [SerializeField] Image giFill;
+        [SerializeField] Button anyButton, foodOnlyButton, inclButton, goKitchenButton, closeButton, dimButton;
+        [SerializeField] RectTransform listContent;
+        [SerializeField] ScrollRect scroll;
+
         const string PrefIncludeOfferings = "feed.includeOfferings";
         const float HoldDelay = 0.3f, HoldRepeat = 0.3f;
 
         CharacterAgent agent;
-        GameObject root;
-        Text titleText, subText, giText, statusText, anyLabel, emptyText;
-        Image giFill;
-        Button anyButton, foodOnlyButton, inclButton, goKitchenButton;
-        RectTransform listContent;
-        ScrollRect scroll;
         readonly List<GameObject> cells = new List<GameObject>();
         readonly Dictionary<string, Text> cellCounts = new Dictionary<string, Text>();
 
-        static readonly Color BoxColor = new Color(0.14f, 0.1f, 0.08f, 0.98f);
         static readonly Color TextColor = new Color(1f, 0.95f, 0.85f);
         static readonly Color DimText = new Color(0.85f, 0.78f, 0.66f);
         static readonly Color CellColor = new Color(0.27f, 0.21f, 0.16f, 1f);
@@ -62,7 +62,34 @@ namespace Yoegoe.UI
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            if (root != null) root.SetActive(false);
             MapPointerRouter.FeedRequested += Open;
+        }
+
+        void Start()
+        {
+            Wire(closeButton, Close);
+            Wire(dimButton, Close);
+            if (foodOnlyButton != null) { foodOnlyButton.onClick.RemoveAllListeners(); foodOnlyButton.onClick.AddListener(() => { IncludeOfferings = false; Refresh(); }); }
+            if (inclButton != null) { inclButton.onClick.RemoveAllListeners(); inclButton.onClick.AddListener(() => { IncludeOfferings = true; Refresh(); }); }
+            if (goKitchenButton != null)
+            {
+                goKitchenButton.onClick.RemoveAllListeners();
+                goKitchenButton.onClick.AddListener(() => { Close(); GongyangganScreen.Resolve()?.Open(); });
+            }
+            if (anyButton != null)
+            {
+                var anyHold = anyButton.GetComponent<FeedHoldButton>();
+                if (anyHold == null) anyHold = anyButton.gameObject.AddComponent<FeedHoldButton>();
+                anyHold.Setup(this, null, null);
+            }
+        }
+
+        static void Wire(Button b, UnityEngine.Events.UnityAction action)
+        {
+            if (b == null) return;
+            b.onClick.RemoveAllListeners();
+            b.onClick.AddListener(action);
         }
 
         void OnDestroy()
@@ -75,8 +102,7 @@ namespace Yoegoe.UI
 
         public void Open(CharacterAgent target)
         {
-            if (target == null || target.Stats.State == ActionState.Fainted) return;
-            EnsureBuilt();
+            if (target == null || target.Stats.State == ActionState.Fainted || root == null) return;
             agent = target;
             statusText.text = "";
             root.SetActive(true);
@@ -324,99 +350,7 @@ namespace Yoegoe.UI
             if (!ok) StopHold();
         }
 
-        // ---------------- 만들기 ----------------
-
-        void EnsureBuilt()
-        {
-            if (root != null) return;
-            if (font == null) font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-
-            var canvasGO = new GameObject("Canvas_Feed");
-            canvasGO.transform.SetParent(transform, false);
-            var canvas = canvasGO.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = 880;
-            var scaler = canvasGO.AddComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1080, 1920);
-            scaler.matchWidthOrHeight = 0.5f;
-            canvasGO.AddComponent<GraphicRaycaster>();
-
-            root = new GameObject("Panel", typeof(RectTransform));
-            var rootRt = (RectTransform)root.transform;
-            rootRt.SetParent(canvasGO.transform, false);
-            rootRt.anchorMin = Vector2.zero; rootRt.anchorMax = Vector2.one;
-            rootRt.offsetMin = rootRt.offsetMax = Vector2.zero;
-            var dim = root.AddComponent<Image>();
-            dim.color = new Color(0f, 0f, 0f, 0.55f);
-            var dimBtn = root.AddComponent<Button>();
-            dimBtn.transition = Selectable.Transition.None;
-            dimBtn.onClick.AddListener(Close);
-
-            var box = MakeRect("Box", rootRt, Vector2.zero, new Vector2(920, 1380));
-            box.gameObject.AddComponent<Image>().color = BoxColor;
-            box.gameObject.AddComponent<Button>().transition = Selectable.Transition.None; // 상자 안 탭은 닫지 않게
-
-            titleText = MakeText(box, "먹이기", 44, new Vector2(0, 620), new Vector2(760, 70), TextColor);
-            var x = MakeButton(box, "X", new Vector2(400, 625), new Vector2(80, 80), new Color(0.35f, 0.27f, 0.2f), 36);
-            x.onClick.AddListener(Close);
-            subText = MakeText(box, "", 26, new Vector2(0, 560), new Vector2(820, 44), DimText);
-
-            var barBg = MakeRect("GiBar", box, new Vector2(0, 500), new Vector2(780, 30));
-            barBg.gameObject.AddComponent<Image>().color = new Color(0.08f, 0.06f, 0.05f, 1f);
-            var fill = MakeRect("Fill", barBg, Vector2.zero, Vector2.zero);
-            fill.anchorMin = Vector2.zero; fill.anchorMax = new Vector2(0.5f, 1f); fill.pivot = new Vector2(0, 0.5f);
-            fill.offsetMin = fill.offsetMax = Vector2.zero;
-            giFill = fill.gameObject.AddComponent<Image>();
-            giFill.color = new Color(0.45f, 0.75f, 0.4f, 1f);
-            giText = MakeText(box, "", 26, new Vector2(0, 455), new Vector2(820, 40), TextColor);
-
-            anyButton = MakeButton(box, "", new Vector2(-170, 355), new Vector2(520, 120), new Color(0.3f, 0.5f, 0.45f, 1f), 28);
-            anyLabel = anyButton.GetComponentInChildren<Text>();
-            var anyHold = anyButton.gameObject.AddComponent<FeedHoldButton>();
-            anyHold.Setup(this, null, null);
-            anyButton.transition = Selectable.Transition.ColorTint;
-
-            foodOnlyButton = MakeButton(box, "음식만", new Vector2(250, 385), new Vector2(300, 54), SegOn, 26);
-            foodOnlyButton.onClick.AddListener(() => { IncludeOfferings = false; Refresh(); });
-            inclButton = MakeButton(box, "공양물 포함", new Vector2(250, 325), new Vector2(300, 54), SegOff, 26);
-            inclButton.onClick.AddListener(() => { IncludeOfferings = true; Refresh(); });
-
-            statusText = MakeText(box, "", 26, new Vector2(0, 262), new Vector2(820, 44), GoldColor);
-
-            // 목록 (스크롤)
-            var view = MakeRect("List", box, new Vector2(0, -205), new Vector2(840, 860));
-            view.gameObject.AddComponent<Image>().color = new Color(0, 0, 0, 0.2f);
-            view.gameObject.AddComponent<RectMask2D>();
-            scroll = view.gameObject.AddComponent<ScrollRect>();
-            scroll.horizontal = false;
-            scroll.movementType = ScrollRect.MovementType.Clamped;
-            listContent = MakeRect("Content", view, Vector2.zero, Vector2.zero);
-            listContent.anchorMin = new Vector2(0, 1); listContent.anchorMax = new Vector2(1, 1); listContent.pivot = new Vector2(0.5f, 1);
-            listContent.offsetMin = listContent.offsetMax = Vector2.zero;
-            var grid = listContent.gameObject.AddComponent<GridLayoutGroup>();
-            grid.cellSize = new Vector2(190, 200);
-            grid.spacing = new Vector2(14, 14);
-            grid.padding = new RectOffset(12, 12, 12, 12);
-            grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-            grid.constraintCount = 4;
-            listContent.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-            scroll.content = listContent;
-            scroll.viewport = view;
-
-            emptyText = MakeText(view, "", 28, new Vector2(0, 60), new Vector2(760, 120), DimText);
-            goKitchenButton = MakeButton(view, "화덕으로", new Vector2(0, -60), new Vector2(260, 70), new Color(0.55f, 0.4f, 0.2f, 1f), 28);
-            goKitchenButton.onClick.AddListener(() =>
-            {
-                Close();
-                GongyangganScreen.Resolve()?.Open();
-            });
-
-            MakeText(box, "누르면 한 그릇 · 꾹 누르면 기력이 가득 찰 때까지\n아무거나는 황금 요리와 혼령이 청한 요리를 빼요", 22,
-                new Vector2(0, -660), new Vector2(840, 60), DimText);
-
-            root.SetActive(false);
-        }
+        // ---------------- 동적 칸 (listContent 안) ----------------
 
         static RectTransform MakeRect(string name, Transform parent, Vector2 pos, Vector2 size)
         {
@@ -429,10 +363,16 @@ namespace Yoegoe.UI
             return rt;
         }
 
+        Font FontOrBuiltin()
+        {
+            if (font == null) font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            return font;
+        }
+
         Text MakeText(Transform parent, string msg, int size, Vector2 pos, Vector2 box, Color color)
         {
             var t = MakeRect("Text", parent, pos, box).gameObject.AddComponent<Text>();
-            t.font = font;
+            t.font = FontOrBuiltin();
             t.fontSize = UiFonts.Size(size);
             t.alignment = TextAnchor.MiddleCenter;
             t.color = color;
@@ -441,18 +381,6 @@ namespace Yoegoe.UI
             t.horizontalOverflow = HorizontalWrapMode.Wrap;
             t.verticalOverflow = VerticalWrapMode.Overflow;
             return t;
-        }
-
-        Button MakeButton(Transform parent, string label, Vector2 pos, Vector2 size, Color color, int fontSize)
-        {
-            var rt = MakeRect("Button", parent, pos, size);
-            var img = rt.gameObject.AddComponent<Image>();
-            img.color = color;
-            var b = rt.gameObject.AddComponent<Button>();
-            b.targetGraphic = img;
-            b.transition = Selectable.Transition.None;
-            MakeText(rt, label, fontSize, Vector2.zero, size, TextColor);
-            return b;
         }
     }
 

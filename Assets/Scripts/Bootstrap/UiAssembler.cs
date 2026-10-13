@@ -111,17 +111,31 @@ namespace Yoegoe.Bootstrap
             pier.font = cfg.hudFont;
             pierGO.SetActive(true);
 
-            var panelGO = new GameObject("PropPanel");
-            panelGO.SetActive(false);
-            var propPanel = panelGO.AddComponent<PropPanel>();
-            propPanel.font = cfg.hudFont;
-            panelGO.SetActive(true);
+            var propPanel = Object.FindAnyObjectByType<PropPanel>(FindObjectsInactive.Include);
+            if (propPanel == null)
+            {
+                Debug.LogError(
+                    "[UiAssembler] PropPanel 프리팹 인스턴스가 씬에 없습니다. Main 씬에 Prefab 인스턴스를 배치하세요.");
+            }
+            else
+            {
+                propPanel.font = cfg.hudFont;
+                if (!propPanel.gameObject.activeSelf)
+                    propPanel.gameObject.SetActive(true);
+            }
 
-            var feedGO = new GameObject("FeedPopup");
-            feedGO.SetActive(false);
-            var feed = feedGO.AddComponent<FeedPopup>();
-            feed.font = cfg.hudFont;
-            feedGO.SetActive(true);
+            var feed = Object.FindAnyObjectByType<FeedPopup>(FindObjectsInactive.Include);
+            if (feed == null)
+            {
+                Debug.LogError(
+                    "[UiAssembler] FeedPopup 프리팹 인스턴스가 씬에 없습니다. Main 씬에 Prefab 인스턴스를 배치하세요.");
+            }
+            else
+            {
+                feed.font = cfg.hudFont;
+                if (!feed.gameObject.activeSelf)
+                    feed.gameObject.SetActive(true);
+            }
 
             var toastGO = new GameObject("WorldToast");
             toastGO.SetActive(false);
