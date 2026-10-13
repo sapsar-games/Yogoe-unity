@@ -254,8 +254,8 @@ namespace Yoegoe.UI
                 for (int i = 0; i < dests.Count; i++)
                 {
                     var d = dests[i];
-                    var seatProp = ResolveSeatProp(prop, d.id);
-                    bool destBusy = seatProp != null && seatProp != prop && seatProp.IsOccupied;
+                    var destSeatProp = ResolveSeatProp(prop, d.id);
+                    bool destBusy = destSeatProp != null && destSeatProp != prop && destSeatProp.IsOccupied;
                     var card = Card(new Vector2(-total / 2f + w / 2f + i * (w + gap), y), new Vector2(w, 230),
                         destBusy ? CardDisabled : d.id == selectedDest ? CardOn : CardOff,
                         destBusy ? null : () => { selectedDest = d.id; refusing = null; Rebuild(); });
