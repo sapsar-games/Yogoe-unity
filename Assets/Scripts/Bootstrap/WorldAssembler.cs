@@ -39,7 +39,6 @@ namespace Yoegoe.Bootstrap
 
             WireMap(cfg);
             WireSceneProps(cfg);
-            WireMeritWillow(cfg);
 
             float mapScale = Mathf.Max(0.01f, cfg.scale.mapScale);
             // 캐릭터는 아직 런타임 스폰 (세이브가 좌표 복원)
@@ -460,21 +459,6 @@ namespace Yoegoe.Bootstrap
                     ? slot.data.displayName
                     : slot.data.propId);
             }
-        }
-
-        static void WireMeritWillow(Config cfg)
-        {
-            if (MeritWillow.Instance != null) return;
-
-            var existing = Object.FindAnyObjectByType<MeritWillow>(FindObjectsInactive.Include);
-            if (existing != null) return;
-
-            var layout = cfg.propLayout != null ? cfg.propLayout : PropLayoutSettings.Get();
-            float mapScale = Mathf.Max(0.01f, cfg.scale.mapScale);
-            Vector3 pos = layout != null
-                ? MapToWorld(layout.willowPosition, mapScale)
-                : Vector3.zero;
-            MeritWillow.Create(pos, cfg.scale.SortOrderForProp(pos.y));
         }
 
         static void CreateCharacter(string name, Vector3 pos, Color color, CharacterData realData, Font hudFont)

@@ -63,7 +63,7 @@ namespace Yoegoe.Save
             }
 
             ApplyToWorld(data, bubbleFont);
-            // 공덕 더미는 기물에 남겨 두고 버드나무에서 수거한다 (7-4). 예전의 콜드스타트 일괄 스윕은 폐지.
+            // 공덕 더미는 기물에 남겨 두고 탭/일괄 수거한다 (7-4). 예전의 콜드스타트 일괄 스윕은 폐지.
             RefreshAllPropPileLabels();
         }
 

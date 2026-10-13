@@ -24,9 +24,6 @@ namespace Yoegoe.Data
 
         public Placement[] placements;
 
-        [Tooltip("공덕 버드나무 초기 배치 좌표 (mapScale=1 기준).")]
-        public Vector3 willowPosition = new Vector3(0f, -1.35f, 0f);
-
         public static PropLayoutSettings Get()
         {
             var loaded = Resources.Load<PropLayoutSettings>("PropLayoutSettings");

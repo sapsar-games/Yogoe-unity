@@ -85,7 +85,7 @@ namespace Yoegoe.Characters
         private enum Phase { Idle, Pending, MapDrag, CharacterDrag, PinchZoom }
 
         /// <summary>press 시점에 딱 한 번 정해지는 "무엇을 눌렀는지". Hold/Release는 이 값만 본다.</summary>
-        public enum PressTarget { Empty, LockedProp, Prop, Character, GongyangganProp, Willow, PropLevelTag, PierProp }
+        public enum PressTarget { Empty, LockedProp, Prop, Character, GongyangganProp, PropLevelTag, PierProp }
 
         /// <summary>길게 누르기로 이미 처리(업그레이드 팝업)한 press — release에서 탭으로 다시 처리하지 않는다.</summary>
         private bool pressConsumed;
@@ -293,15 +293,12 @@ namespace Yoegoe.Characters
             // 나루터(요괴가 앉지 않는 시설) — 누르면 나루터 화면 (v1.3)
             if (pressTarget == PressTarget.Prop && pressProp != null && pressProp.data != null && pressProp.data.opensPier)
                 pressTarget = PressTarget.PierProp;
-            // 공덕 버드나무: 요괴·기물이 아닌 곳에서만 (드래그 방해 안 하게)
-            if (pressTarget == PressTarget.Empty && IsOverWillow(screenPos))
-                pressTarget = PressTarget.Willow;
             phase = Phase.Pending;
         }
 
         /// <summary>
         /// "무엇을 눌렀는지"를 press 시점에 딱 한 번 정한다. Hold/Release는 이 결과만 본다.
-        /// 우선순위(Docs/07): 요괴 몸 > 자물쇠 > 화덕 > 기물(본체·보관 라벨) > 버드나무 > 빈 맵.
+        /// 우선순위(Docs/07): 요괴 몸 > 자물쇠 > 화덕 > 기물(본체·보관 라벨) > 빈 맵.
         /// 기물 위에 앉은 요괴를 누르면 기물이 아니라 요괴가 반응해야 한다.
         /// </summary>
         public static PressTarget ClassifyPress(bool characterHit, bool propHit, bool propBuilt, bool propOpensGongyanggan)
@@ -447,12 +444,6 @@ namespace Yoegoe.Characters
                         PropPanelRequested?.Invoke(pressProp, null);
                         break;
 
-                    case PressTarget.Willow:
-                        CancelPendingMonologueTap();
-                        MeritWillow.Instance?.OnTapped();
-                        Yoegoe.Save.GameSaveBridge.RequestSave();
-                        break;
-
                     case PressTarget.Character:
                         HandleCharacterTap(pressCharacter);
                         break;
@@ -516,7 +507,7 @@ namespace Yoegoe.Characters
                 return;
             }
             lastCollectedProp = null;
-            // 떡절구(버드나무로 가는 공덕)는 v1.3에서도 '지금 그대로' — 탭은 수거만, 레벨업은 길게 누르기로.
+            // 떡절구: 탭은 수거만(위 TryCollect), 레벨업은 길게 누르기. 일괄 수거는 MeritBatchCollect.
             if (prop.ResourceType == PropResourceType.Merit && !prop.CollectsByTap) return;
             // 보관함이 비었으면(또는 방금 받았으면) 기물 창 — 보내기 / 일하는 중 / 레벨업 (v1.3)
             PropPanelRequested?.Invoke(prop, null);
@@ -586,7 +577,7 @@ namespace Yoegoe.Characters
             if (agent.Stats.State == ActionState.Staying)
             {
                 // 일하는 중은 일 대사 + 기물 창(현황·불러들이기) — 둘 다 같은 탭 (08문서 ❓1 해소).
-                // 떡절구는 예외(기물 본체 탭과 동일하게 그대로 둠) — 수거는 버드나무, 레벨업은 길게 누르기.
+                // 떡절구는 예외(기물 본체 탭과 동일) — 수거는 탭/일괄 버튼, 레벨업은 길게 누르기.
                 var workProp = agent.CurrentProp;
                 if (workProp != null && !(workProp.ResourceType == PropResourceType.Merit && !workProp.CollectsByTap))
                     PropPanelRequested?.Invoke(workProp, null);
@@ -744,14 +735,6 @@ namespace Yoegoe.Characters
             var locked = PropManager.Instance.FindNearestUnbuiltProp(world, lockTapRadius);
             if (locked != null) return locked;
             return PropManager.Instance.FindNearestProp(world, propTapRadius);
-        }
-
-        bool IsOverWillow(Vector2 screenPos)
-        {
-            if (targetCamera == null || MeritWillow.Instance == null) return false;
-            float depth = -targetCamera.transform.position.z;
-            Vector3 world = targetCamera.ScreenToWorldPoint(new Vector3(screenPos.x, screenPos.y, depth));
-            return MeritWillow.Instance.HitTest(world, 0.05f);
         }
 
         /// <summary>보관 라벨(***·숫자) TextMesh 히트 — 라벨이 기물 bounds 밖으로 나와 있어도 그 기물로.</summary>

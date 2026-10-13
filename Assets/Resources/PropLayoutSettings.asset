@@ -61,4 +61,3 @@ MonoBehaviour:
   - data: {fileID: 11400000, guid: 60e1f0d48e6048268ecc4532b0863ca8, type: 2}
     prefab: {fileID: 100004, guid: c93e4f500be24f66868f84b920edfc08, type: 3}
     position: {x: 3.2, y: 1.5, z: 0}
-  willowPosition: {x: 0, y: -0.35, z: 0}

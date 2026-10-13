@@ -27,7 +27,7 @@ namespace Yoegoe.Characters
         /// <summary>v1.3 사냥·채집 목적지 id (시트 destinations). 고정 기물이면 PropData.fixedDestinationId.</summary>
         public string DestinationId { get; set; }
 
-        /// <summary>공덕을 이 기물을 눌러 바로 받는지 (v1.3 북제단·남제단). 아니면 버드나무로.</summary>
+        /// <summary>공덕을 이 기물을 눌러 바로 받는지 (v1.3 북제단·남제단). 아니면 일괄 수거(MeritBatchCollect).</summary>
         public bool CollectsByTap => data != null && data.collectByTap;
 
         /// <summary>목적지가 있는 기물(사냥·채집)인지.</summary>
@@ -88,8 +88,6 @@ namespace Yoegoe.Characters
         /// <summary>황금 재료를 캐낸 요괴 — 수거 탭 때 이 요괴가 "발견했어!"를 말한다.</summary>
         CharacterAgent goldenFinder;
         bool sparkling;
-        float petalTimer;
-        float nextPetalAt = 20f;
 
         /// <summary>만창 — 앉아 있어도 생산·기력소모 정지.</summary>
         public bool IsStorageHalted =>

@@ -66,7 +66,7 @@ namespace Yoegoe.UI
             root.SetActive(true);
         }
 
-        /// <summary>공덕 버드나무 만땅 탭 — 꽃잎은 버드나무(월드)에서 출발.</summary>
+        /// <summary>일괄 수거 만땅 — FX는 worldOrigin에서 출발.</summary>
         public void OpenBatchFromWorld(Vector3 worldOrigin)
         {
             OpenBatch(null);

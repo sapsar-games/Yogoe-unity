@@ -59,7 +59,7 @@ namespace Yoegoe.Data
         public bool opensPier;
 
         [Header("v1.3 제단")]
-        [Tooltip("공덕을 버드나무로 보내지 않고 이 기물을 눌러 바로 받는다 (북제단·남제단).")]
+        [Tooltip("공덕을 이 기물을 눌러 바로 받는다 (북제단·남제단). false면 일괄 수거(MeritBatchCollect).")]
         public bool collectByTap;
 
         [Tooltip("공덕 보관량이 레벨마다 몇 배로 늘어나는지 (제단 1.1). 시트 props capacityGrowth 가 덮어쓴다.")]

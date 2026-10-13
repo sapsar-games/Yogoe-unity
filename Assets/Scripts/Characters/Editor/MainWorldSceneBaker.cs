@@ -9,7 +9,7 @@ using Yoegoe.Data;
 namespace Yoegoe.Characters.EditorTools
 {
     /// <summary>
-    /// Main 씬에 맵 배경·기물 Prefab·버드나무·PropManager를 Edit 모드 배치.
+    /// Main 씬에 맵 배경·기물 Prefab·PropManager를 Edit 모드 배치.
     /// 메뉴: Yoegoe/Place Map & Props In Main Scene
     /// </summary>
     public static class MainWorldSceneBaker
@@ -62,7 +62,6 @@ namespace Yoegoe.Characters.EditorTools
             EnsurePropManager();
             EnsureMapBackgrounds(main, scale, mapScale);
             int propCount = EnsureProps(main, mapScale, scale);
-            EnsureMeritWillow(main, mapScale, scale);
 
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
@@ -278,31 +277,6 @@ namespace Yoegoe.Characters.EditorTools
             }
 
             return count;
-        }
-
-        static void EnsureMeritWillow(Yoegoe.Main main, float mapScale, ArtScaleSettings scale)
-        {
-            var existing = Object.FindAnyObjectByType<MeritWillow>(FindObjectsInactive.Include);
-            var layout = main.propLayout != null
-                ? main.propLayout
-                : AssetDatabase.LoadAssetAtPath<PropLayoutSettings>(LayoutPath);
-            Vector3 pos = layout != null
-                ? new Vector3(layout.willowPosition.x * mapScale, layout.willowPosition.y * mapScale, 0f)
-                : Vector3.zero;
-
-            if (existing != null)
-            {
-                existing.transform.position = pos;
-                return;
-            }
-
-            var go = new GameObject("MeritWillow");
-            go.transform.position = pos;
-            go.AddComponent<MeritWillow>();
-            var sr = go.GetComponent<SpriteRenderer>();
-            if (sr == null) sr = go.AddComponent<SpriteRenderer>();
-            sr.sortingOrder = scale.SortOrderForProp(pos.y);
-            Undo.RegisterCreatedObjectUndo(go, "Place MeritWillow");
         }
 
         static void EnsureFolder(string path)

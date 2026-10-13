@@ -112,18 +112,18 @@ namespace Yoegoe.UI
         {
             MapPointerRouter.CharacterDetailRequested += HandleCharacterDetailRequested;
             PropSlot.MeritCollectedAtWorld += PlayMeritCollectFxFromWorld;
-            MeritWillow.FullTapped += HandleWillowFullTapped;
+            MeritBatchCollect.FullRequested += HandleBatchMeritFull;
         }
 
         private void OnDisable()
         {
             MapPointerRouter.CharacterDetailRequested -= HandleCharacterDetailRequested;
             PropSlot.MeritCollectedAtWorld -= PlayMeritCollectFxFromWorld;
-            MeritWillow.FullTapped -= HandleWillowFullTapped;
+            MeritBatchCollect.FullRequested -= HandleBatchMeritFull;
         }
 
-        /// <summary>버드나무 만땅 탭: 광고 2배 / 그냥 받기 (공덕은 일괄 대기분으로 옮겨진 상태).</summary>
-        void HandleWillowFullTapped(Vector3 worldPos)
+        /// <summary>일괄 수거 만땅: 광고 2배 / 그냥 받기 (공덕은 일괄 대기분으로 옮겨진 상태).</summary>
+        void HandleBatchMeritFull(Vector3 worldPos)
         {
             if (DualActionPopup.Instance != null)
             {

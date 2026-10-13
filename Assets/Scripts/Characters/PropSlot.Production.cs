@@ -57,22 +57,11 @@ namespace Yoegoe.Characters
             float worked = producedSeconds / speed;
 
             if (meritAdded > 0)
-            {
                 AddToMeritPile(meritAdded);
-                // 가끔 공덕꽃잎이 버드나무로 날아가 붙는다 (연출) — 제단은 버드나무를 거치지 않으므로 없음
-                petalTimer += worked;
-                if (!CollectsByTap && petalTimer >= nextPetalAt && worked < 60f)
-                {
-                    petalTimer = 0f;
-                    nextPetalAt = UnityEngine.Random.Range(15f, 35f);
-                    if (MeritWillow.Instance != null)
-                        MeritWillow.Instance.LaunchPetalFrom(TopAnchorWorld(0.05f));
-                }
-            }
             return worked;
         }
 
-        /// <summary>버드나무 등 기물 밖에서 공덕을 수거했을 때 같은 꽃잎 연출을 띄운다.</summary>
+        /// <summary>기물 밖에서 공덕을 수거했을 때 HUD 연출용.</summary>
         public static void NotifyMeritCollectedAt(Vector3 worldPos) => MeritCollectedAtWorld?.Invoke(worldPos);
 
         /// <summary>탭 수거 — 공덕 더미 또는 자원 보관을 지갑으로.</summary>

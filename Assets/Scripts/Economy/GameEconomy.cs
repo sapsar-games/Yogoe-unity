@@ -41,8 +41,8 @@ namespace Yoegoe.Economy
         public event Action<BigNumber> OnMeritChanged;
 
         /// <summary>
-        /// 일괄 수거 대기분 — 버드나무 만땅 탭 시 여기로 옮겨 '광고 2배 / 그냥 받기' 팝업을 띄운다(7-4).
-        /// 팝업을 받지 않고 닫으면 남아서 HUD 일괄 수거 버튼으로 받는다.
+        /// 일괄 수거 대기분 — 만땅 수거 시 여기로 옮겨 '광고 2배 / 그냥 받기' 팝업을 띄운다(7-4).
+        /// 팝업을 받지 않고 닫으면 남아 HUD 일괄 수거 버튼으로 받는다.
         /// 백그라운드 복귀만으로는 채우지 않는다.
         /// </summary>
         public BigNumber PendingBatchMerit { get; private set; } = BigNumber.Zero;

@@ -185,14 +185,6 @@ namespace Yoegoe.Characters
 
         private void RefreshPileLabel()
         {
-            // 공덕은 버드나무에 모인 것으로 보여 준다 — 기물 위 더미 라벨 없음 (7-4)
-            if (ResourceType == PropResourceType.Merit && MeritWillow.Instance != null)
-            {
-                if (pileLabel != null && pileLabel.gameObject.activeSelf)
-                    pileLabel.gameObject.SetActive(false);
-                return;
-            }
-
             if (IsResourceProp)
             {
                 RefreshResourceLabel();
