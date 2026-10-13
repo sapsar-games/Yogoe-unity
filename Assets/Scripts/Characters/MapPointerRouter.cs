@@ -462,8 +462,9 @@ namespace Yoegoe.Characters
             {
                 CancelPendingMonologueTap();
                 var prop = FindDropProp(dragCharacter, screenPos);
-                // 사냥·채집은 기물 창(요괴 미리 선택, "해당 목적지로 보낼까요?" 확인 — v1.2 시연).
-                // 목적지가 기물마다 고정(6개 개별 기물, 05 C문서)이라도 드래그는 항상 이 확인을 거친다 —
+                // 사냥·채집은 기물 창(요괴 미리 선택, "어디로 보낼까요?" 3곳 선택 — v1.2 시연).
+                // 멧돼지 앞산 등 6개 개별 기물은 배경일 뿐 IsDirectlyInteractable=false라 드래그로
+                // 안 잡힌다 — 실제로 잡히는 건 사냥터·채집터 허브(HuntingGround/GatheringField)뿐.
                 // 바로 착석은 옹달샘·북제단·남제단(HasDestinations가 false인 기물)만.
                 var dropTarget = prop != null ? prop : FindAnyDestinationPropAt(dragCharacter, screenPos);
                 if (dropTarget != null && dropTarget.HasDestinations && !dropTarget.IsOccupied)
@@ -675,7 +676,7 @@ namespace Yoegoe.Characters
             float depth = -targetCamera.transform.position.z;
             Vector3 w = targetCamera.ScreenToWorldPoint(new Vector3(screenPos.x, screenPos.y, depth));
             foreach (var p in PropManager.Instance.AllProps)
-                if (p != null && p.HitLevelTag(w, 0.12f)) return p;
+                if (p != null && p.IsDirectlyInteractable && p.HitLevelTag(w, 0.12f)) return p;
             return null;
         }
 
@@ -767,7 +768,7 @@ namespace Yoegoe.Characters
             for (int i = 0; i < all.Count; i++)
             {
                 var p = all[i];
-                if (p == null) continue;
+                if (p == null || !p.IsDirectlyInteractable) continue;
                 if (!p.TryGetPileLabelHitScore(world, pileLabelTapPadding, out float score)) continue;
                 if (score < bestScore)
                 {

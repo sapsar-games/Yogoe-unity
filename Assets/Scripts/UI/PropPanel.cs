@@ -64,7 +64,7 @@ namespace Yoegoe.UI
         {
             if (target == null || !target.IsBuilt || !target.AcceptsWorkers) return;
             EnsureBuilt();
-            prop = target;
+            prop = ResolveOpenTarget(target);
             prop.ApplyFixedDestination();
             var dests = PropCatalog.DestinationsFor(prop.ResourceType);
             selectedDest = prop.DestinationId;
@@ -78,6 +78,18 @@ namespace Yoegoe.UI
             Rebuild();
             // 끌어다 놓은 요괴가 못 가는 곳이면 바로 물어본 것처럼
             if (preselect != null && WhyNot(preselect, out bool refuse) != null && refuse) Refuse(preselect);
+        }
+
+        /// <summary>사냥터·채집터(허브)를 열었는데 그 목적지 중 하나가 이미 일하는 중이면
+        /// 그 개별 기물(멧돼지 앞산 등)을 바로 보여준다 — 허브 자신은 앉는 자리가 아니다.
+        /// 개별 기물을 직접 열었으면(일하는 중 탭 등) 그대로.</summary>
+        static PropSlot ResolveOpenTarget(PropSlot target)
+        {
+            if (!target.NeedsDestinationPick || PropManager.Instance == null) return target;
+            foreach (var p in PropManager.Instance.All)
+                if (p != null && p != target && p.ResourceType == target.ResourceType
+                    && (p.IsOccupied || p.HasPendingCollectible)) return p;
+            return target;
         }
 
         public void Close()
@@ -145,15 +157,31 @@ namespace Yoegoe.UI
             if (prop == null || selectedAgent == null) return;
             var a = selectedAgent;
             if (WhyNot(a, out _) != null) { Rebuild(); return; }
-            if (prop.IsOccupied || prop.IsStorageHalted) { Rebuild(); return; }
-            if (prop.HasDestinations) prop.DestinationId = selectedDest;
-            if (a.TrySitOnProp(prop))
+            // 고른 목적지(selectedDest)와 propId가 같은 실제 기물에 앉힌다 —
+            // 드래그로 건드린 기물(prop)이 아니라 고른 목적지가 진짜 자리다.
+            var seatProp = ResolveSeatProp(prop, selectedDest);
+            if (seatProp == null || seatProp.IsOccupied || seatProp.IsStorageHalted) { Rebuild(); return; }
+            if (seatProp.HasDestinations) seatProp.DestinationId = selectedDest;
+            if (a.TrySitOnProp(seatProp))
             {
-                a.SayCatalogLine(e => e.GoLinesFor(prop.ResourceType));
+                a.SayCatalogLine(e => e.GoLinesFor(seatProp.ResourceType));
                 GameSaveBridge.RequestSave();
             }
             selectedAgent = null;
             Rebuild();
+        }
+
+        /// <summary>목적지 id(destinations 탭)와 fixedDestinationId가 같은 실제 기물 —
+        /// 없으면(목적지 선택 전 등) 드래그로 건드린 기물 그대로. propId가 아니라 fixedDestinationId로
+        /// 맞춰야 한다 — propId는 한글 이름(예: 멧돼지 앞산), destId는 영문 id(예: BoarHill)라 서로 다르다.</summary>
+        static PropSlot ResolveSeatProp(PropSlot touched, string destId)
+        {
+            if (string.IsNullOrEmpty(destId)) return touched;
+            if (touched != null && touched.data != null && touched.data.fixedDestinationId == destId) return touched;
+            if (PropManager.Instance == null) return touched;
+            foreach (var p in PropManager.Instance.All)
+                if (p != null && p.data != null && p.data.fixedDestinationId == destId) return p;
+            return touched;
         }
 
         void Recall()
@@ -214,8 +242,11 @@ namespace Yoegoe.UI
         void BuildFree()
         {
             float y = 470f;
+            // v1.3: 사냥터·채집터는 어느 개별 기물(멧돼지 앞산 등)에 드래그해도 똑같이
+            // "어디로 보낼까요" 3곳 선택창이 뜬다 — 6개는 배경일 뿐, 실제 목적지는 여기서 고른다.
+            // (고른 destId와 같은 propId를 가진 실제 기물에 앉힌다 — ResolveSeatProp.)
             var dests = PropCatalog.DestinationsFor(prop.ResourceType);
-            if (prop.NeedsDestinationPick && dests.Count > 0)
+            if (dests.Count > 0)
             {
                 Label("어디로 보낼까요?  목적지마다 나오는 재료가 달라요", new Vector2(0, y), 26, DimText);
                 y -= 150f;
@@ -223,12 +254,18 @@ namespace Yoegoe.UI
                 for (int i = 0; i < dests.Count; i++)
                 {
                     var d = dests[i];
+                    var seatProp = ResolveSeatProp(prop, d.id);
+                    bool destBusy = seatProp != null && seatProp != prop && seatProp.IsOccupied;
                     var card = Card(new Vector2(-total / 2f + w / 2f + i * (w + gap), y), new Vector2(w, 230),
-                        d.id == selectedDest ? CardOn : CardOff, () => { selectedDest = d.id; refusing = null; Rebuild(); });
+                        destBusy ? CardDisabled : d.id == selectedDest ? CardOn : CardOff,
+                        destBusy ? null : () => { selectedDest = d.id; refusing = null; Rebuild(); });
                     TextIn(card, d.name, new Vector2(0, 80), 30, TextColor, FontStyle.Bold);
                     TextIn(card, d.minIntimacy > 0 ? $"♥ 친밀도 {d.minIntimacy:0} 이상" : "누구나 · 희귀도 하", new Vector2(0, 40), 22, DimText);
-                    TextIn(card, DropLine(d.id), new Vector2(0, -30), 22, TextColor, FontStyle.Normal, new Vector2(w - 16, 90));
-                    if (d.goldenChance > 0f) TextIn(card, $"황금 {d.goldenChance:0.#}%", new Vector2(0, -92), 22, Gold, FontStyle.Bold);
+                    if (destBusy)
+                        TextIn(card, "다른 요괴가 일하는 중", new Vector2(0, -30), 22, DimText, FontStyle.Normal, new Vector2(w - 16, 90));
+                    else
+                        TextIn(card, DropLine(d.id), new Vector2(0, -30), 22, TextColor, FontStyle.Normal, new Vector2(w - 16, 90));
+                    if (!destBusy && d.goldenChance > 0f) TextIn(card, $"황금 {d.goldenChance:0.#}%", new Vector2(0, -92), 22, Gold, FontStyle.Bold);
                 }
                 y -= 160f;
             }
@@ -241,6 +278,7 @@ namespace Yoegoe.UI
                 y -= 70f;
             }
 
+            var seatProp = ResolveSeatProp(prop, selectedDest);
             Label("누구를 보낼까요?  보관함이 차면 빈 옹달샘·제단으로 옮겨 가요", new Vector2(0, y), 26, DimText);
             y -= 140f;
             var workers = new List<CharacterAgent>(Workers());
@@ -270,22 +308,22 @@ namespace Yoegoe.UI
             var dd = Dest;
             if (refusing != null && dd != null)
                 summary = $"{refusing.Data.displayName} “{GameSettingsText.Refuse}”  {dd.name}{Josa(dd.name, "은", "는")} 친밀도 {dd.minIntimacy:0}부터 가요 · 지금 {Mathf.FloorToInt(refusing.Stats.Intimacy)}";
-            else if (prop.IsStorageHalted)
+            else if (seatProp.IsStorageHalted)
                 summary = "보관함이 가득 찼어요. 먼저 받아 주세요.";
             else if (selectedAgent != null)
             {
                 float gi = selectedAgent.Stats.Stamina;
                 float cycle, fillMin;
-                if (prop.ResourceType == PropResourceType.Merit)
+                if (seatProp.ResourceType == PropResourceType.Merit)
                 {
-                    double perMin = PropProduction.BaseMeritPerMinute(prop.ProductionConfig, prop.level);
+                    double perMin = PropProduction.BaseMeritPerMinute(seatProp.ProductionConfig, seatProp.level);
                     cycle = 15f;
-                    fillMin = perMin > 0 ? (float)((prop.MeritCapacity - prop.PendingMerit.ToDouble()) / perMin) : 0f;
+                    fillMin = perMin > 0 ? (float)((seatProp.MeritCapacity - seatProp.PendingMerit.ToDouble()) / perMin) : 0f;
                 }
                 else
                 {
-                    int room = Mathf.Max(0, prop.ResourceCapacity - prop.StoredResources);
-                    cycle = prop.ProductionConfig.CycleMinutes;
+                    int room = Mathf.Max(0, seatProp.ResourceCapacity - seatProp.StoredResources);
+                    cycle = seatProp.ProductionConfig.CycleMinutes;
                     fillMin = room * cycle;
                 }
                 float workMin = gi * GameSettings.Get("staminaDrainMinutes");
@@ -294,10 +332,10 @@ namespace Yoegoe.UI
                     : $"약 {Dur(fillMin)}이면 보관함이 차고, 남은 기력으로 빈 옹달샘·제단에 옮겨 가요";
             }
             else summary = (dd != null ? dd.name + "(으)로 " : "") + "보낼 요괴를 골라 주세요." + (prop.StoredResources > 0 ? $"  보관함에 {prop.StoredResources}개가 있어요." : "");
-            Label(summary, new Vector2(0, y), 24, refusing != null || prop.IsStorageHalted ? Warn : TextColor, new Vector2(860, 70));
+            Label(summary, new Vector2(0, y), 24, refusing != null || seatProp.IsStorageHalted ? Warn : TextColor, new Vector2(860, 70));
             y -= 100f;
 
-            bool canSend = selectedAgent != null && !prop.IsStorageHalted;
+            bool canSend = selectedAgent != null && !seatProp.IsOccupied && !seatProp.IsStorageHalted;
             Button(selectedAgent != null ? selectedAgent.Data.displayName + " 보내기" : "보내기", new Vector2(0, y), new Vector2(380, 90),
                 canSend ? Btn : BtnOff, canSend ? Send : (System.Action)null);
             y -= 120f;

@@ -52,6 +52,7 @@ namespace Yoegoe.Characters
                 if (p == exclude) continue;
                 if (p.IsStorageHalted) continue; // 가도 일을 못 함
                 if (!p.AcceptsWorkers) continue; // 화덕 등 — 요리 전용, 일할 곳 아님
+                if (p.NeedsDestinationPick) continue; // 사냥터·채집터 허브 자체는 앉는 자리가 아니다(개별 기물로만 앉힌다)
                 if (!p.CanBeUsedBy(requester)) continue;
                 if (filter != null && !filter(p)) continue;
                 candidates.Add(p);
@@ -79,6 +80,7 @@ namespace Yoegoe.Characters
             {
                 if (p == null) continue;
                 if (!p.IsBuilt) continue;
+                if (!p.IsDirectlyInteractable) continue; // 사냥·채집 개별 기물은 허브로만 접근
 
                 bool endingRefuse = p.IsForbiddenEndingFor(requester);
                 if (endingRefuse)
@@ -109,6 +111,7 @@ namespace Yoegoe.Characters
             foreach (var p in allProps)
             {
                 if (p == null) continue;
+                if (!p.IsDirectlyInteractable) continue; // 사냥·채집 개별 기물은 허브로만 접근
                 float d = DistanceToPropSurface(p, worldPos);
                 if (d <= bestDist)
                 {
@@ -127,6 +130,7 @@ namespace Yoegoe.Characters
             foreach (var p in allProps)
             {
                 if (p == null || p.IsBuilt) continue;
+                if (!p.IsDirectlyInteractable) continue;
                 float d = DistanceToPropSurface(p, worldPos);
                 if (d <= bestDist)
                 {

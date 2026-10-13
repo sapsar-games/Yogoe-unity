@@ -40,6 +40,10 @@ namespace Yoegoe.Characters
         /// <summary>목적지 카드를 고르는 UI가 필요한지 (고정이면 false).</summary>
         public bool NeedsDestinationPick => HasDestinations && !HasFixedDestination;
 
+        /// <summary>플레이어가 직접 탭·드래그할 수 있는 기물인지. 목적지가 고정된 사냥·채집 개별 기물
+        /// (멧돼지 앞산 등, 6개)은 배경일 뿐 — 사냥터·채집터(허브)를 통해서만 접근한다 (v1.3 — 2026-10-13).</summary>
+        public bool IsDirectlyInteractable => !(HasDestinations && HasFixedDestination);
+
         /// <summary>지금 목적지의 입장 친밀도 (없으면 0).</summary>
         public float RequiredIntimacy => PropCatalog.FindDestination(DestinationId)?.minIntimacy ?? 0f;
 
