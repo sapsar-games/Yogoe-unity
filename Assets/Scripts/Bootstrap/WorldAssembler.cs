@@ -119,17 +119,20 @@ namespace Yoegoe.Bootstrap
         }
 
         /// <summary>
-        /// 씬의 Background_* 를 찾아 걷기/패닝만 연결. 없으면 Main 스프라이트로 폴백 생성.
+        /// 씬의 Background_* 를 찾아 걷기/패닝만 연결.
+        /// 플레이어 빌드는 씬 Prefab이 있어야 하고, 폴백 생성은 에디터 전용.
         /// </summary>
         static void WireMap(Config cfg)
         {
             var overviewGo = GameObject.Find(OverviewName);
             var playfieldGo = GameObject.Find(PlayfieldName);
 
+#if UNITY_EDITOR
+            // 개발 중 씬 미배치 시에만 임시 생성. 출시 빌드에는 포함되지 않음.
             if (overviewGo == null && cfg.overviewBackgroundSprite != null)
             {
                 Debug.LogWarning(
-                    $"[WorldAssembler] 씬에 {OverviewName} 없음 — 런타임 폴백 생성. " +
+                    $"[WorldAssembler] 씬에 {OverviewName} 없음 — 에디터 폴백 생성. " +
                     "메뉴 Yoegoe/Place Map & Props In Main Scene 을 실행하세요.");
                 overviewGo = CreateBackgroundGo(OverviewName, cfg.overviewBackgroundSprite,
                     cfg.overviewOffset * Mathf.Max(0.01f, cfg.scale.mapScale),
@@ -139,40 +142,57 @@ namespace Yoegoe.Bootstrap
             if (playfieldGo == null && cfg.playfieldSprite != null)
             {
                 Debug.LogWarning(
-                    $"[WorldAssembler] 씬에 {PlayfieldName} 없음 — 런타임 폴백 생성. " +
+                    $"[WorldAssembler] 씬에 {PlayfieldName} 없음 — 에디터 폴백 생성. " +
                     "메뉴 Yoegoe/Place Map & Props In Main Scene 을 실행하세요.");
                 playfieldGo = CreateBackgroundGo(PlayfieldName, cfg.playfieldSprite,
                     Vector2.zero, cfg.scale.mapScale, cfg.scale.backgroundSort + 1, z: 0.9f);
             }
+#endif
 
-            var overviewSr = overviewGo != null ? overviewGo.GetComponent<SpriteRenderer>() : null;
+            // 에디터·플레이어 공통: Prefab이 하나도 없으면 wiring 중단.
+            if (overviewGo == null && playfieldGo == null)
+            {
+                Debug.LogError(
+                    "[WorldAssembler] Background_Overview / Background_Playfield 가 씬에 없습니다. " +
+                    "메뉴 Yoegoe/Place Map & Props In Main Scene 을 실행하세요.");
+                return;
+            }
+
+            // Playfield = 캐릭터 걷기 영역.
             var playfieldSr = playfieldGo != null ? playfieldGo.GetComponent<SpriteRenderer>() : null;
-            Sprite overview = overviewSr != null ? overviewSr.sprite : cfg.overviewBackgroundSprite;
-            Sprite playfield = playfieldSr != null ? playfieldSr.sprite : cfg.playfieldSprite;
-
+            Sprite playfield = playfieldSr != null ? playfieldSr.sprite : null;
             if (playfieldGo != null && playfield != null)
             {
-                var walkCol = playfieldGo.GetComponent<Collider2D>();
-                if (walkCol == null)
-                    walkCol = BuildPlayfieldWalkCollider(playfieldGo, playfield);
+                // Prefab에 Collider2D가 있으면 그대로, 없으면 스프라이트 Physics Shape로 생성.
+                var sourceCol = playfieldGo.GetComponent<Collider2D>();
+                if (sourceCol == null)
+                    sourceCol = BuildPlayfieldWalkCollider(playfieldGo, playfield);
 
+                // Prefab 꼭짓점은 유지하고, 런타임 자식에 복사·팽창한 영역을 WalkArea로 씀.
+                const float walkPadWorld = 0.1f;
+                var walkCol = EnsureExpandedWalkCollider(playfieldGo, sourceCol, walkPadWorld);
                 MapBounds.SetWalkArea(walkCol);
+
+                // Collider도 없으면: 스프라이트 월드 AABB를 마진만큼 넓힌 사각 바운드.
                 if (walkCol == null)
                 {
                     float scale = playfieldGo.transform.lossyScale.x;
                     if (TryGetSpriteWorldAabb(playfield, scale, out Vector2 walkMin, out Vector2 walkMax))
                     {
-                        const float margin = 0.35f;
+                        const float margin = 0.2f;
                         MapBounds.SetBounds(
-                            new Vector2(walkMin.x + margin, walkMin.y + margin),
-                            new Vector2(walkMax.x - margin, walkMax.y - margin));
+                            new Vector2(walkMin.x - margin, walkMin.y - margin),
+                            new Vector2(walkMax.x + margin, walkMax.y + margin));
                     }
                 }
             }
 
-            WireCameraPan(cfg, overviewGo, overview, playfieldGo, playfield);
+            // Overview 기준으로 카메라 Ortho·드래그 패닝 한도 연결 (스프라이트는 안에서 GO로부터 읽음).
+            WireCameraPan(overviewGo, playfieldGo);
         }
 
+#if UNITY_EDITOR
+        /// <summary>에디터 전용: 씬에 배경 Prefab이 없을 때 임시 스프라이트 GO 생성.</summary>
         static GameObject CreateBackgroundGo(
             string name, Sprite sprite, Vector2 posXy, float mapScale, int sort, float z)
         {
@@ -185,58 +205,50 @@ namespace Yoegoe.Bootstrap
             sr.sortingOrder = sort;
             return go;
         }
+#endif
 
 
         /// <summary>
         /// 맵 배경 크기에 맞춰 카메라 Ortho·패닝 한도를 연결한다.
         /// 가로는 화면에 딱 맞추고, 세로가 길면 위아래만 드래그로 본다.
         /// </summary>
-        static void WireCameraPan(
-            Config cfg,
-            GameObject overviewGo, Sprite overview,
-            GameObject playfieldGo, Sprite playfield)
+        static void WireCameraPan(GameObject overviewGo, GameObject playfieldGo)
         {
             var cam = Camera.main;
             if (cam == null || !cam.orthographic) return;
 
             // 1) 패닝 콘텐츠 = Overview 우선, 없으면 Playfield.
-            //    panW/H = 월드에서 맵이 차지하는 가로·세로, panCenter = 맵 중심.
+            //    SpriteRenderer.bounds = 스케일 반영된 월드 AABB (양옆 틈 계산 기준).
             float panW = 0f, panH = 0f;
             Vector2 panCenter = Vector2.zero;
 
-            if (overviewGo != null && overview != null)
+            var overviewSr = overviewGo != null ? overviewGo.GetComponent<SpriteRenderer>() : null;
+            var playfieldSr = playfieldGo != null ? playfieldGo.GetComponent<SpriteRenderer>() : null;
+
+            if (overviewSr != null && overviewSr.sprite != null)
             {
-                float sx = overviewGo.transform.lossyScale.x;
-                float sy = overviewGo.transform.lossyScale.y;
-                panW = overview.bounds.size.x * sx;
-                panH = overview.bounds.size.y * sy;
-                panCenter = new Vector2(overviewGo.transform.position.x, overviewGo.transform.position.y);
+                Bounds b = overviewSr.bounds;
+                panW = b.size.x;
+                panH = b.size.y;
+                panCenter = new Vector2(b.center.x, b.center.y);
             }
-            else if (playfieldGo != null && playfield != null)
+            else if (playfieldSr != null && playfieldSr.sprite != null)
             {
-                float sx = playfieldGo.transform.lossyScale.x;
-                float sy = playfieldGo.transform.lossyScale.y;
-                panW = playfield.bounds.size.x * sx;
-                panH = playfield.bounds.size.y * sy;
-                panCenter = new Vector2(playfieldGo.transform.position.x, playfieldGo.transform.position.y);
+                Bounds b = playfieldSr.bounds;
+                panW = b.size.x;
+                panH = b.size.y;
+                panCenter = new Vector2(b.center.x, b.center.y);
             }
             else return;
 
             var drag = cam.GetComponent<MapCameraDrag>();
             if (drag == null) drag = cam.gameObject.AddComponent<MapCameraDrag>();
 
-            // 2) 맵 가로 = 화면 가로가 되도록 Ortho 고정.
-            //    ortho = panW / (2 * aspect). 세로가 길면 위아래만 패닝 여유로 남음.
-            float newOrtho = panW / (2f * Mathf.Max(0.01f, cam.aspect));
-            if (newOrtho > 0.1f)
-                cam.orthographicSize = newOrtho;
-
-            // 3) MapCameraDrag에 맵 반폭·반높이 전달 → Clamp로 카메라가 맵 밖으로 안 나감.
+            // 2) 맵 반폭·반높이 등록 후, 가로 = 화면 가로로 Ortho 맞춤 (세로만 패닝).
             drag.SetContentRect(panCenter, panW * 0.5f, panH * 0.5f);
-            // 핀치 줌: 최소 1.4(최대 확대), 최대 ≈ 현재 ortho(시작보다 멀리 못 감).
-            drag.SetOrthoLimits(1.4f, Mathf.Max(cam.orthographicSize * 1.05f, cam.orthographicSize));
+            drag.FitOrthoToContentWidth();
 
-            // 4) 터치/드래그 입력이 drag를 쓰도록 연결 + 인트로가 홈 ortho/위치를 기억.
+            // 3) 터치/드래그 입력이 drag를 쓰도록 연결 + 인트로가 홈 ortho/위치를 기억.
             var router = cam.GetComponent<MapPointerRouter>();
             if (router != null) router.mapDrag = drag;
 
@@ -262,6 +274,63 @@ namespace Yoegoe.Bootstrap
                 col.SetPath(i, path);
             }
             return col;
+        }
+
+        const string WalkAreaChildName = "__WalkArea";
+
+        /// <summary>
+        /// Prefab/소스 폴리곤은 그대로 두고, 자식 GO에 바깥으로 pad만큼 넓힌 복사본을 만든다.
+        /// Build가 여러 번 호출돼도 소스 기준으로 다시 써서 점점 커지지 않는다.
+        /// </summary>
+        static Collider2D EnsureExpandedWalkCollider(
+            GameObject fieldGO, Collider2D source, float padWorld)
+        {
+            if (fieldGO == null || source == null) return null;
+
+            var poly = source as PolygonCollider2D;
+            if (poly == null) return source;
+
+            Transform childT = fieldGO.transform.Find(WalkAreaChildName);
+            GameObject childGo = childT != null
+                ? childT.gameObject
+                : new GameObject(WalkAreaChildName);
+            if (childT == null)
+                childGo.transform.SetParent(fieldGO.transform, false);
+
+            var expanded = childGo.GetComponent<PolygonCollider2D>();
+            if (expanded == null)
+                expanded = childGo.AddComponent<PolygonCollider2D>();
+            expanded.isTrigger = true;
+
+            float sx = Mathf.Max(0.01f, Mathf.Abs(fieldGO.transform.lossyScale.x));
+            float padLocal = Mathf.Max(0f, padWorld) / sx;
+
+            expanded.pathCount = poly.pathCount;
+            for (int p = 0; p < poly.pathCount; p++)
+            {
+                Vector2[] path = poly.GetPath(p);
+                if (path == null || path.Length == 0)
+                {
+                    expanded.SetPath(p, path);
+                    continue;
+                }
+
+                Vector2 center = Vector2.zero;
+                for (int i = 0; i < path.Length; i++)
+                    center += path[i];
+                center /= path.Length;
+
+                for (int i = 0; i < path.Length; i++)
+                {
+                    Vector2 d = path[i] - center;
+                    float len = d.magnitude;
+                    if (len > 1e-5f)
+                        path[i] = center + d * ((len + padLocal) / len);
+                }
+                expanded.SetPath(p, path);
+            }
+
+            return expanded;
         }
 
         static bool TryGetSpriteWorldAabb(Sprite sprite, float scale, out Vector2 min, out Vector2 max)

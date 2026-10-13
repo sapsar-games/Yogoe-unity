@@ -30,7 +30,11 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 3e7db520db2d44dab81c86c3caabc010, type: 3}
   - {fileID: 21300000, guid: 4f3404e969bfd4de8a25c12de7fa16a9, type: 3}
   - {fileID: 21300000, guid: fbb7919e4a016474b8ee6ca8a7508595, type: 3}
-  walkLeft: []
+  walkLeft:
+  - {fileID: 21300000, guid: 9d82c1e6dd1794efab98b816222a5116, type: 3}
+  - {fileID: 21300000, guid: a7d1ff935d9a04e718939a8cde507a6d, type: 3}
+  - {fileID: 21300000, guid: f83b9a014ac314247b22d44c35bfe9d6, type: 3}
+  - {fileID: 21300000, guid: 901a62db50697426b83c20183f8ab418, type: 3}
   walkRight:
   - {fileID: 2082839472, guid: 052a0f213e91645d59b004deb025be45, type: 3}
   - {fileID: -320883922, guid: 052a0f213e91645d59b004deb025be45, type: 3}

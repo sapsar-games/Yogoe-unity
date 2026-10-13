@@ -51,8 +51,10 @@ namespace Yoegoe.Bootstrap
             var drag = cam != null ? cam.GetComponent<MapCameraDrag>() : null;
             if (cam == null || drag == null || !drag.BoundsReady) return;
 
-            homeOrtho = cam.orthographicSize;
+            // 홈 = 맵 가로 맞춤. 부트 직후 aspect가 어긋나도 PlayReveal에서 다시 맞춤.
+            homeOrtho = drag.ComputeOrthoToFitWidth();
             homePos = cam.transform.position;
+            homePos.x = drag.ContentCenter.x;
 
             float ortho = Mathf.Clamp(IntroOrtho, drag.minOrtho, Mathf.Max(drag.minOrtho + 0.05f, homeOrtho));
             cam.orthographicSize = ortho;
@@ -89,7 +91,16 @@ namespace Yoegoe.Bootstrap
             }
 
             Vector3 from = cam.transform.position;
-            float fromOrtho = cam.orthographicSize;
+            float fromOrtho = cam.orthographicSize; // Prepare가 둔 하늘 ortho 유지
+
+            // 홈만 현재 화면 비율로 다시 계산 (지금 ortho는 건드리지 않음)
+            if (drag != null && drag.BoundsReady)
+            {
+                homeOrtho = drag.ComputeOrthoToFitWidth();
+                homePos.x = drag.ContentCenter.x;
+                drag.SetOrthoLimits(drag.minOrtho, homeOrtho);
+            }
+
             float t = 0f;
             while (t < PanSeconds)
             {
@@ -102,14 +113,14 @@ namespace Yoegoe.Bootstrap
                 yield return null;
             }
 
-            cam.orthographicSize = homeOrtho;
             if (drag != null)
             {
-                drag.RefreshPanLimits();
+                drag.FitOrthoToContentWidth();
                 cam.transform.position = drag.ClampCenter(homePos);
             }
             else
             {
+                cam.orthographicSize = homeOrtho;
                 cam.transform.position = homePos;
             }
 
