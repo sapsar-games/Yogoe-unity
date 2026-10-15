@@ -41,14 +41,19 @@ namespace Yoegoe.Characters
 
         // ---------------- Walking ----------------
 
-        private void EnterWalking()
+        /// <summary>
+        /// 걷기 상태로 전환
+        /// </summary>
+        /// <param name="pickDestination">목적지 선택 여부</param>
+        private void EnterWalking(bool pickDestination = true)
         {
             Stats.State = ActionState.Walking;
             Stats.StateTimer = 0f;
             animFrame = 0;
             animTimer = 0f;
             lastPosition = transform.position;
-            PickDestination();
+
+            if (pickDestination) PickDestination();
         }
 
         private void PickDestination()
@@ -391,6 +396,26 @@ namespace Yoegoe.Characters
             return true;
         }
 
+        /// <summary>
+        /// 목적지로 설정된 기물까지 걸어감
+        /// </summary>
+        /// <param name="target">목적지 기물</param>
+        /// <returns>성공 여부</returns>
+        public bool WalkToProp(PropSlot target)
+        {
+            if (target == null) return false;
+            if (Stats.State == ActionState.Fainted) return false;
+
+            ClearWalkDestination();
+            LeaveCurrentProp();
+
+            EnterWalking(false);
+            destination = target;
+
+            isWandering = false;
+            return true;
+        }
+
         private void ClearWalkDestination()
         {
             if (destination != null)
@@ -401,6 +426,7 @@ namespace Yoegoe.Characters
             isWandering = false;
             wanderTarget = null;
         }
+
 
         // ---------------- Fainted ----------------
 

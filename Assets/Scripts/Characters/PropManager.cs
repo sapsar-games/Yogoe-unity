@@ -35,7 +35,8 @@ namespace Yoegoe.Characters
         /// <summary>
         /// 6-2 걷기 목적지 후보 선정.
         /// 룰 기준: Docs/06_행동룰.md
-        /// 비어있고, 직전 기물이 아니고, 다른 요괴의 엔딩 기물이 아니고, 만창이 아닌(가서 일할 수 있는) 것 중 랜덤.
+        /// 비어있고, 직전 기물이 아니고, 다른 요괴의 엔딩 기물이 아니고, 만창이 아닌(가서 일할 수 있는) 것 중 랜덤
+        /// 사냥터, 채집터는 기물 자체가 앉는 자리가 아니므로 제외
         /// 후보가 없으면 null (호출측에서 30초 방황 후 재추첨).
         /// </summary>
         public PropSlot GetRandomAvailableProp(CharacterAgent requester, PropSlot exclude,
@@ -52,7 +53,8 @@ namespace Yoegoe.Characters
                 if (p == exclude) continue;
                 if (p.IsStorageHalted) continue; // 가도 일을 못 함
                 if (!p.AcceptsWorkers) continue; // 화덕 등 — 요리 전용, 일할 곳 아님
-                if (p.NeedsDestinationPick) continue; // 사냥터·채집터 허브 자체는 앉는 자리가 아니다(개별 기물로만 앉힌다)
+                if (p.NeedsDestinationPick) continue; // 사냥터·채집터 허브 자체는 앉는 자리가 아니므로 제외
+                if (p.HasFixedDestination) continue; // 고정 목적지 기물은 제외
                 if (!p.CanBeUsedBy(requester)) continue;
                 if (filter != null && !filter(p)) continue;
                 candidates.Add(p);

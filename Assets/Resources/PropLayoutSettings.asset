@@ -27,7 +27,7 @@ MonoBehaviour:
     position: {x: 0.67, y: 1.83, z: 0}
   - data: {fileID: 11400000, guid: 0c03f9c879a6437ba5accc26b5a2e3a7, type: 2}
     prefab: {fileID: 100004, guid: 91750233941940ad895cb5949f795d3b, type: 3}
-    position: {x: -2.0, y: -3.3, z: 0}
+    position: {x: -2, y: -3.3, z: 0}
   - data: {fileID: 11400000, guid: aad88d1e579a428186decdb6e394b558, type: 2}
     prefab: {fileID: 100004, guid: fac8b362c8fc436080483e8fb3a41299, type: 3}
     position: {x: -2.67, y: -4.83, z: 0}
@@ -39,19 +39,19 @@ MonoBehaviour:
     position: {x: 0.15, y: -1.95, z: 0}
   - data: {fileID: 11400000, guid: a1b2c3d4e5f64001a2b3c4d5e6f70001, type: 2}
     prefab: {fileID: 100004, guid: b1b2c3d4e5f64001a2b3c4d5e6f70001, type: 3}
-    position: {x: -1.5, y: 2.0, z: 0}
+    position: {x: -1.5, y: 2, z: 0}
   - data: {fileID: 11400000, guid: a1b2c3d4e5f64001a2b3c4d5e6f70002, type: 2}
     prefab: {fileID: 100004, guid: b1b2c3d4e5f64001a2b3c4d5e6f70002, type: 3}
     position: {x: -1.8, y: 0.4, z: 0}
   - data: {fileID: 11400000, guid: a1b2c3d4e5f64001a2b3c4d5e6f70003, type: 2}
     prefab: {fileID: 100004, guid: b1b2c3d4e5f64001a2b3c4d5e6f70003, type: 3}
-    position: {x: 2.0, y: -4.0, z: 0}
+    position: {x: 2, y: -4, z: 0}
   - data: {fileID: 11400000, guid: a1b2c3d4e5f64001a2b3c4d5e6f70004, type: 2}
     prefab: {fileID: 100004, guid: b1b2c3d4e5f64001a2b3c4d5e6f70004, type: 3}
-    position: {x: 2.0, y: 0.5, z: 0}
+    position: {x: 2, y: 0.5, z: 0}
   - data: {fileID: 11400000, guid: a1b2c3d4e5f64001a2b3c4d5e6f70005, type: 2}
     prefab: {fileID: 100004, guid: b1b2c3d4e5f64001a2b3c4d5e6f70005, type: 3}
-    position: {x: 1.8, y: -1.0, z: 0}
+    position: {x: 1.8, y: -1, z: 0}
   - data: {fileID: 11400000, guid: a1b2c3d4e5f64001a2b3c4d5e6f70006, type: 2}
     prefab: {fileID: 100004, guid: b1b2c3d4e5f64001a2b3c4d5e6f70006, type: 3}
     position: {x: 0.2, y: 2.5, z: 0}
