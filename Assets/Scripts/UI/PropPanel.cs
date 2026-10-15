@@ -180,12 +180,12 @@ namespace Yoegoe.UI
             if (prop == null || selectedAgent == null) return;
             var a = selectedAgent;
             if (WhyNot(a, out _) != null) { Rebuild(); return; }
-            // 고른 목적지(selectedDest)와 propId가 같은 실제 기물에 앉힌다 —
+            // 고른 목적지(selectedDest)와 propId가 같은 실제 기물로 걸어간다 —
             // 드래그로 건드린 기물(prop)이 아니라 고른 목적지가 진짜 자리다.
             var seatProp = ResolveSeatProp(prop, selectedDest);
             if (seatProp == null || seatProp.IsOccupied || seatProp.IsStorageHalted) { Rebuild(); return; }
             if (seatProp.HasDestinations) seatProp.DestinationId = selectedDest;
-            if (a.TrySitOnProp(seatProp))
+            if (a.WalkToProp(seatProp))
             {
                 a.SayCatalogLine(e => e.GoLinesFor(seatProp.ResourceType));
                 GameSaveBridge.RequestSave();
