@@ -9,23 +9,14 @@ namespace Yoegoe.UI
     /// 빈 캐릭터 슬롯 탭 → 소환 확인 / 잠긴 슬롯 해금 확인.
     /// 셸은 <see cref="ConfirmPopup"/> Prefab. (기획 9-1)
     /// </summary>
-    public class SummonPopup : MonoBehaviour
+    public class SummonPopup : SingletonBehaviour<SummonPopup>
     {
-        public static SummonPopup Instance { get; private set; }
-
         public Font font;
         public CharacterData goraniData;
 
         enum Mode { Summon, Unlock }
         Mode mode;
         CharacterId target = CharacterId.Gorani;
-
-        void Awake() => Instance = this;
-
-        void OnDestroy()
-        {
-            if (Instance == this) Instance = null;
-        }
 
         /// <summary>빈 슬롯 소환 확인. target: 3번째 슬롯 고라니, 4번째(연 뒤) 구미호.</summary>
         public void Open(CharacterId summonTarget = CharacterId.Gorani)

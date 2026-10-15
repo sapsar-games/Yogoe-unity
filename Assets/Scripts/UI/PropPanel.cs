@@ -18,9 +18,8 @@ namespace Yoegoe.UI
     /// 친밀도가 모자란 요괴를 고르면 "거기는 가기 싫어." 하고 필요한 친밀도를 보여 준다.
     /// 셸은 Prefab(Assets/Prefabs/UI/PropPanel.prefab), 목적지·요괴 칸 등 동적 콘텐츠만 코드로 만든다.
     /// </summary>
-    public class PropPanel : MonoBehaviour
+    public class PropPanel : SingletonBehaviour<PropPanel>
     {
-        public static PropPanel Instance { get; private set; }
         public Font font;
 
         [SerializeField] GameObject root;
@@ -46,31 +45,24 @@ namespace Yoegoe.UI
         static readonly Color Btn = new Color(0.3f, 0.5f, 0.45f, 1f);
         static readonly Color BtnOff = new Color(0.3f, 0.28f, 0.26f, 1f);
 
-        void Awake()
+        protected override void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
-            Instance = this;
+            base.Awake();
             if (root != null) root.SetActive(false);
             MapPointerRouter.PropPanelRequested += Open;
         }
 
         void Start()
         {
-            Wire(dimButton, Close);
-            Wire(closeButton, Close);
+            UiButtonUtils.Bind(dimButton, Close);
+            UiButtonUtils.Bind(closeButton, Close);
         }
 
-        void OnDestroy()
+        protected override void OnDestroy()
         {
-            if (Instance == this) Instance = null;
+            base.OnDestroy();
             MapPointerRouter.PropPanelRequested -= Open;
-        }
-
-        static void Wire(Button b, UnityEngine.Events.UnityAction action)
-        {
-            if (b == null) return;
-            b.onClick.RemoveAllListeners();
-            b.onClick.AddListener(action);
         }
 
         public bool IsOpen => root != null && root.activeSelf;

@@ -37,10 +37,8 @@ namespace Yoegoe.UI
     /// 탭하면 HUD 수량창으로 비행 → 재개 → 3초 후 최저 기력 1명 공양물 요구.
     /// (중도 나가기에는 YutScreen이 Begin을 호출하지 않는다.)
     /// </summary>
-    public class PostYutLootPresenter : MonoBehaviour
+    public class PostYutLootPresenter : SingletonBehaviour<PostYutLootPresenter>
     {
-        public static PostYutLootPresenter Instance { get; private set; }
-
         public const float OfferingRequestDelaySeconds = 3f;
         const float FlyDuration = 0.45f;
         const float IconWorldScale = 0.38f;
@@ -68,14 +66,14 @@ namespace Yoegoe.UI
             return go.AddComponent<PostYutLootPresenter>();
         }
 
-        void Awake()
+        protected override void Awake()
         {
             if (Instance != null && Instance != this)
             {
                 Destroy(gameObject);
                 return;
             }
-            Instance = this;
+            base.Awake();
         }
 
         void LateUpdate()
@@ -94,9 +92,9 @@ namespace Yoegoe.UI
             }
         }
 
-        void OnDestroy()
+        protected override void OnDestroy()
         {
-            if (Instance == this) Instance = null;
+            base.OnDestroy();
             ClearVisuals();
             UnpauseAll();
         }

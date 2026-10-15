@@ -11,9 +11,8 @@ namespace Yoegoe.UI
     /// 못 본 요리는 잠긴 '?' 칸. 공양간 요리 중에 열면 타이머가 멈춘다(<see cref="IsShowing"/>).
     /// 셸은 Prefab(Assets/Prefabs/UI/CodexScreen.prefab), 칸은 동적 콘텐츠.
     /// </summary>
-    public class CodexScreen : MonoBehaviour
+    public class CodexScreen : SingletonBehaviour<CodexScreen>
     {
-        public static CodexScreen Instance { get; private set; }
         public static bool IsShowing => Instance != null && Instance.panel != null && Instance.panel.activeSelf;
 
         [SerializeField] GameObject panel;
@@ -30,9 +29,9 @@ namespace Yoegoe.UI
         static readonly Color LockedCell = new Color(0.16f, 0.13f, 0.11f, 1f);
         static readonly Color HeaderColor = new Color(1f, 0.85f, 0.55f, 1f);
 
-        void Awake()
+        protected override void Awake()
         {
-            Instance = this;
+            base.Awake();
             if (panel != null) panel.SetActive(false);
             if (detailPanel != null) detailPanel.SetActive(false);
         }
@@ -49,11 +48,6 @@ namespace Yoegoe.UI
                 detailCloseButton.onClick.RemoveAllListeners();
                 detailCloseButton.onClick.AddListener(() => detailPanel.SetActive(false));
             }
-        }
-
-        void OnDestroy()
-        {
-            if (Instance == this) Instance = null;
         }
 
         public void Open()

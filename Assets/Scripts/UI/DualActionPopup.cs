@@ -10,10 +10,8 @@ namespace Yoegoe.UI
     /// 공통 이중 선택 팝업 셸 — 일괄 수거(1배/광고 2배) · 윷 토큰(엽전 구매/광고 충전).
     /// Prefab화 전이므로 런타임 Build. 호출은 <see cref="OpenBatch"/> / <see cref="OpenYutTokenShop"/>.
     /// </summary>
-    public class DualActionPopup : MonoBehaviour
+    public class DualActionPopup : SingletonBehaviour<DualActionPopup>
     {
-        public static DualActionPopup Instance { get; private set; }
-
         public Font font;
 
         GameObject root;
@@ -38,17 +36,10 @@ namespace Yoegoe.UI
         const int AdGrantTokens = 1;
         const float AdWatchSeconds = 0.8f;
 
-        void Awake() => Instance = this;
-
         void Start()
         {
             EnsureBuilt();
             root.SetActive(false);
-        }
-
-        void OnDestroy()
-        {
-            if (Instance == this) Instance = null;
         }
 
         /// <summary>7-2 일괄 수거. fxFrom은 꽃잎 출발(옥토끼 일괄 버튼).</summary>

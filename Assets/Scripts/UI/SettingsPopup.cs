@@ -9,10 +9,8 @@ namespace Yoegoe.UI
     /// 고른 값은 기기에 저장(<see cref="UiTextScale"/>)되고 게임 전체 글자에 바로 적용된다.
     /// 코드로만 만든다(프리팹 없음) — GiftBundlePopup 과 같은 방식.
     /// </summary>
-    public class SettingsPopup : MonoBehaviour
+    public class SettingsPopup : SingletonBehaviour<SettingsPopup>
     {
-        public static SettingsPopup Instance { get; private set; }
-
         public Font font;
 
         GameObject root;
@@ -26,15 +24,10 @@ namespace Yoegoe.UI
         static readonly Color ButtonOff = new Color(0.32f, 0.25f, 0.19f, 1f);
         static readonly Color ButtonOn = new Color(0.78f, 0.58f, 0.25f, 1f);
 
-        void Awake()
+        protected override void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
-            Instance = this;
-        }
-
-        void OnDestroy()
-        {
-            if (Instance == this) Instance = null;
+            base.Awake();
         }
 
         public void Open()

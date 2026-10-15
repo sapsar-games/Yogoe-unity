@@ -8,23 +8,14 @@ namespace Yoegoe.UI
     /// <summary>
     /// 빈 자리(자물쇠) 탭 → 구매 확인. 셸은 <see cref="ConfirmPopup"/> Prefab.
     /// </summary>
-    public class PropPurchasePopup : MonoBehaviour
+    public class PropPurchasePopup : SingletonBehaviour<PropPurchasePopup>
     {
-        public static PropPurchasePopup Instance { get; private set; }
-
         PropSlot target;
         /// <summary>자물쇠 위에 드롭해서 팝업을 열었을 때 — 건설 성공 후 앉힐 요괴.</summary>
         CharacterAgent sitAfterBuild;
 
-        void Awake() => Instance = this;
-
         void OnEnable() => MapPointerRouter.PropPurchaseRequested += Open;
         void OnDisable() => MapPointerRouter.PropPurchaseRequested -= Open;
-
-        void OnDestroy()
-        {
-            if (Instance == this) Instance = null;
-        }
 
         public void Open(PropSlot prop) => Open(prop, null);
 

@@ -8,10 +8,8 @@ namespace Yoegoe.UI
     /// 범용 예/아니오 확인 팝업. 셸은 Prefab(Assets/Prefabs/UI/ConfirmPopup.prefab) — 다른 화면(공양간 850)보다 위(900).
     /// 사용: <c>ConfirmPopup.Show("재료가 모자라는데도 요리할까요?", onYes)</c>. 바깥(어두운 배경)·아니오 = 취소.
     /// </summary>
-    public class ConfirmPopup : MonoBehaviour
+    public class ConfirmPopup : SingletonBehaviour<ConfirmPopup>
     {
-        public static ConfirmPopup Instance { get; private set; }
-
         [SerializeField] GameObject panel;
         [SerializeField] Text messageText;
         [SerializeField] Button yesButton;
@@ -25,29 +23,17 @@ namespace Yoegoe.UI
 
         public bool IsOpen => panel != null && panel.activeSelf;
 
-        void Awake()
+        protected override void Awake()
         {
-            Instance = this;
+            base.Awake();
             if (panel != null) panel.SetActive(false);
         }
 
         void Start()
         {
-            Wire(yesButton, () => Answer(true));
-            Wire(noButton, () => Answer(false));
-            Wire(dimButton, () => Answer(false));
-        }
-
-        void OnDestroy()
-        {
-            if (Instance == this) Instance = null;
-        }
-
-        static void Wire(Button b, UnityEngine.Events.UnityAction action)
-        {
-            if (b == null) return;
-            b.onClick.RemoveAllListeners();
-            b.onClick.AddListener(action);
+            UiButtonUtils.Bind(yesButton, () => Answer(true));
+            UiButtonUtils.Bind(noButton, () => Answer(false));
+            UiButtonUtils.Bind(dimButton, () => Answer(false));
         }
 
         /// <summary>팝업을 띄운다. 팝업이 없으면(씬 미배치) 묻지 않고 onYes를 바로 실행한다.</summary>

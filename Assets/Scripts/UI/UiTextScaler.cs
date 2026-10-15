@@ -10,10 +10,8 @@ namespace Yoegoe.UI
     /// — 프리팹·코드 어디서 만든 글자든 손대지 않고 따라오게. 새로 생긴 글자는 주기적으로 찾아 적용.
     /// 요괴 말풍선은 크기에 맞춰 배경을 그리므로 여기서 빼고 CharacterAgent 가 직접 배율을 쓴다.
     /// </summary>
-    public class UiTextScaler : MonoBehaviour
+    public class UiTextScaler : SingletonBehaviour<UiTextScaler>
     {
-        public static UiTextScaler Instance { get; private set; }
-
         const float ScanInterval = 0.3f;
         const int PurgeEveryScans = 30;
         int scans;
@@ -29,16 +27,16 @@ namespace Yoegoe.UI
         /// <summary>말풍선 등 직접 크기를 관리하는 TextMesh 는 이 이름 끝을 붙인다.</summary>
         public const string ExcludeSuffix = "_Bubble";
 
-        void Awake()
+        protected override void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
-            Instance = this;
+            base.Awake();
             UiTextScale.Changed += ApplyNow;
         }
 
-        void OnDestroy()
+        protected override void OnDestroy()
         {
-            if (Instance == this) Instance = null;
+            base.OnDestroy();
             UiTextScale.Changed -= ApplyNow;
         }
 

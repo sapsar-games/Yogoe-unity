@@ -18,7 +18,7 @@ namespace Yoegoe.UI
     /// 윷놀이 진입점(11장). 윷 토큰 소모 → 현재 슬롯의 혼 전원(옥토끼 제외 — v1.3 NPC화) vs 이무기(말 1개) →
     /// 완주 시 부적 지급까지의 최소 완결 루프. 화면/입력은 YutMiniGame, 규칙은 YutMatch가 담당.
     /// </summary>
-    public partial class YutScreen : MonoBehaviour, IYutChallengeHost, IYutSquareRewardHost
+    public partial class YutScreen : SingletonBehaviour<YutScreen>, IYutChallengeHost, IYutSquareRewardHost
     {
         YutMiniGame IYutChallengeHost.MiniGame => miniGame;
         void IYutChallengeHost.ShowNotice(string message, Action onOk) => ShowNotice(message, onOk);
@@ -40,8 +40,6 @@ namespace Yoegoe.UI
         void IYutSquareRewardHost.RefreshCollectedItemsDisplay() => RefreshCollectedItemsDisplay();
         void IYutSquareRewardHost.SaveFromWorld() => GameSaveBridge.SaveFromWorld();
         void IYutSquareRewardHost.OnSquareRewardFlowEnded(bool pendingBonusThrow) => OnSquareRewardFlowEnded(pendingBonusThrow);
-
-        public static YutScreen Instance { get; private set; }
 
         public Font font;
 
@@ -167,9 +165,9 @@ namespace Yoegoe.UI
         Action pendingReviveYes;
         Action pendingReviveNo;
 
-        void Awake()
+        protected override void Awake()
         {
-            Instance = this;
+            base.Awake();
             CharacterSummon.Summoned += OnCharacterSummoned;
         }
 
@@ -181,9 +179,9 @@ namespace Yoegoe.UI
             IsOpen = false;
         }
 
-        void OnDestroy()
+        protected override void OnDestroy()
         {
-            if (Instance == this) Instance = null;
+            base.OnDestroy();
             CharacterSummon.Summoned -= OnCharacterSummoned;
             Yoegoe.Core.UiBlockGate.Unregister(this);
         }

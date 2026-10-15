@@ -10,19 +10,10 @@ using Yoegoe.Save;
 namespace Yoegoe.UI
 {
     /// <summary>9-1 소환 연출: 암전 → 빛나는 요괴가 화면 중앙으로 하강.</summary>
-    public class SummonCeremony : MonoBehaviour
+    public class SummonCeremony : SingletonBehaviour<SummonCeremony>
     {
-        public static SummonCeremony Instance { get; private set; }
-
         public Font font;
         public CharacterData goraniData;
-
-        void Awake() => Instance = this;
-
-        void OnDestroy()
-        {
-            if (Instance == this) Instance = null;
-        }
 
         public bool TryPlay(CharacterId target = CharacterId.Gorani)
         {

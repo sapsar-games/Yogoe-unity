@@ -17,9 +17,8 @@ namespace Yoegoe.UI
     /// - 위 줄: 기억 조각 · 줄 n/5 · 다음 혼령까지 · 바로 내줄 수 있는 혼령 수
     /// 맵의 나루터 위에는 기다리는 혼령 수 배지를 띄운다. 규칙은 <see cref="SpiritPier"/>.
     /// </summary>
-    public class PierScreen : MonoBehaviour
+    public class PierScreen : SingletonBehaviour<PierScreen>
     {
-        public static PierScreen Instance { get; private set; }
         public Font font;
 
         static readonly string[] KindNames = { "여자", "남자", "노인", "어린이" };
@@ -44,17 +43,17 @@ namespace Yoegoe.UI
         TextMesh badge;
         PropSlot pierProp;
 
-        void Awake()
+        protected override void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
-            Instance = this;
+            base.Awake();
             SpiritPier.Served += OnServed;
             SpiritPier.Left += OnLeft;
         }
 
-        void OnDestroy()
+        protected override void OnDestroy()
         {
-            if (Instance == this) Instance = null;
+            base.OnDestroy();
             SpiritPier.Served -= OnServed;
             SpiritPier.Left -= OnLeft;
         }

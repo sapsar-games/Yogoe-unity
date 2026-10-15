@@ -11,10 +11,8 @@ namespace Yoegoe.UI
     /// <summary>
     /// 12장 고가구점. 레이아웃은 Prefab(<c>Assets/Prefabs/UI/ShopScreen.prefab</c>)만 사용.
     /// </summary>
-    public class ShopScreen : MonoBehaviour
+    public class ShopScreen : SingletonBehaviour<ShopScreen>
     {
-        public static ShopScreen Instance { get; private set; }
-
         /// <summary>set 될 때마다 UiBlockGate에 자동 등록/해제 — 열려 있는 동안 맵 입력 차단
         /// (프리팹의 Background raycastTarget 설정에만 기대지 않는 안전망).</summary>
         bool isOpen;
@@ -91,8 +89,6 @@ namespace Yoegoe.UI
 
         int dialogueIndex;
 
-        void Awake() => Instance = this;
-
         void Start()
         {
             if (!EnsureShell()) return;
@@ -100,9 +96,9 @@ namespace Yoegoe.UI
             root.SetActive(false);
         }
 
-        void OnDestroy()
+        protected override void OnDestroy()
         {
-            if (Instance == this) Instance = null;
+            base.OnDestroy();
             Yoegoe.Core.UiBlockGate.Unregister(this);
         }
 
@@ -267,23 +263,23 @@ namespace Yoegoe.UI
             if (root == null) return;
             BindMissingRefsFromHierarchy();
 
-            BindButton(root.transform.Find("Imugi"), OnImugiTapped);
-            BindButton(root.transform.Find("LeftFood/PriceBuy"), OnBuyLeft);
-            BindButton(root.transform.Find("RightFood/PriceBuy"), OnBuyRight);
-            BindButton(root.transform.Find("Hyang/PriceBuy"), OnBuyHyang);
-            BindButton(root.transform.Find("Reroll"), OnReroll);
-            BindButton(root.transform.Find("Close"), () => Close());
+            UiButtonUtils.Bind(root.transform.Find("Imugi"), OnImugiTapped);
+            UiButtonUtils.Bind(root.transform.Find("LeftFood/PriceBuy"), OnBuyLeft);
+            UiButtonUtils.Bind(root.transform.Find("RightFood/PriceBuy"), OnBuyRight);
+            UiButtonUtils.Bind(root.transform.Find("Hyang/PriceBuy"), OnBuyHyang);
+            UiButtonUtils.Bind(root.transform.Find("Reroll"), OnReroll);
+            UiButtonUtils.Bind(root.transform.Find("Close"), () => Close());
 
             for (int i = 0; i < Packages.Length; i++)
             {
                 int captured = i;
-                BindButton(root.transform.Find("Pkg_" + Packages[i].Id), () => OpenPackage(captured));
+                UiButtonUtils.Bind(root.transform.Find("Pkg_" + Packages[i].Id), () => OpenPackage(captured));
             }
 
             if (packagePopup != null)
             {
-                BindButton(packagePopup.transform, ClosePackage);
-                BindButton(packagePopup.transform.Find("Box/ClosePkg"), ClosePackage);
+                UiButtonUtils.Bind(packagePopup.transform, ClosePackage);
+                UiButtonUtils.Bind(packagePopup.transform.Find("Box/ClosePkg"), ClosePackage);
             }
         }
 
@@ -326,13 +322,5 @@ namespace Yoegoe.UI
             }
         }
 
-        static void BindButton(Transform t, UnityEngine.Events.UnityAction action)
-        {
-            if (t == null || action == null) return;
-            var btn = t.GetComponent<Button>();
-            if (btn == null) return;
-            btn.onClick.RemoveAllListeners();
-            btn.onClick.AddListener(action);
-        }
     }
 }

@@ -10,10 +10,8 @@ namespace Yoegoe.UI
 /// <summary>
 /// 공양간(요리 미니게임). Prefab: Assets/Prefabs/UI/GongyangganScreen.prefab
 /// </summary>
-public class GongyangganScreen : MonoBehaviour
+public class GongyangganScreen : SingletonBehaviour<GongyangganScreen>
 {
-    public static GongyangganScreen Instance { get; private set; }
-
     public Font font;
 
     [SerializeField] GameObject root;
@@ -40,11 +38,6 @@ public class GongyangganScreen : MonoBehaviour
     CookingSession session;
     CookingCharmType selectedCharm = CookingCharmType.None;
     bool pointerDown;
-
-    void Awake()
-    {
-        Instance = this;
-    }
 
     void OnEnable()
     {
@@ -87,9 +80,9 @@ public class GongyangganScreen : MonoBehaviour
         IsOpen = false;
     }
 
-    void OnDestroy()
+    protected override void OnDestroy()
     {
-        if (Instance == this) Instance = null;
+        base.OnDestroy();
         Yoegoe.Core.UiBlockGate.Unregister(this);
         if (session != null)
         {

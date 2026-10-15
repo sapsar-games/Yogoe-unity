@@ -7,9 +7,8 @@ namespace Yoegoe.UI
     /// 맵 화면 아래쪽에 잠깐 뜨는 안내 토스트 (v1.2 시연 — 일하는 중 요괴 탭 현황, 부엌으로 안내 등).
     /// 코드로만 만든다(프리팹 없음).
     /// </summary>
-    public class WorldToast : MonoBehaviour
+    public class WorldToast : SingletonBehaviour<WorldToast>
     {
-        public static WorldToast Instance { get; private set; }
         public Font font;
 
         const float ShowSeconds = 2.8f;
@@ -18,15 +17,10 @@ namespace Yoegoe.UI
         GameObject box;
         float hideAt;
 
-        void Awake()
+        protected override void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
-            Instance = this;
-        }
-
-        void OnDestroy()
-        {
-            if (Instance == this) Instance = null;
+            base.Awake();
         }
 
         public static void Show(string message) => Instance?.ShowInternal(message);

@@ -19,9 +19,8 @@ namespace Yoegoe.UI
     ///   누른 채 손가락이 움직이면 스크롤로 보고 멈춤.
     /// 셸은 Prefab(Assets/Prefabs/UI/FeedPopup.prefab), 음식 칸 목록만 동적 콘텐츠로 코드로 만든다.
     /// </summary>
-    public class FeedPopup : MonoBehaviour
+    public class FeedPopup : SingletonBehaviour<FeedPopup>
     {
-        public static FeedPopup Instance { get; private set; }
         public Font font;
 
         [SerializeField] GameObject root;
@@ -58,18 +57,18 @@ namespace Yoegoe.UI
             set { try { PlayerPrefs.SetInt(PrefIncludeOfferings, value ? 1 : 0); PlayerPrefs.Save(); } catch { } }
         }
 
-        void Awake()
+        protected override void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
-            Instance = this;
+            base.Awake();
             if (root != null) root.SetActive(false);
             MapPointerRouter.FeedRequested += Open;
         }
 
         void Start()
         {
-            Wire(closeButton, Close);
-            Wire(dimButton, Close);
+            UiButtonUtils.Bind(closeButton, Close);
+            UiButtonUtils.Bind(dimButton, Close);
             if (foodOnlyButton != null) { foodOnlyButton.onClick.RemoveAllListeners(); foodOnlyButton.onClick.AddListener(() => { IncludeOfferings = false; Refresh(); }); }
             if (inclButton != null) { inclButton.onClick.RemoveAllListeners(); inclButton.onClick.AddListener(() => { IncludeOfferings = true; Refresh(); }); }
             if (goKitchenButton != null)
@@ -85,16 +84,9 @@ namespace Yoegoe.UI
             }
         }
 
-        static void Wire(Button b, UnityEngine.Events.UnityAction action)
+        protected override void OnDestroy()
         {
-            if (b == null) return;
-            b.onClick.RemoveAllListeners();
-            b.onClick.AddListener(action);
-        }
-
-        void OnDestroy()
-        {
-            if (Instance == this) Instance = null;
+            base.OnDestroy();
             MapPointerRouter.FeedRequested -= Open;
         }
 

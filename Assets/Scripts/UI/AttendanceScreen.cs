@@ -15,10 +15,8 @@ namespace Yoegoe.UI
     /// 하루(새벽 4시 기준) 첫 접속 팝업 → 오늘 칸 탭 → 엽전 → 윷 3번 → 옥토끼 대화창(64괘).
     /// 팝업이 떠 있는 동안 ~ 옥토끼 대사가 끝날 때까지 요괴들은 말하지 않는다(SpeechGate).
     /// </summary>
-    public class AttendanceScreen : MonoBehaviour
+    public class AttendanceScreen : SingletonBehaviour<AttendanceScreen>
     {
-        public static AttendanceScreen Instance { get; private set; }
-
         /// <summary>set 될 때마다 UiBlockGate에 자동 등록/해제 — 열려 있는 동안 맵 입력 차단.</summary>
         static bool isOpen;
         public static bool IsOpen
@@ -62,13 +60,7 @@ namespace Yoegoe.UI
         bool busy;
         readonly RectTransform[] sticks = new RectTransform[4];
 
-        void Awake() => Instance = this;
         void OnEnable() => Instance = this;
-
-        void OnDestroy()
-        {
-            if (Instance == this) Instance = null;
-        }
 
         /// <summary>오늘 아직 처리 안 했으면 연다 (Main: 로드 직후·앱 복귀 시). hudFont = 한글 폰트.</summary>
         public static void TryOpenIfDue(Font hudFont)

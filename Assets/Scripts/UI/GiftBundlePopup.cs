@@ -9,10 +9,8 @@ using Yoegoe.Economy;
 namespace Yoegoe.UI
 {
     /// <summary>10장 선물꾸러미. 탭으로 개봉 → 보상 → (1회) 광고/보상권으로 하나 더.</summary>
-    public class GiftBundlePopup : MonoBehaviour
+    public class GiftBundlePopup : SingletonBehaviour<GiftBundlePopup>
     {
-        public static GiftBundlePopup Instance { get; private set; }
-
         public Font font;
         public Sprite closedChestSprite;
         public Sprite openChestSprite;
@@ -32,8 +30,6 @@ namespace Yoegoe.UI
         /// <summary>첫 개봉에 나온 재료 — "하나 더"는 같은 구성을 한 번 더.</summary>
         Yoegoe.Cooking.CookingIngredientId[] lastGranted;
 
-        void Awake() => Instance = this;
-
         void OnEnable() => CharacterRequestState.GiftBundleAwarded += HandleGiftBundleAwarded;
         void OnDisable() => CharacterRequestState.GiftBundleAwarded -= HandleGiftBundleAwarded;
 
@@ -43,11 +39,6 @@ namespace Yoegoe.UI
         {
             EnsureBuilt();
             root.SetActive(false);
-        }
-
-        void OnDestroy()
-        {
-            if (Instance == this) Instance = null;
         }
 
         public void OpenForReward(string messageBeforeOpen, Action closed = null)

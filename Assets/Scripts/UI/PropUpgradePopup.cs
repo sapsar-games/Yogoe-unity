@@ -13,10 +13,8 @@ namespace Yoegoe.UI
     /// 셸은 Prefab(Assets/Prefabs/UI/PropUpgradePopup.prefab), 여기선 문구·버튼 배선만.
     /// 업그레이드해도 닫지 않는다 — 같은 기물을 연달아 올릴 수 있게.
     /// </summary>
-    public class PropUpgradePopup : MonoBehaviour
+    public class PropUpgradePopup : SingletonBehaviour<PropUpgradePopup>
     {
-        public static PropUpgradePopup Instance { get; private set; }
-
         [SerializeField] GameObject panel;
         [SerializeField] Text titleText;
         [SerializeField] Text effectText;
@@ -32,9 +30,9 @@ namespace Yoegoe.UI
 
         public bool IsOpen => panel != null && panel.activeSelf;
 
-        void Awake()
+        protected override void Awake()
         {
-            Instance = this;
+            base.Awake();
             if (panel != null) panel.SetActive(false);
         }
 
@@ -43,23 +41,16 @@ namespace Yoegoe.UI
 
         void Start()
         {
-            Wire(upgradeButton, OnUpgradeClicked);
-            Wire(closeButton, Close);
-            Wire(dimButton, Close);
+            UiButtonUtils.Bind(upgradeButton, OnUpgradeClicked);
+            UiButtonUtils.Bind(closeButton, Close);
+            UiButtonUtils.Bind(dimButton, Close);
             if (GameEconomy.Instance != null) GameEconomy.Instance.OnMeritChanged += OnMeritChanged;
         }
 
-        void OnDestroy()
+        protected override void OnDestroy()
         {
             if (GameEconomy.Instance != null) GameEconomy.Instance.OnMeritChanged -= OnMeritChanged;
-            if (Instance == this) Instance = null;
-        }
-
-        static void Wire(Button b, UnityEngine.Events.UnityAction action)
-        {
-            if (b == null) return;
-            b.onClick.RemoveAllListeners();
-            b.onClick.AddListener(action);
+            base.OnDestroy();
         }
 
         public void Open(PropSlot prop)

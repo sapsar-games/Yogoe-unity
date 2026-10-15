@@ -17,9 +17,8 @@ namespace Yoegoe.UI
     /// 메인 HUD (상단 재화 바 + 하단 슬롯바).
     /// 셸은 Prefab만 사용. 슬롯 칩은 항상 코드로 갱신.
     /// </summary>
-    public class GameHud : MonoBehaviour
+    public class GameHud : SingletonBehaviour<GameHud>
     {
-        public static GameHud Instance { get; private set; }
 
         // 색·글자 크기: Resources/UiStyleSettings.asset
         UiStyleSettings Style => UiStyleSettings.Get();
@@ -106,11 +105,6 @@ namespace Yoegoe.UI
         private PropSlot lastUpgradeTarget;
         private bool lastUpgradeCanAfford;
 
-        private void Awake()
-        {
-            Instance = this;
-        }
-
         private void OnEnable()
         {
             MapPointerRouter.CharacterDetailRequested += HandleCharacterDetailRequested;
@@ -139,11 +133,6 @@ namespace Yoegoe.UI
             if (!GameEconomy.Instance.TryClaimBatchMerit(1)) return;
             BeginMeritCountUpPublic(before, GameEconomy.Instance.MeritPile);
             PlayMeritCollectFxFromWorld(worldPos);
-        }
-
-        private void OnDestroy()
-        {
-            if (Instance == this) Instance = null;
         }
 
         private void HandleCharacterDetailRequested(CharacterAgent agent, string highlight)
