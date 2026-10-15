@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Yoegoe.Characters;
 using Yoegoe.Core;
@@ -29,8 +28,9 @@ namespace Yoegoe.UI
         public Sprite waterIcon;
         public DetailScreen detailScreen;
 
-        [Header("셸 (Prefab/씬 — 비어 있으면 Play 시 코드 조립)")]
+        [Header("셸 (Prefab/씬 — Inspector에서 연결)")]
         [SerializeField] Canvas hudCanvas;
+        [SerializeField] RectTransform currencyRow;
         [SerializeField] Text meritText;
         [SerializeField] RectTransform meritTextRt;
         [SerializeField] Text yeopjeonText;
@@ -38,9 +38,8 @@ namespace Yoegoe.UI
         [SerializeField] Text waterText;
         [SerializeField] Text yutTokenText;
         [SerializeField] Button yutTokenPlusButton;
-        [SerializeField] Button tempResetButton;
-        [SerializeField] Button tempClearCacheButton;
         [SerializeField] Button shopButton;
+        [SerializeField] Button settingsButton;
         [SerializeField] Button yutButton;
         [SerializeField] Transform slotBarRoot;
         [SerializeField] GameObject upgradeButtonRoot;
@@ -49,9 +48,9 @@ namespace Yoegoe.UI
         [SerializeField] Text upgradeNameText;
         [SerializeField] Text upgradeCostText;
 
-        /// <summary>Prefab/씬에 HUD 셸이 이미 연결돼 있는지.</summary>
+        /// <summary>Prefab/씬에 HUD 셸이 이미 연결돼 있는지. 상단은 CurrencyRow만 있으면 됨.</summary>
         public bool HasPrefabShell =>
-            hudCanvas != null && slotBarRoot != null && meritText != null;
+            hudCanvas != null && slotBarRoot != null && currencyRow != null;
 
         private bool upgradeHoldActive;
         private float upgradeHoldTimer;
@@ -162,45 +161,41 @@ namespace Yoegoe.UI
                 "[GameHud] Prefab 셸이 없습니다. Main 씬에 GameHud Prefab 인스턴스를 배치하세요.");
         }
 
-        /// <summary>재화 칩 4개 + [+] 버튼이 한 줄에 다 들어가는 데 필요한 TopBar 최소 폭.</summary>
-        const float MinTopBarWidth = 750f;
-
-        /// <summary>
-        /// 윷 토큰 칩 옆 [+] 버튼 — Prefab에 이미 있으면 그대로 쓰고, 예전 Prefab에도
-        /// 이름으로 찾아 붙여서 항상 나타나게 한다.
-        /// </summary>
-        const string SettingsButtonName = "SettingsButton";
+        /// <summary>재화 칩 + [+] 버튼이 한 줄에 다 들어가는 데 필요한 CurrencyRow 최소 폭.</summary>
+        const float MinCurrencyRowWidth = 750f;
         const float SettingsButtonWidth = 104f;
 
         /// <summary>
-        /// 상단 오른쪽 [설정] — 상점 버튼을 복제해 같은 모양으로 만들고, 상점 버튼은 그 왼쪽으로 민다.
-        /// 프리팹에 없어도(구운 HUD) 매번 Start 에서 찾거나 만든다.
+        /// 상단 오른쪽 [설정] — Prefab에 없으면 상점 버튼을 복제해 만들고 settingsButton에 보관.
         /// </summary>
         void EnsureSettingsButton()
         {
-            if (shopButton == null) return;
-            var parent = shopButton.transform.parent;
-            var existing = parent.Find(SettingsButtonName);
-            Button btn;
-            if (existing != null) btn = existing.GetComponent<Button>();
-            else
+            if (settingsButton == null)
             {
-                var go = Instantiate(shopButton.gameObject, parent);
-                go.name = SettingsButtonName;
-                btn = go.GetComponent<Button>();
-                var rt = (RectTransform)go.transform;
-                var shopRt = (RectTransform)shopButton.transform;
-                rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(1f, 1f);
-                rt.sizeDelta = new Vector2(SettingsButtonWidth, shopRt.sizeDelta.y);
-                rt.anchoredPosition = shopRt.anchoredPosition;
-                var label = go.GetComponentInChildren<Text>(true);
-                if (label != null) label.text = "설정";
-                // 상점 버튼은 설정 버튼 왼쪽으로
-                shopRt.anchoredPosition = shopRt.anchoredPosition + new Vector2(-(SettingsButtonWidth + 12f), 0f);
+                if (shopButton == null) return;
+                var parent = shopButton.transform.parent;
+                // Prefab에 아직 안 넣었으면 런타임 생성분을 이름으로 한 번만 회수 (매 Play마다 복제 방지)
+                var existing = parent.Find("SettingsButton");
+                if (existing != null)
+                    settingsButton = existing.GetComponent<Button>();
+                else
+                {
+                    var go = Instantiate(shopButton.gameObject, parent);
+                    go.name = "SettingsButton";
+                    settingsButton = go.GetComponent<Button>();
+                    var rt = (RectTransform)go.transform;
+                    var shopRt = (RectTransform)shopButton.transform;
+                    rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(1f, 1f);
+                    rt.sizeDelta = new Vector2(SettingsButtonWidth, shopRt.sizeDelta.y);
+                    rt.anchoredPosition = shopRt.anchoredPosition;
+                    var label = go.GetComponentInChildren<Text>(true);
+                    if (label != null) label.text = "설정";
+                    shopRt.anchoredPosition = shopRt.anchoredPosition + new Vector2(-(SettingsButtonWidth + 12f), 0f);
+                }
             }
-            if (btn == null) return;
-            btn.onClick.RemoveAllListeners();
-            btn.onClick.AddListener(() =>
+            if (settingsButton == null) return;
+            settingsButton.onClick.RemoveAllListeners();
+            settingsButton.onClick.AddListener(() =>
             {
                 if (SettingsPopup.Instance != null) SettingsPopup.Instance.Open();
             });
@@ -208,35 +203,22 @@ namespace Yoegoe.UI
 
         void EnsureYutTokenPlusButton()
         {
-            if (yutTokenPlusButton == null)
-            {
-                var row = hudCanvas != null ? hudCanvas.transform.Find("TopBar/CurrencyRow") : null;
-                if (row != null)
-                {
-                    var existing = row.Find("YutTokenPlus");
-                    yutTokenPlusButton = existing != null
-                        ? existing.GetComponent<Button>()
-                        : CreateYutTokenPlusButton(row);
-                }
-            }
+            // Prefab에 yutTokenPlusButton이 연결되어 있어야 함. 없으면 CurrencyRow 아래에 한 번만 생성.
+            if (yutTokenPlusButton == null && currencyRow != null)
+                yutTokenPlusButton = CreateYutTokenPlusButton(currencyRow);
 
-            // 예전 Prefab은 재화 칩 4개 기준 폭(690)으로 굳어 있어서, [+] 버튼이 추가된 뒤로는
-            // 오른쪽 칩(윷 토큰 등)이 잘려 보인다 — 최소 폭만 보장(더 넓게 손댔으면 안 줄임).
-            var topBarRt = hudCanvas != null ? hudCanvas.transform.Find("TopBar") as RectTransform : null;
-            if (topBarRt != null && topBarRt.sizeDelta.x < MinTopBarWidth)
-                topBarRt.sizeDelta = new Vector2(MinTopBarWidth, topBarRt.sizeDelta.y);
+            if (currencyRow != null && currencyRow.sizeDelta.x < MinCurrencyRowWidth)
+                currencyRow.sizeDelta = new Vector2(MinCurrencyRowWidth, currencyRow.sizeDelta.y);
         }
 
         const string BatchCollectButtonName = "BatchCollectButton";
 
-        /// <summary>떡절구 공덕 일괄 수거 버튼 — TopBar 바로 아래, 평소엔 숨김. 코드로만 만든다(버드나무 자리였던 프리팹 요소가 없음).</summary>
+        /// <summary>떡절구 공덕 일괄 수거 버튼 — CurrencyRow 아래, 평소엔 숨김. 코드로만 만든다.</summary>
         void EnsureBatchCollectButton()
         {
             if (hudCanvas == null) return;
-            var existing = hudCanvas.transform.Find(BatchCollectButtonName);
-            batchCollectButton = existing != null
-                ? existing.GetComponent<Button>()
-                : CreateBatchCollectButton(hudCanvas.transform);
+            if (batchCollectButton == null)
+                batchCollectButton = CreateBatchCollectButton(hudCanvas.transform);
 
             batchCollectButton.onClick.RemoveAllListeners();
             batchCollectButton.onClick.AddListener(OnBatchCollectClicked);
@@ -289,29 +271,40 @@ namespace Yoegoe.UI
             batchCollectButton.gameObject.SetActive(false);
         }
 
-        /// <summary>공덕 수거 연출 타겟(상단 공덕 텍스트)으로 꽃잎 Gather.</summary>
+        /// <summary>공덕 수거 연출 타겟 — 공덕 칩이 없으면 엽전/CurrencyRow.</summary>
+        RectTransform MeritFxTargetRt()
+        {
+            if (meritTextRt != null) return meritTextRt;
+            var chip = ChipRt(yeopjeonText);
+            if (chip != null) return chip;
+            return currencyRow;
+        }
+
+        /// <summary>공덕 수거 연출 타겟(상단 재화)으로 꽃잎 Gather.</summary>
         public void PlayMeritCollectFx(RectTransform from)
         {
-            if (hudCanvas == null || meritTextRt == null || from == null) return;
-            MeritCollectFx.Play(hudCanvas, from, meritTextRt, font);
+            var to = MeritFxTargetRt();
+            if (hudCanvas == null || to == null || from == null) return;
+            MeritCollectFx.Play(hudCanvas, from, to, font);
         }
 
         public void PlayMeritCollectFxFromWorld(Vector3 worldPos)
         {
-            if (hudCanvas == null || meritTextRt == null) return;
-            MeritCollectFx.PlayFromWorld(hudCanvas, worldPos, meritTextRt);
+            var to = MeritFxTargetRt();
+            if (hudCanvas == null || to == null) return;
+            MeritCollectFx.PlayFromWorld(hudCanvas, worldPos, to);
         }
 
-        /// <summary>윷 복귀 아이템 비행 목표(월드). 공양물·광고권은 공덕 칩, 없으면 상단 중앙.</summary>
+        /// <summary>윷 복귀 아이템 비행 목표(월드). 공양물·광고권은 공덕 칩, 없으면 엽전.</summary>
         public Vector3 GetLootFlyTargetWorld(YutSquareRewardKind kind, Camera worldCam = null)
         {
             RectTransform rt = kind switch
             {
                 YutSquareRewardKind.Yeopjeon => ChipRt(yeopjeonText),
                 YutSquareRewardKind.Hyang => ChipRt(hyangText),
-                YutSquareRewardKind.Water => ChipRt(waterText),
+                YutSquareRewardKind.Water => ChipRt(waterText) ?? ChipRt(yeopjeonText),
                 YutSquareRewardKind.YutToken => ChipRt(yutTokenText),
-                _ => meritTextRt != null ? meritTextRt : ChipRt(yeopjeonText),
+                _ => MeritFxTargetRt(),
             };
             return UiChipToWorld(rt, worldCam);
         }
@@ -352,9 +345,9 @@ namespace Yoegoe.UI
         const float IdleHideSeconds = 30f;
         const float HideSlideSeconds = 0.3f;
 
-        RectTransform idleTopBarRt;
+        RectTransform idleCurrencyRowRt;
         RectTransform idleSlotBarRt;
-        Vector2 idleTopBarShownPos;
+        Vector2 idleCurrencyRowShownPos;
         Vector2 idleSlotBarShownPos;
         /// <summary>0 = 제자리, 1 = 완전히 숨김. MoveTowards 로만 움직여서 방향이 바뀌어도 끊기지 않는다.</summary>
         float uiHideAmount;
@@ -366,17 +359,17 @@ namespace Yoegoe.UI
 
         void CacheIdleHideTargets()
         {
-            if (idleTopBarRt != null || idleSlotBarRt != null) return;
-            idleTopBarRt = hudCanvas != null ? hudCanvas.transform.Find("TopBar") as RectTransform : null;
+            if (idleCurrencyRowRt != null || idleSlotBarRt != null) return;
+            idleCurrencyRowRt = currencyRow;
             idleSlotBarRt = slotBarRoot as RectTransform;
-            if (idleTopBarRt != null) idleTopBarShownPos = idleTopBarRt.anchoredPosition;
+            if (idleCurrencyRowRt != null) idleCurrencyRowShownPos = idleCurrencyRowRt.anchoredPosition;
             if (idleSlotBarRt != null) idleSlotBarShownPos = idleSlotBarRt.anchoredPosition;
         }
 
         void TickIdleHide()
         {
             CacheIdleHideTargets();
-            if (idleTopBarRt == null && idleSlotBarRt == null) return;
+            if (idleCurrencyRowRt == null && idleSlotBarRt == null) return;
 
             bool blocked = UiBlockGate.IsBlocking
                 || (PropPanel.Instance != null && PropPanel.Instance.IsOpen)
@@ -422,10 +415,10 @@ namespace Yoegoe.UI
 
         void ApplyUiHideAmount(float amount)
         {
-            if (idleTopBarRt != null)
+            if (idleCurrencyRowRt != null)
             {
-                float offset = idleTopBarRt.rect.height + 40f;
-                idleTopBarRt.anchoredPosition = idleTopBarShownPos + new Vector2(0f, offset * amount);
+                float offset = idleCurrencyRowRt.rect.height + 40f;
+                idleCurrencyRowRt.anchoredPosition = idleCurrencyRowShownPos + new Vector2(0f, offset * amount);
             }
             if (idleSlotBarRt != null)
             {
@@ -935,62 +928,24 @@ namespace Yoegoe.UI
             WireUpgradeHoldTriggers();
         }
 
-        /// <summary>
-        /// "초기화"/"캐시 날리기" 버튼은 Button.onClick.AddListener를 코드로만 붙이는데, 이건
-        /// UnityEvent의 "런타임 전용" 리스너라 프리팹에 저장되지 않는다.
-        /// Prefab에 버튼이 남아있으면 이름으로 찾아 매번 다시 연결한다.
-        /// </summary>
+        /// <summary>예전 HUD 테스트 버튼은 설정 팝업으로 옮김 — Prefab에 남아 있으면 숨긴다.</summary>
         void WireTempDebugButtons()
         {
             if (hudCanvas == null) return;
-
-            if (tempResetButton == null)
-                tempResetButton = hudCanvas.transform.Find("TempResetButton")?.GetComponent<Button>();
-            if (tempClearCacheButton == null)
-                tempClearCacheButton = hudCanvas.transform.Find("TempClearCacheButton")?.GetComponent<Button>();
-
-            if (tempResetButton != null)
-            {
-                tempResetButton.onClick.RemoveAllListeners();
-                tempResetButton.onClick.AddListener(OnTempResetClicked);
-            }
-
-            if (tempClearCacheButton != null)
-            {
-                tempClearCacheButton.onClick.RemoveAllListeners();
-                tempClearCacheButton.onClick.AddListener(OnClearCacheClicked);
-            }
+            HideIfExists(hudCanvas.transform, "TempResetButton");
+            HideIfExists(hudCanvas.transform, "TempClearCacheButton");
+            HideIfExists(hudCanvas.transform, "TempSkipTimeButton");
+            HideIfExists(hudCanvas.transform, "TempTimeScale2x");
+            HideIfExists(hudCanvas.transform, "TempTimeScale4x");
+            HideIfExists(hudCanvas.transform, "TempTimeScale8x");
+            HideIfExists(hudCanvas.transform, "TempTimeScale16x");
         }
 
-        private static void OnTempResetClicked()
+        static void HideIfExists(Transform parent, string name)
         {
-            GameSaveService.DeleteSave();
-            ReloadActiveScene();
+            var t = parent.Find(name);
+            if (t != null) t.gameObject.SetActive(false);
         }
-
-        private static void OnClearCacheClicked()
-        {
-            GameSaveService.ClearAllLocalData();
-#if UNITY_WEBGL && !UNITY_EDITOR
-            YogoeClearBrowserCacheAndReload();
-#else
-            ReloadActiveScene();
-#endif
-        }
-
-        static void ReloadActiveScene()
-        {
-            var scene = SceneManager.GetActiveScene();
-            if (scene.buildIndex >= 0)
-                SceneManager.LoadScene(scene.buildIndex);
-            else
-                SceneManager.LoadScene(scene.name);
-        }
-
-#if UNITY_WEBGL && !UNITY_EDITOR
-        [System.Runtime.InteropServices.DllImport("__Internal")]
-        static extern void YogoeClearBrowserCacheAndReload();
-#endif
 
         void WireUpgradeHoldTriggers()
         {

@@ -39,5 +39,12 @@ namespace Yoegoe.Core
             serverOffset = TimeSpan.Zero;
             HasServerTime = false;
         }
+
+        /// <summary>테스트용 — 신뢰 시각을 앞으로 민다 (나루터·오프라인 정산 등).</summary>
+        public static void DebugAdvance(TimeSpan delta)
+        {
+            if (delta <= TimeSpan.Zero) return;
+            serverOffset += delta;
+        }
     }
 }

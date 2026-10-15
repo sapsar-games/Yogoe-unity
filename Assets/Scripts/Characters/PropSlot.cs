@@ -98,7 +98,12 @@ namespace Yoegoe.Characters
             : PropProduction.MeritCapacity(ProductionConfig, level);
 
         private TextMesh pileLabel;
+        private SpriteRenderer pileLabelBg;
+        private TextMesh nameLabel;
+        private SpriteRenderer nameLabelBg;
         private TextMesh lockLabel;
+        private string lastNameLabelText;
+        private static Sprite sharedNameBgSprite;
         private SpriteRenderer spriteRenderer;
         private Renderer meshRenderer;
         private Sprite builtSprite;
@@ -106,7 +111,6 @@ namespace Yoegoe.Characters
         private Color builtTint = Color.white;
         private static Font sharedPileFont;
         private CharacterAgent hiddenOccupantVisual;
-        private int lastPileStage = -1;
         private string lastPileAmount;
         private int lastPileRounded = int.MinValue;
         private double lastPileDisplayKey = double.NaN;
@@ -133,6 +137,7 @@ namespace Yoegoe.Characters
 
         private void LateUpdate()
         {
+            RefreshNameLabel();
             RefreshPileLabel();
             RefreshLockVisual();
             RefreshGoldenSparkle();
@@ -290,6 +295,11 @@ namespace Yoegoe.Characters
             {
                 Destroy(pileLabel.gameObject);
                 pileLabel = null;
+            }
+            if (nameLabel != null)
+            {
+                Destroy(nameLabel.gameObject);
+                nameLabel = null;
             }
             DestroyLevelTag();
         }
