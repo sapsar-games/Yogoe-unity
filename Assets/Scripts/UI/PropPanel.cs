@@ -189,6 +189,8 @@ namespace Yoegoe.UI
             {
                 a.SayCatalogLine(e => e.GoLinesFor(seatProp.ResourceType));
                 GameSaveBridge.RequestSave();
+                Close(); // 걸어가는 중이라 도착 전까진 IsOccupied가 안 바뀌어 화면이 그대로 보이므로, 보내면 바로 닫는다
+                return;
             }
             selectedAgent = null;
             Rebuild();
