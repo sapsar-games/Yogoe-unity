@@ -21,11 +21,15 @@ namespace Yoegoe.Characters
         static bool pending;
         static float readyAt;
 
+        /// <summary>앱 시작 / 오래 비웠다 복귀 시점 통지 — HUD 일괄 수거 버튼 등 "돌아왔을 때만" 뜨는 UI가 구독.</summary>
+        public static event System.Action Returned;
+
         /// <summary>인사 예약 (앱 시작 / 오래 비웠다 복귀).</summary>
         public static void Request()
         {
             pending = true;
             readyAt = Time.unscaledTime + FirstDelaySeconds;
+            Returned?.Invoke();
         }
 
         /// <summary>매 프레임 — 출석 윷점 대사가 끝나야 실행.</summary>

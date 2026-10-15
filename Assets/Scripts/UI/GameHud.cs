@@ -59,6 +59,9 @@ namespace Yoegoe.UI
         private const float UpgradeHoldInitialDelay = 0.35f;
         private const float UpgradeHoldInterval = 0.12f;
 
+        /// <summary>버드나무 삭제(2026-10-13)로 대체된 떡절구 공덕 일괄 수거 — 앱을 켜거나 오래 비웠다 돌아왔을 때만 뜬다.</summary>
+        Button batchCollectButton;
+
         private readonly List<SlotChip> slotChips = new List<SlotChip>();
 
         private class SlotChip
@@ -113,6 +116,7 @@ namespace Yoegoe.UI
             MapPointerRouter.CharacterDetailRequested += HandleCharacterDetailRequested;
             PropSlot.MeritCollectedAtWorld += PlayMeritCollectFxFromWorld;
             MeritBatchCollect.FullRequested += HandleBatchMeritFull;
+            Greeting.Returned += ShowBatchCollectButtonIfAny;
         }
 
         private void OnDisable()
@@ -120,6 +124,7 @@ namespace Yoegoe.UI
             MapPointerRouter.CharacterDetailRequested -= HandleCharacterDetailRequested;
             PropSlot.MeritCollectedAtWorld -= PlayMeritCollectFxFromWorld;
             MeritBatchCollect.FullRequested -= HandleBatchMeritFull;
+            Greeting.Returned -= ShowBatchCollectButtonIfAny;
         }
 
         /// <summary>일괄 수거 만땅: 광고 2배 / 그냥 받기 (공덕은 일괄 대기분으로 옮겨진 상태).</summary>
@@ -152,6 +157,7 @@ namespace Yoegoe.UI
             EnsureHudShell();
             EnsureYutTokenPlusButton();
             EnsureSettingsButton();
+            EnsureBatchCollectButton();
             WireRuntimeListeners();
             RefreshCurrencies();
             RefreshUpgradeButton();
@@ -230,6 +236,68 @@ namespace Yoegoe.UI
             var topBarRt = hudCanvas != null ? hudCanvas.transform.Find("TopBar") as RectTransform : null;
             if (topBarRt != null && topBarRt.sizeDelta.x < MinTopBarWidth)
                 topBarRt.sizeDelta = new Vector2(MinTopBarWidth, topBarRt.sizeDelta.y);
+        }
+
+        const string BatchCollectButtonName = "BatchCollectButton";
+
+        /// <summary>떡절구 공덕 일괄 수거 버튼 — TopBar 바로 아래, 평소엔 숨김. 코드로만 만든다(버드나무 자리였던 프리팹 요소가 없음).</summary>
+        void EnsureBatchCollectButton()
+        {
+            if (hudCanvas == null) return;
+            var existing = hudCanvas.transform.Find(BatchCollectButtonName);
+            batchCollectButton = existing != null
+                ? existing.GetComponent<Button>()
+                : CreateBatchCollectButton(hudCanvas.transform);
+
+            batchCollectButton.onClick.RemoveAllListeners();
+            batchCollectButton.onClick.AddListener(OnBatchCollectClicked);
+            batchCollectButton.gameObject.SetActive(false);
+        }
+
+        Button CreateBatchCollectButton(Transform parent)
+        {
+            var go = new GameObject(BatchCollectButtonName);
+            var rt = SetupRect(go, parent, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+                new Vector2(0.5f, 1f), new Vector2(0f, -140f), new Vector2(300f, 70f));
+
+            var img = go.AddComponent<Image>();
+            img.color = C.hudUpgradeButton;
+            var btn = go.AddComponent<Button>();
+            btn.targetGraphic = img;
+
+            var labelGO = new GameObject("Label");
+            var labelRt = labelGO.AddComponent<RectTransform>();
+            labelRt.SetParent(rt, false);
+            labelRt.anchorMin = Vector2.zero;
+            labelRt.anchorMax = Vector2.one;
+            labelRt.offsetMin = Vector2.zero;
+            labelRt.offsetMax = Vector2.zero;
+            var label = labelGO.AddComponent<Text>();
+            label.font = font;
+            label.fontSize = UiFonts.HudCurrency;
+            label.fontStyle = FontStyle.Bold;
+            label.alignment = TextAnchor.MiddleCenter;
+            label.color = C.hudUpgradeCost;
+            label.text = "공덕 일괄 수거";
+            label.raycastTarget = false;
+
+            return btn;
+        }
+
+        /// <summary>앱 시작/복귀 시점 — 모아 둔(또는 전에 못 받은) 공덕이 있을 때만 버튼을 띄운다.</summary>
+        void ShowBatchCollectButtonIfAny()
+        {
+            if (batchCollectButton == null) return;
+            bool any = MeritBatchCollect.HasMerit
+                || (GameEconomy.Instance != null && GameEconomy.Instance.HasPendingBatchMerit);
+            if (any) batchCollectButton.gameObject.SetActive(true);
+        }
+
+        void OnBatchCollectClicked()
+        {
+            if (batchCollectButton == null) return;
+            MeritBatchCollect.Collect(UiChipToWorld((RectTransform)batchCollectButton.transform, Camera.main));
+            batchCollectButton.gameObject.SetActive(false);
         }
 
         /// <summary>공덕 수거 연출 타겟(상단 공덕 텍스트)으로 꽃잎 Gather.</summary>
