@@ -20,6 +20,9 @@ namespace Yoegoe.Characters
         public PropSlot CurrentProp => currentProp;
         private PropSlot previousProp;
         private PropSlot destination;
+        /// <summary>WalkToProp으로 받은 명시적 목적지(사냥터·채집터 보내기 등). 방황 풀(GetRandomAvailableProp)에
+        /// 못 들어가는 기물일 수 있으므로, 길이 막혀도 이 목적지만은 포기하지 않고 계속 재시도한다.</summary>
+        private PropSlot pinnedDestination;
         private bool isWandering;
         private float wanderTimer;
         private Vector3? wanderTarget; // isWandering 중 실제로 걸어갈 맵 안의 임시 목적지
@@ -65,6 +68,7 @@ namespace Yoegoe.Characters
         {
             // 이전에 찜해둔 목적지가 있으면(도착 못 하고 재추첨하는 경우) 먼저 예약 해제.
             if (destination != null) destination.ReleaseReservation(this);
+            pinnedDestination = null; // 일반 방황 풀에서 다시 고르므로 명시적 목적지는 해제
 
             destination = PropManager.Instance != null
                 ? PropManager.Instance.GetRandomAvailableProp(this, exclude)
@@ -86,7 +90,13 @@ namespace Yoegoe.Characters
             {
                 // 6-2 방황/재추첨 — Docs/06_행동룰.md (후보없음·자리없음을 한 루프로 통합)
                 wanderTimer += dt;
-                if (wanderTimer >= WanderRetrySeconds) { PickDestination(); return; }
+                if (wanderTimer >= WanderRetrySeconds)
+                {
+                    // 명시적으로 보낸 목적지가 있으면(사냥터·채집터 보내기 등) 방황 풀 대신 그 자리로 재시도.
+                    if (pinnedDestination != null) { destination = pinnedDestination; isWandering = false; return; }
+                    PickDestination();
+                    return;
+                }
 
                 if (wanderTarget == null || Vector3.Distance(transform.position, wanderTarget.Value) < 0.05f)
                 {
@@ -127,7 +137,13 @@ namespace Yoegoe.Characters
                 {
                     currentProp = destination;
                     destination = null;
+                    pinnedDestination = null;
                     EnterStaying();
+                }
+                else if (destination == pinnedDestination)
+                {
+                    // 대체 자리가 없는 명시적 목적지(사냥터·채집터)라 다른 후보로 안 돌리고
+                    // 그 자리가 빌 때까지 옆에서 기다렸다 다시 시도한다.
                 }
                 else
                 {
@@ -146,6 +162,10 @@ namespace Yoegoe.Characters
             boundaryStuckTimer += dt;
             if (boundaryStuckTimer < BoundaryStuckSeconds) return;
             boundaryStuckTimer = 0f;
+
+            // 명시적 목적지(사냥터·채집터 보내기 등)는 방황 풀(GetRandomAvailableProp)에 못 들어가는
+            // 기물일 수 있으므로 제외하고 재선정하지 않는다 — 잠시 후 같은 자리로 다시 시도.
+            if (pinnedDestination != null && excludeProp == pinnedDestination) return;
 
             if (excludeProp != null)
             {
@@ -411,6 +431,7 @@ namespace Yoegoe.Characters
 
             EnterWalking(false);
             destination = target;
+            pinnedDestination = target;
 
             isWandering = false;
             return true;
@@ -423,6 +444,7 @@ namespace Yoegoe.Characters
                 destination.ReleaseReservation(this);
                 destination = null;
             }
+            pinnedDestination = null;
             isWandering = false;
             wanderTarget = null;
         }

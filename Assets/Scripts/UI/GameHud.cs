@@ -34,11 +34,6 @@ namespace Yoegoe.UI
         [SerializeField] Text meritText;
         [SerializeField] RectTransform meritTextRt;
         [SerializeField] Text yeopjeonText;
-        [SerializeField] Text hyangText;
-        [SerializeField] Text waterText;
-        [SerializeField] Text yutTokenText;
-        [SerializeField] Button yutTokenPlusButton;
-        [SerializeField] Button shopButton;
         [SerializeField] Button settingsButton;
         [SerializeField] Transform slotBarRoot;
         [SerializeField] GameObject upgradeButtonRoot;
@@ -92,10 +87,6 @@ namespace Yoegoe.UI
         private const float MeritCountDelay = 0.68f;
         private const float MeritCountDuration = 1.35f;
         private int lastYeopjeon = int.MinValue;
-        private int lastHyang = int.MinValue;
-        private int lastWater = int.MinValue;
-        private int lastYutToken = int.MinValue;
-        private int lastYutTokenMax = int.MinValue;
         private string lastUpgradeName;
         private BigNumber lastUpgradeCostValue;
         private bool hasLastUpgradeCost;
@@ -142,7 +133,6 @@ namespace Yoegoe.UI
         private void Start()
         {
             EnsureHudShell();
-            EnsureYutTokenPlusButton();
             EnsureSettingsButton();
             EnsureBatchCollectButton();
             WireRuntimeListeners();
@@ -160,54 +150,15 @@ namespace Yoegoe.UI
                 "[GameHud] Prefab 셸이 없습니다. Main 씬에 GameHud Prefab 인스턴스를 배치하세요.");
         }
 
-        /// <summary>재화 칩 + [+] 버튼이 한 줄에 다 들어가는 데 필요한 CurrencyRow 최소 폭.</summary>
-        const float MinCurrencyRowWidth = 750f;
-        const float SettingsButtonWidth = 104f;
-
-        /// <summary>
-        /// 상단 오른쪽 [설정] — Prefab에 없으면 상점 버튼을 복제해 만들고 settingsButton에 보관.
-        /// </summary>
+        /// <summary>상단 오른쪽 [설정] — Prefab에 고정 배치된 settingsButton의 클릭을 연결한다.</summary>
         void EnsureSettingsButton()
         {
-            if (settingsButton == null)
-            {
-                if (shopButton == null) return;
-                var parent = shopButton.transform.parent;
-                // Prefab에 아직 안 넣었으면 런타임 생성분을 이름으로 한 번만 회수 (매 Play마다 복제 방지)
-                var existing = parent.Find("SettingsButton");
-                if (existing != null)
-                    settingsButton = existing.GetComponent<Button>();
-                else
-                {
-                    var go = Instantiate(shopButton.gameObject, parent);
-                    go.name = "SettingsButton";
-                    settingsButton = go.GetComponent<Button>();
-                    var rt = (RectTransform)go.transform;
-                    var shopRt = (RectTransform)shopButton.transform;
-                    rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(1f, 1f);
-                    rt.sizeDelta = new Vector2(SettingsButtonWidth, shopRt.sizeDelta.y);
-                    rt.anchoredPosition = shopRt.anchoredPosition;
-                    var label = go.GetComponentInChildren<Text>(true);
-                    if (label != null) label.text = "설정";
-                    shopRt.anchoredPosition = shopRt.anchoredPosition + new Vector2(-(SettingsButtonWidth + 12f), 0f);
-                }
-            }
             if (settingsButton == null) return;
             settingsButton.onClick.RemoveAllListeners();
             settingsButton.onClick.AddListener(() =>
             {
                 if (SettingsPopup.Instance != null) SettingsPopup.Instance.Open();
             });
-        }
-
-        void EnsureYutTokenPlusButton()
-        {
-            // Prefab에 yutTokenPlusButton이 연결되어 있어야 함. 없으면 CurrencyRow 아래에 한 번만 생성.
-            if (yutTokenPlusButton == null && currencyRow != null)
-                yutTokenPlusButton = CreateYutTokenPlusButton(currencyRow);
-
-            if (currencyRow != null && currencyRow.sizeDelta.x < MinCurrencyRowWidth)
-                currencyRow.sizeDelta = new Vector2(MinCurrencyRowWidth, currencyRow.sizeDelta.y);
         }
 
         const string BatchCollectButtonName = "BatchCollectButton";
@@ -300,9 +251,6 @@ namespace Yoegoe.UI
             RectTransform rt = kind switch
             {
                 YutSquareRewardKind.Yeopjeon => ChipRt(yeopjeonText),
-                YutSquareRewardKind.Hyang => ChipRt(hyangText),
-                YutSquareRewardKind.Water => ChipRt(waterText) ?? ChipRt(yeopjeonText),
-                YutSquareRewardKind.YutToken => ChipRt(yutTokenText),
                 _ => MeritFxTargetRt(),
             };
             return UiChipToWorld(rt, worldCam);
@@ -458,23 +406,6 @@ namespace Yoegoe.UI
             {
                 lastYeopjeon = eco.Yeopjeon;
                 yeopjeonText.text = "엽전 " + lastYeopjeon;
-            }
-            if (hyangText != null && eco.Hyang != lastHyang)
-            {
-                lastHyang = eco.Hyang;
-                hyangText.text = "향 " + lastHyang;
-            }
-            if (waterText != null && eco.Water != lastWater)
-            {
-                lastWater = eco.Water;
-                waterText.text = "물 " + lastWater;
-            }
-            if (yutTokenText != null
-                && (eco.YutToken != lastYutToken || eco.YutTokenMax != lastYutTokenMax))
-            {
-                lastYutToken = eco.YutToken;
-                lastYutTokenMax = eco.YutTokenMax;
-                yutTokenText.text = "윷 " + lastYutToken + "/" + lastYutTokenMax;
             }
         }
 
@@ -899,15 +830,6 @@ namespace Yoegoe.UI
             // ShopButton/YutButton: Assets/Scripts/UI/UiNavigationButton.cs가 프리팹에 셀프와이어링되어 있음
             // (Yoegoe/Bake GameHud Navigation Buttons로 베이킹) — 여기서 더 와이어링하지 않음.
 
-            if (yutTokenPlusButton != null)
-            {
-                yutTokenPlusButton.onClick.RemoveAllListeners();
-                yutTokenPlusButton.onClick.AddListener(() =>
-                {
-                    if (DualActionPopup.Instance != null) DualActionPopup.Instance.OpenYutTokenShop();
-                });
-            }
-
             WireTempDebugButtons();
             WireUpgradeHoldTriggers();
         }
@@ -948,37 +870,6 @@ namespace Yoegoe.UI
             var exit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
             exit.callback.AddListener(_ => OnUpgradePointerUp());
             trigger.triggers.Add(exit);
-        }
-
-        /// <summary>윷 토큰 칩 옆 작은 [+] — 눌러 DualActionPopup 윷 토큰 상점(엽전 구매/광고 충전)을 연다.</summary>
-        Button CreateYutTokenPlusButton(Transform parent)
-        {
-            const float size = 40f;
-            var go = new GameObject("YutTokenPlus");
-            go.transform.SetParent(parent, false);
-            go.AddComponent<LayoutElement>().preferredWidth = size;
-
-            var img = go.AddComponent<Image>();
-            img.color = C.currencyYutToken;
-            var btn = go.AddComponent<Button>();
-            btn.targetGraphic = img;
-
-            var labelGO = new GameObject("Label");
-            labelGO.transform.SetParent(go.transform, false);
-            var labelRt = labelGO.AddComponent<RectTransform>();
-            labelRt.anchorMin = Vector2.zero;
-            labelRt.anchorMax = Vector2.one;
-            labelRt.offsetMin = Vector2.zero;
-            labelRt.offsetMax = Vector2.zero;
-            var label = labelGO.AddComponent<Text>();
-            label.font = font;
-            label.fontSize = UiFonts.HudCurrency;
-            label.alignment = TextAnchor.MiddleCenter;
-            label.color = C.textOnDark;
-            label.text = "+";
-            label.raycastTarget = false;
-
-            return btn;
         }
 
         private static RectTransform SetupRect(GameObject go, Transform parent, Vector2 anchorMin, Vector2 anchorMax,
