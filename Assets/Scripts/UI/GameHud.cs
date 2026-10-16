@@ -40,7 +40,6 @@ namespace Yoegoe.UI
         [SerializeField] Button yutTokenPlusButton;
         [SerializeField] Button shopButton;
         [SerializeField] Button settingsButton;
-        [SerializeField] Button yutButton;
         [SerializeField] Transform slotBarRoot;
         [SerializeField] GameObject upgradeButtonRoot;
         [SerializeField] RectTransform upgradeButtonRt;
@@ -897,23 +896,8 @@ namespace Yoegoe.UI
 
         void WireRuntimeListeners()
         {
-            if (shopButton != null)
-            {
-                shopButton.onClick.RemoveAllListeners();
-                shopButton.onClick.AddListener(() =>
-                {
-                    if (ShopScreen.Instance != null) ShopScreen.Instance.Open();
-                });
-            }
-
-            if (yutButton != null)
-            {
-                yutButton.onClick.RemoveAllListeners();
-                yutButton.onClick.AddListener(() =>
-                {
-                    if (YutScreen.Instance != null) YutScreen.Instance.Open();
-                });
-            }
+            // ShopButton/YutButton: Assets/Scripts/UI/UiNavigationButton.cs가 프리팹에 셀프와이어링되어 있음
+            // (Yoegoe/Bake GameHud Navigation Buttons로 베이킹) — 여기서 더 와이어링하지 않음.
 
             if (yutTokenPlusButton != null)
             {
