@@ -12,10 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c48ac105ccb6741d59f151fd9c1d1d61, type: 3}
   m_Name: SouthAltar
   m_EditorClassIdentifier: 
-  propId: 남제단
-  displayName: 남제단
+  propId: SouthAltar
+  displayName: "\uB0A8\uC81C\uB2E8"
   icon: {fileID: 21300000, guid: a21c78f104ef4fbfb6403b62b9fb0461, type: 3}
+  resourceType: 1
   baseProductionPerMinute: 0
+  levelGrowth: 1.1
+  meritCapacityMinutes: 30
+  intimacyBonus: 1
+  ownerMultiplier: 2
+  cycleMinutes: 0
+  baseCapacity: 0
+  upgradable: 1
   upgradeBaseCost: 500
   upgradeCostMultiplier: 1.15
   isPrebuilt: 1
@@ -23,4 +31,9 @@ MonoBehaviour:
   owner: 0
   hasUniqueEndingAnimation: 0
   occupiedByOwnerSprite: {fileID: 0}
+  disallowOccupancy: 0
+  opensGongyanggan: 0
+  opensPier: 0
   collectByTap: 1
+  capacityGrowth: 1
+  fixedDestinationId: 

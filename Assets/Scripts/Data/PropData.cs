@@ -41,8 +41,10 @@ namespace Yoegoe.Data
                  "false면 빈 자리(자물쇠)로 시작하며, 최초 구매 비용은 800 * 1.4^(n-1) (n=구매 순서)로 별도 계산.")]
         public bool isPrebuilt;
 
-        [Header("엔딩 기물 (8장): 지정된 캐릭터만 착석 가능, 주인이 앉으면 생산 x2")]
+        [Header("착석 제한 (8장)")]
+        [Tooltip("엔딩 기물: 지정된 캐릭터만 착석 가능, 주인이 앉으면 생산 x2")]
         public bool isEndingProp;
+        [Tooltip("엔딩 기물 주인 (Rabbit=옥토끼, SamjokO=삼족오, Gumiho=구미호, Gorani=고라니)")]
         public CharacterId owner;
 
         [Tooltip("떡절구처럼 전용 애니메이션이 있는지. 없으면 '자기 엔딩 기물 앞에서 기도하기'로 통일 (8장).")]
@@ -51,11 +53,14 @@ namespace Yoegoe.Data
         [Tooltip("주인 캐릭터가 점유 중일 때 기물에 표시할 전용 스프라이트 (예: 옥토끼+떡절구). 비우면 기본 기물 그림 유지.")]
         public Sprite occupiedByOwnerSprite;
 
-        [Header("공양간")]
+        [Tooltip("요괴가 앉을 수 없는 시설인지 (옹달샘·사냥터·채집터·북제단·남제단)")]
+        public bool disallowOccupancy;
+
+        [Header("특수 시설")]
         [Tooltip("탭하면 공양간(요리) 화면을 연다. 화덕.")]
         public bool opensGongyanggan;
 
-        [Tooltip("탭하면 나루터 화면을 연다 (v1.3). 요괴가 앉지 않는 시설.")]
+        [Tooltip("탭하면 나루터 화면을 연다 (v1.3).")]
         public bool opensPier;
 
         [Header("v1.3 제단")]
@@ -68,6 +73,9 @@ namespace Yoegoe.Data
         [Header("v1.3 목적지 (사냥·채집)")]
         [Tooltip("비어 있지 않으면 이 기물의 목적지가 고정된다 (시트 destinations id). 보내기 창에서 목적지 선택 없음.")]
         public string fixedDestinationId;
+
+        
+
     }
 }
 

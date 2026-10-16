@@ -255,7 +255,7 @@ namespace Yoegoe.Characters
         {
             get
             {
-                if (data != null && (data.opensGongyanggan || data.opensPier)) return false; // 화덕·나루터는 시설
+                if (data != null && (data.opensGongyanggan || data.opensPier || data.disallowOccupancy)) return false; // 화덕·나루터·기타 시설
                 return ResourceType != PropResourceType.None;
             }
         }

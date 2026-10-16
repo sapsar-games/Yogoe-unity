@@ -246,9 +246,9 @@ namespace Yoegoe.Tests.EditMode
         public void Config_PrefersSheet_ThenAsset()
         {
             var asset = ScriptableObject.CreateInstance<PropData>();
-            asset.propId = "옹달샘";
+            asset.propId = "Well";
             asset.resourceType = PropResourceType.Merit; // 시트가 이긴다
-            Assert.AreEqual(PropResourceType.Water, PropProduction.Config.Resolve("옹달샘", asset).Type);
+            Assert.AreEqual(PropResourceType.Water, PropProduction.Config.Resolve("Well", asset).Type);
             asset.propId = "시트에_없는_기물";
             Assert.AreEqual(PropResourceType.Merit, PropProduction.Config.Resolve(asset.propId, asset).Type);
             UnityEngine.Object.DestroyImmediate(asset);
@@ -263,7 +263,7 @@ namespace Yoegoe.Tests.EditMode
             var data = new GameSaveData
             {
                 savedAtUtcTicks = now.AddHours(-10).Ticks,
-                props = new[] { new PropSave { propId = "옹달샘", isBuilt = true, level = 1 } },
+                props = new[] { new PropSave { propId = "Well", isBuilt = true, level = 1 } },
                 agents = new[]
                 {
                     new AgentSave

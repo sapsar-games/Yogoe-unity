@@ -18,7 +18,7 @@ namespace Yoegoe.Tests.EditMode
                 savedAtUtcTicks = savedAtUtc.Ticks,
                 props = new[]
                 {
-                    new PropSave { propId = "떡절구", isBuilt = true } // 시트 props 의 공덕 기물
+                    new PropSave { propId = "Mortar", isBuilt = true } // 시트 props 의 공덕 기물
                 },
                 agents = new[]
                 {

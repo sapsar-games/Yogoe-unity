@@ -11,9 +11,9 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c48ac105ccb6741d59f151fd9c1d1d61, type: 3}
   m_Name: HuntingGround
-  m_EditorClassIdentifier:
-  propId: 사냥터
-  displayName: 사냥터
+  m_EditorClassIdentifier: 
+  propId: HuntingGround
+  displayName: "\uC0AC\uB0E5\uD130"
   icon: {fileID: 21300000, guid: 5c56cb30a57f45f69862c7b391a9ae07, type: 3}
   resourceType: 4
   baseProductionPerMinute: 0
@@ -31,8 +31,9 @@ MonoBehaviour:
   owner: 0
   hasUniqueEndingAnimation: 0
   occupiedByOwnerSprite: {fileID: 0}
+  disallowOccupancy: 0
   opensGongyanggan: 0
   opensPier: 0
   collectByTap: 0
   capacityGrowth: 1
-  fixedDestinationId:
+  fixedDestinationId: 

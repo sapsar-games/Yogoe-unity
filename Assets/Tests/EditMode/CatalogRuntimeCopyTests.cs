@@ -11,7 +11,7 @@ namespace Yoegoe.Tests.EditMode
         public void PropRuntimeCopy_AppliesSheet_LeavesSourceUntouched()
         {
             var src = ScriptableObject.CreateInstance<PropData>();
-            src.propId = "옹달샘";
+            src.propId = "Well";
             src.displayName = "옛 이름";
             src.resourceType = PropResourceType.Merit;
 
