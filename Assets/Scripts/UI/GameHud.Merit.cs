@@ -38,7 +38,7 @@ namespace Yoegoe.UI
         Button CreateBatchCollectButton(Transform parent)
         {
             var go = new GameObject(BatchCollectButtonName);
-            var rt = SetupRect(go, parent, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+            var rt = UiRectUtils.SetupRect(go, parent, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
                 new Vector2(0.5f, 1f), new Vector2(0f, -140f), new Vector2(300f, 70f));
 
             var img = go.AddComponent<Image>();

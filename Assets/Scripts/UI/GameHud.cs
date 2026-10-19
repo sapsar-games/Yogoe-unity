@@ -196,17 +196,5 @@ namespace Yoegoe.UI
             if (t != null) t.gameObject.SetActive(false);
         }
 
-        private static RectTransform SetupRect(GameObject go, Transform parent, Vector2 anchorMin, Vector2 anchorMax,
-            Vector2 pivot, Vector2 anchoredPos, Vector2 sizeDelta)
-        {
-            var rt = go.AddComponent<RectTransform>();
-            rt.SetParent(parent, false);
-            rt.anchorMin = anchorMin;
-            rt.anchorMax = anchorMax;
-            rt.pivot = pivot;
-            rt.anchoredPosition = anchoredPos;
-            rt.sizeDelta = sizeDelta;
-            return rt;
-        }
     }
 }

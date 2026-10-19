@@ -143,7 +143,7 @@ namespace Yoegoe.UI
             foreach (var agent in SlotBarAgents())
             {
                 var chipGO = new GameObject("Slot_" + (agent.Data != null ? agent.Data.displayName : "?"));
-                var chipRt = SetupRect(chipGO, slotBarRoot, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+                var chipRt = UiRectUtils.SetupRect(chipGO, slotBarRoot, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                     new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(160, 100));
                 var chipLayout = chipGO.AddComponent<LayoutElement>();
                 chipLayout.preferredWidth = 160;
@@ -161,12 +161,12 @@ namespace Yoegoe.UI
                 });
 
                 var tagGO = new GameObject("StatusTag");
-                SetupRect(tagGO, chipRt, new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0.5f, 0f),
+                UiRectUtils.SetupRect(tagGO, chipRt, new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0.5f, 0f),
                     new Vector2(0, 4), new Vector2(72, 22));
                 var tagBg = tagGO.AddComponent<Image>();
                 tagBg.color = C.hudStatusTag;
                 var tagTextGO = new GameObject("Label");
-                SetupRect(tagTextGO, tagGO.transform, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f),
+                UiRectUtils.SetupRect(tagTextGO, tagGO.transform, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f),
                     Vector2.zero, Vector2.zero);
                 var tagText = tagTextGO.AddComponent<Text>();
                 tagText.font = font;
@@ -178,7 +178,7 @@ namespace Yoegoe.UI
                 tagGO.SetActive(false);
 
                 var nameGO = new GameObject("Name");
-                SetupRect(nameGO, chipRt, new Vector2(0, 1), new Vector2(1, 1), new Vector2(0.5f, 1f),
+                UiRectUtils.SetupRect(nameGO, chipRt, new Vector2(0, 1), new Vector2(1, 1), new Vector2(0.5f, 1f),
                     new Vector2(0, -6), new Vector2(-10, 26));
                 var nameText = nameGO.AddComponent<Text>();
                 nameText.font = font;
@@ -188,13 +188,13 @@ namespace Yoegoe.UI
                 nameText.raycastTarget = false;
 
                 var barBgGO = new GameObject("StaminaBarBg");
-                SetupRect(barBgGO, chipRt, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f),
+                UiRectUtils.SetupRect(barBgGO, chipRt, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f),
                     new Vector2(0, 10), new Vector2(130, 14));
                 var barBg = barBgGO.AddComponent<Image>();
                 barBg.color = C.hudStaminaTrack;
 
                 var barFillGO = new GameObject("StaminaBarFill");
-                var barFillRt = SetupRect(barFillGO, barBgGO.transform, Vector2.zero, Vector2.one,
+                var barFillRt = UiRectUtils.SetupRect(barFillGO, barBgGO.transform, Vector2.zero, Vector2.one,
                     new Vector2(0f, 0.5f), Vector2.zero, Vector2.zero);
                 var barFill = barFillGO.AddComponent<Image>();
                 barFill.color = C.hudStaminaFill;
@@ -222,7 +222,7 @@ namespace Yoegoe.UI
             bool locked = extra == ExtraSlot.Locked;
             var summonTarget = extra == ExtraSlot.SummonGumiho ? CharacterId.Gumiho : CharacterId.Gorani;
             var chipGO = new GameObject(locked ? "Slot_Locked" : "Slot_Summon");
-            var chipRt = SetupRect(chipGO, slotBarRoot, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+            var chipRt = UiRectUtils.SetupRect(chipGO, slotBarRoot, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(160, 100));
             var chipLayout = chipGO.AddComponent<LayoutElement>();
             chipLayout.preferredWidth = 160;
@@ -241,7 +241,7 @@ namespace Yoegoe.UI
             });
 
             var nameGO = new GameObject("Name");
-            SetupRect(nameGO, chipRt, new Vector2(0, 0), new Vector2(1, 1), new Vector2(0.5f, 0.5f),
+            UiRectUtils.SetupRect(nameGO, chipRt, new Vector2(0, 0), new Vector2(1, 1), new Vector2(0.5f, 0.5f),
                 Vector2.zero, Vector2.zero);
             var nameText = nameGO.AddComponent<Text>();
             nameText.font = font;

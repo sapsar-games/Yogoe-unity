@@ -129,7 +129,7 @@ namespace Yoegoe.UI
             var q = CreateText(circle, mark, F.title, TextAnchor.MiddleCenter);
             q.color = C.textDark;
             q.raycastTarget = false;
-            SetupRect(q.gameObject, circle, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f),
+            UiRectUtils.SetupRect(q.gameObject, circle, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f),
                 Vector2.zero, Vector2.zero);
         }
 
@@ -167,7 +167,7 @@ namespace Yoegoe.UI
             }
 
             var iconGO = new GameObject("Icon");
-            SetupRect(iconGO, circleGO.transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+            UiRectUtils.SetupRect(iconGO, circleGO.transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(56, 56));
             var iconImg = iconGO.AddComponent<Image>();
             iconImg.sprite = icon;
@@ -194,14 +194,14 @@ namespace Yoegoe.UI
             tagBg.raycastTarget = false;
             var tagText = CreateText(tagGO.transform, label ?? "", F.caption, TextAnchor.MiddleCenter);
             tagText.color = Color.white;
-            SetupRect(tagText.gameObject, tagGO.transform, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f),
+            UiRectUtils.SetupRect(tagText.gameObject, tagGO.transform, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f),
                 Vector2.zero, Vector2.zero);
         }
 
         Text AttachCountBadge(Transform iconParent, OfferingData offering, bool isWater)
         {
             var badgeGO = new GameObject("CountBadge");
-            SetupRect(badgeGO, iconParent, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f),
+            UiRectUtils.SetupRect(badgeGO, iconParent, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(1f, 1f),
                 new Vector2(-4f, -4f), new Vector2(36f, 22f));
             var bg = badgeGO.AddComponent<Image>();
             bg.color = C.badgeBg;
@@ -215,7 +215,7 @@ namespace Yoegoe.UI
             }
             var text = CreateText(badgeGO.transform, "x" + n, F.caption, TextAnchor.MiddleCenter);
             text.color = Color.white;
-            SetupRect(text.gameObject, badgeGO.transform, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f),
+            UiRectUtils.SetupRect(text.gameObject, badgeGO.transform, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f),
                 Vector2.zero, Vector2.zero);
             offeringCountBadges.Add(new CountBadge
             {
