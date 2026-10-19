@@ -82,7 +82,7 @@ namespace Yoegoe.Tests.EditMode
         [Test]
         public void Catalog_HasSpecValues()
         {
-            Assert.IsTrue(PropCatalog.TryGet("옹달샘", out var well));
+            Assert.IsTrue(PropCatalog.TryGet("Well", out var well));
             Assert.AreEqual(PropResourceType.Water, well.ResourceType);
             Assert.AreEqual(15f, well.cycleMinutes, 0.001f); // v1.2: 모든 기물 15분에 1개 · 보관 15
             Assert.AreEqual(15, well.baseCapacity);
@@ -269,7 +269,7 @@ namespace Yoegoe.Tests.EditMode
                     new AgentSave
                     {
                         characterId = "SamjokO", stamina = 75f, intimacy = 50f,
-                        state = ActionState.Staying, occupiedPropId = "옹달샘"
+                        state = ActionState.Staying, occupiedPropId = "Well"
                     }
                 }
             };

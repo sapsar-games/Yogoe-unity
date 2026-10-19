@@ -26,22 +26,20 @@ MonoBehaviour:
   - 다들 배고프지 않아? 나 좀 출출한데.
   - 새 손님 왔나? 어디 보자~
   walkDown:
-  - {fileID: 21300000, guid: 9b71a38e2217f4db5aed3d5c0b0fc28e, type: 3}
-  - {fileID: 21300000, guid: 3e7db520db2d44dab81c86c3caabc010, type: 3}
-  - {fileID: 21300000, guid: 4f3404e969bfd4de8a25c12de7fa16a9, type: 3}
-  - {fileID: 21300000, guid: fbb7919e4a016474b8ee6ca8a7508595, type: 3}
+  - {fileID: 21300000, guid: 5b4a04b7bc53415d837aed0424ae4190, type: 3}
+  - {fileID: 21300000, guid: bb9e0623f0c844e2a3d72a82bb0fe303, type: 3}
+  - {fileID: 21300000, guid: 3cce3060e0244e9ab1f177e9145d2a7e, type: 3}
+  - {fileID: 21300000, guid: 961fb1dccac346e183c6a678c9ce2321, type: 3}
   walkLeft:
-  - {fileID: 21300000, guid: 9d82c1e6dd1794efab98b816222a5116, type: 3}
-  - {fileID: 21300000, guid: a7d1ff935d9a04e718939a8cde507a6d, type: 3}
-  - {fileID: 21300000, guid: f83b9a014ac314247b22d44c35bfe9d6, type: 3}
-  - {fileID: 21300000, guid: 901a62db50697426b83c20183f8ab418, type: 3}
+  - {fileID: 21300000, guid: f537fc06cd214d6fac577bf5afbc561e, type: 3}
+  - {fileID: 21300000, guid: 0cd866473da94f8a8f859199dce27139, type: 3}
+  - {fileID: 21300000, guid: 83b59444cdca4b5b8b62396bc019e64f, type: 3}
+  - {fileID: 21300000, guid: f22d72acf1564c298bf2984e15cf3754, type: 3}
   walkRight:
-  - {fileID: 2082839472, guid: 052a0f213e91645d59b004deb025be45, type: 3}
-  - {fileID: -320883922, guid: 052a0f213e91645d59b004deb025be45, type: 3}
-  - {fileID: -1157703340, guid: 052a0f213e91645d59b004deb025be45, type: 3}
-  - {fileID: 316354726, guid: 052a0f213e91645d59b004deb025be45, type: 3}
-  - {fileID: -1891192423, guid: 052a0f213e91645d59b004deb025be45, type: 3}
-  - {fileID: -626744401, guid: 052a0f213e91645d59b004deb025be45, type: 3}
+  - {fileID: 21300000, guid: 66fa0151867543d89faff06288439ead, type: 3}
+  - {fileID: 21300000, guid: a36182ea7bfd455bb36e48f46945ef16, type: 3}
+  - {fileID: 21300000, guid: 5797f94c04bd46ee8ec4fb2471e2d65d, type: 3}
+  - {fileID: 21300000, guid: 5e4ce3d83c99477ab4aeb24db271cf60, type: 3}
   walkUp:
   - {fileID: 21300000, guid: 46bf38850abcc4cf8860183bc971d982, type: 3}
   - {fileID: 21300000, guid: 460edd602fed24a5fa66296365ce0830, type: 3}
@@ -63,7 +61,4 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 1d6778ffe87848fda7c0056310a1c1e4, type: 3}
   - {fileID: 21300000, guid: 4566109a73de4b85b80fd812fe4fbcec, type: 3}
   idle:
-  - {fileID: 21300000, guid: 7b89c47d58d14d82bff6ef24d3619b2f, type: 3}
-  - {fileID: 21300000, guid: b1d0d55f921f46f299308481dd458ab1, type: 3}
-  - {fileID: 21300000, guid: ecf66e8390b24d33abaeee4060bf54f7, type: 3}
-  - {fileID: 21300000, guid: 61884e7b94ef4466bf8731cff168227f, type: 3}
+  - {fileID: 21300000, guid: e1349f8b3967495f98159c3f748ef839, type: 3}

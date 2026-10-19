@@ -29,12 +29,13 @@ namespace Yoegoe.UI
         [SerializeField] Button dimButton;
         [SerializeField] Button closeButton;
 
-        PropSlot prop;
-        string selectedDest;
-        CharacterAgent selectedAgent;
-        CharacterAgent refusing;
-        float refuseUntil;
+        PropSlot prop;             // 지금 열려 있는 기물 (허브가 아니라 실제 앉을 자리로 치환된 뒤의 값)
+        string selectedDest;       // 고른 목적지 id (사냥터·채집터일 때만 의미 있음)
+        CharacterAgent selectedAgent; // 보낼 요괴로 고른 카드
+        CharacterAgent refusing;   // 방금 "거기는 가기 싫어"라고 거절한 요괴 (말풍선 잠깐 보여주는 용도)
+        float refuseUntil;         // refusing을 지울 시각 (Time.unscaledTime 기준)
 
+        // 카드·버튼 배경색 팔레트
         static readonly Color TextColor = new Color(1f, 0.95f, 0.85f);
         static readonly Color DimText = new Color(0.85f, 0.78f, 0.66f);
         static readonly Color CardOff = new Color(0.27f, 0.21f, 0.16f, 1f);
@@ -99,6 +100,7 @@ namespace Yoegoe.UI
             return target;
         }
 
+        /// <summary>창 닫기. 선택 상태(selectedAgent 등)도 같이 비운다.</summary>
         public void Close()
         {
             if (root != null) root.SetActive(false);
@@ -108,6 +110,8 @@ namespace Yoegoe.UI
 
         float refreshTimer;
         bool lastOccupied;
+        /// <summary>창이 열려 있는 동안 1초마다 내용을 갱신 (보관함·기력 등은 시간이 지나면 바뀌므로).
+        /// 일하는 중(IsOccupied)이 아니면 누르던 칸이 사라지지 않게 상태가 실제로 바뀔 때만 다시 그린다.</summary>
         void Update()
         {
             if (!IsOpen || prop == null) return;
@@ -123,14 +127,16 @@ namespace Yoegoe.UI
             if (prop.IsOccupied || prop.IsOccupied != lastOccupied || changed) Rebuild();
         }
 
-        // ---------------- 규칙 ----------------
+        // ---------------- 규칙 (누구를 보낼 수 있는지, 보내면 무슨 일이 일어나는지) ----------------
 
+        /// <summary>"보낼 요괴" 칸에 올라올 후보 전체 (옥토끼 제외 — 옥토끼는 떡절구 전용, v1.3).</summary>
         static IEnumerable<CharacterAgent> Workers()
         {
             foreach (var a in CharacterAgent.All)
                 if (a != null && a.Data != null && a.Data.id != CharacterId.Rabbit) yield return a; // 옥토끼는 떡절구만 (v1.3)
         }
 
+        /// <summary>지금 고른 목적지의 destinations 시트 데이터 (이름·친밀도·드랍률 등).</summary>
         PropCatalog.Destination Dest => PropCatalog.FindDestination(selectedDest);
 
         /// <summary>못 보내는 이유 (null = 보낼 수 있음). refuse = 친밀도 부족(누르면 거절 대사).</summary>
@@ -159,6 +165,7 @@ namespace Yoegoe.UI
             return null;
         }
 
+        /// <summary>친밀도가 모자란 요괴 카드를 눌렀을 때 — 거절 말풍선을 2.6초 띄우고 선택은 취소한다.</summary>
         void Refuse(CharacterAgent a)
         {
             refusing = a;
@@ -167,6 +174,7 @@ namespace Yoegoe.UI
             a.ShowTempSpeech(GameSettingsText.Refuse);
         }
 
+        /// <summary>[보내기] 버튼. 고른 요괴를 고른 목적지의 실제 기물로 걷게 한다 (CharacterAgent.WalkToProp).</summary>
         void Send()
         {
             if (prop == null || selectedAgent == null) return;
@@ -201,6 +209,7 @@ namespace Yoegoe.UI
             return touched;
         }
 
+        /// <summary>[불러들이기] 버튼. 일하던 요괴를 내려오게 하고(EnterPlaying) 점유를 비운다.</summary>
         void Recall()
         {
             var a = prop != null ? prop.Occupant : null;
@@ -211,13 +220,15 @@ namespace Yoegoe.UI
             Rebuild();
         }
 
+        /// <summary>[받기] 버튼. 쌓인 보관함/공덕을 수거한다.</summary>
         void Take()
         {
             if (prop != null && prop.HasPendingCollectible && prop.TryCollect()) GameSaveBridge.RequestSave();
             Rebuild();
         }
 
-        string levelNote;
+        string levelNote; // 레벨업 직후 한 번만 보여줄 안내 문구 (다음 Rebuild에서 지워짐)
+        /// <summary>[레벨업] 버튼. 비용을 내고 레벨을 올린다 (실패하면 그냥 다시 그리기만).</summary>
         void LevelUp()
         {
             if (prop == null) return;
@@ -232,8 +243,10 @@ namespace Yoegoe.UI
             Rebuild();
         }
 
-        // ---------------- 화면 ----------------
+        // ---------------- 화면 (body 안의 동적 콘텐츠를 매번 지우고 다시 그림) ----------------
 
+        /// <summary>body를 싹 비우고 지금 상태(점유 여부)에 맞는 화면을 새로 그린다.
+        /// 칸 개수가 상태마다 달라서(목적지 수·요괴 수 등) Prefab 대신 매번 코드로 그리는 방식.</summary>
         void Rebuild()
         {
             if (prop == null || body == null || titleText == null || subText == null) return;
@@ -245,6 +258,7 @@ namespace Yoegoe.UI
             if (prop.IsOccupied) BuildBusy(); else BuildFree();
         }
 
+        /// <summary>제목 밑 한 줄 요약 — 레벨·생산 주기·보관량.</summary>
         string SubLine()
         {
             var c = prop.ProductionConfig;
@@ -256,6 +270,8 @@ namespace Yoegoe.UI
             return $"Lv{prop.level} · {c.CycleMinutes:0}분에 1개 · 보관 {prop.ResourceCapacity}";
         }
 
+        /// <summary>비어 있는 기물 화면: (사냥터·채집터면) 목적지 3칸 → 보낼 요괴 카드들 → 상황 요약 →
+        /// [보내기]/[받기] → 레벨업. y를 계속 깎아가며 위에서 아래로 쌓는 수동 레이아웃.</summary>
         void BuildFree()
         {
             float y = 470f;
@@ -364,6 +380,7 @@ namespace Yoegoe.UI
             BuildLevelRow(y);
         }
 
+        /// <summary>점유된 기물 화면: 누가·어디서 일하는지 → 보관함/기력 게이지 → [불러들이기]/[받기] → 레벨업.</summary>
         void BuildBusy()
         {
             var a = prop.Occupant;
@@ -414,6 +431,7 @@ namespace Yoegoe.UI
             Label("기물마다 한 번에 한 마리만 일해요.", new Vector2(0, -600), 22, DimText);
         }
 
+        /// <summary>바닥에 붙는 레벨업 행 (비용·버튼). 더 못 올리면 아무것도 안 그린다.</summary>
         void BuildLevelRow(float y)
         {
             if (!PropEconomy.CanUpgrade(prop)) return;
@@ -435,10 +453,12 @@ namespace Yoegoe.UI
             }
         }
 
+        /// <summary>[받기] 버튼 라벨 — 공덕이면 금액, 자원이면 개수.</summary>
         string TakeLabel() => prop.ResourceType == PropResourceType.Merit
             ? $"받기 공덕 {prop.PendingMerit.ToDisplayString()}"
             : $"받기 {prop.StoredResources}개";
 
+        /// <summary>목적지 카드에 보이는 "재료 n · 재료 n · 황금 n%" 한 줄 요약.</summary>
         static string DropLine(string destId)
         {
             var sb = new StringBuilder();
@@ -458,6 +478,7 @@ namespace Yoegoe.UI
             return sb.ToString();
         }
 
+        /// <summary>분을 "n분"/"n시간 m분"으로.</summary>
         static string Dur(float minutes)
         {
             int m = Mathf.Max(0, Mathf.RoundToInt(minutes));
@@ -466,6 +487,7 @@ namespace Yoegoe.UI
             return mm > 0 ? $"{h}시간 {mm}분" : $"{h}시간";
         }
 
+        /// <summary>받침 유무에 따라 조사(은/는, 이/가 등)를 골라 붙인다.</summary>
         static string Josa(string word, string withBatchim, string without)
         {
             if (string.IsNullOrEmpty(word)) return without;
@@ -475,13 +497,17 @@ namespace Yoegoe.UI
         }
 
         // ---------------- 동적 칸 (body 안) ----------------
+        // 아래는 전부 범용 UI 레이아웃 헬퍼 — Build*()가 매번 새로 그릴 때 쓰는 블록 조립 함수들.
+        // pos는 body(또는 넘긴 parent) 중심 기준 anchoredPosition.
 
+        /// <summary>인스펙터에 font가 안 꽂혀 있으면 Unity 기본 폰트로 대체.</summary>
         Font FontOrBuiltin()
         {
             if (font == null) font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             return font;
         }
 
+        /// <summary>중앙 피벗·anchoredPosition으로 세팅된 빈 RectTransform 하나 생성.</summary>
         static RectTransform Rect(string name, Transform parent, Vector2 pos, Vector2 size)
         {
             var go = new GameObject(name, typeof(RectTransform));
@@ -493,6 +519,7 @@ namespace Yoegoe.UI
             return rt;
         }
 
+        /// <summary>parent 밑에 텍스트 한 줄(또는 wrap 박스)을 만든다. 클릭을 가리지 않게 raycastTarget은 꺼둠.</summary>
         Text TextIn(Transform parent, string msg, Vector2 pos, int size, Color color, FontStyle style = FontStyle.Normal, Vector2? box = null)
         {
             var t = Rect("Text", parent, pos, box ?? new Vector2(860, 50)).gameObject.AddComponent<Text>();
@@ -508,9 +535,11 @@ namespace Yoegoe.UI
             return t;
         }
 
+        /// <summary>body에 바로 붙는 일반 텍스트 한 줄 (TextIn의 단축형).</summary>
         Text Label(string msg, Vector2 pos, int size, Color color, Vector2? boxSize = null) =>
             TextIn(body, msg, pos, size, color, FontStyle.Normal, boxSize ?? new Vector2(880, 50));
 
+        /// <summary>목적지·요괴 선택용 큰 클릭 카드 (배경 Image + Button). 내용(텍스트)은 호출부에서 TextIn으로 따로 채운다.</summary>
         RectTransform Card(Vector2 pos, Vector2 size, Color color, System.Action onClick)
         {
             var rt = Rect("Card", body, pos, size);
@@ -523,6 +552,7 @@ namespace Yoegoe.UI
             return rt;
         }
 
+        /// <summary>라벨 텍스트까지 포함한 버튼. onClick이 null이면 비활성(회색, 못 누름)으로 그려진다.</summary>
         UnityEngine.UI.Button Button(string label, Vector2 pos, Vector2 size, Color color, System.Action onClick)
         {
             var rt = Rect("Button", body, pos, size);
@@ -536,6 +566,7 @@ namespace Yoegoe.UI
             return b;
         }
 
+        /// <summary>보관함·기력 등에 쓰는 가로 진행바. t는 0~1로 클램프.</summary>
         void Bar(Vector2 pos, float t, Color color)
         {
             var bg = Rect("Bar", body, pos, new Vector2(760, 26));

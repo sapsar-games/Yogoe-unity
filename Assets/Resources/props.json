@@ -1,7 +1,7 @@
 {
   "props": [
     {
-      "propId": "떡절구",
+      "propId": "Mortar",
       "displayName": "떡절구",
       "resourceType": "Merit",
       "cycleMinutes": 0.0,
@@ -17,7 +17,7 @@
       "upgradable": true
     },
     {
-      "propId": "옹달샘",
+      "propId": "Well",
       "displayName": "옹달샘",
       "resourceType": "Water",
       "cycleMinutes": 15.0,
@@ -33,7 +33,7 @@
       "upgradable": true
     },
     {
-      "propId": "멧돼지 앞산",
+      "propId": "BoarHill",
       "displayName": "멧돼지 앞산",
       "resourceType": "Hunt",
       "cycleMinutes": 15.0,
@@ -49,7 +49,7 @@
       "upgradable": true
     },
     {
-      "propId": "꿀벌의 숲",
+      "propId": "BeeForest",
       "displayName": "꿀벌의 숲",
       "resourceType": "Hunt",
       "cycleMinutes": 15.0,
@@ -65,7 +65,7 @@
       "upgradable": true
     },
     {
-      "propId": "파도치는 섬",
+      "propId": "WaveIsland",
       "displayName": "파도치는 섬",
       "resourceType": "Hunt",
       "cycleMinutes": 15.0,
@@ -81,7 +81,7 @@
       "upgradable": true
     },
     {
-      "propId": "첫걸음 들판",
+      "propId": "FirstField",
       "displayName": "첫걸음 들판",
       "resourceType": "Gather",
       "cycleMinutes": 15.0,
@@ -97,7 +97,7 @@
       "upgradable": true
     },
     {
-      "propId": "허수아비 논밭",
+      "propId": "ScarecrowPaddy",
       "displayName": "허수아비 논밭",
       "resourceType": "Gather",
       "cycleMinutes": 15.0,
@@ -113,7 +113,7 @@
       "upgradable": true
     },
     {
-      "propId": "절벽의 약초골",
+      "propId": "HerbCliff",
       "displayName": "절벽의 약초골",
       "resourceType": "Gather",
       "cycleMinutes": 15.0,
@@ -145,7 +145,7 @@
       "upgradable": false
     },
     {
-      "propId": "북제단",
+      "propId": "NorthAltar",
       "displayName": "북제단",
       "resourceType": "Merit",
       "cycleMinutes": 0.0,
@@ -161,7 +161,7 @@
       "upgradable": true
     },
     {
-      "propId": "남제단",
+      "propId": "SouthAltar",
       "displayName": "남제단",
       "resourceType": "Merit",
       "cycleMinutes": 0.0,

@@ -28,7 +28,7 @@ namespace Yoegoe.Tests.EditMode
                         stamina = 100f,
                         intimacy = 0f,
                         state = ActionState.Staying,
-                        occupiedPropId = "떡절구"
+                        occupiedPropId = "Mortar"
                     }
                 }
             };

@@ -7,8 +7,8 @@ namespace Yoegoe.Tests.EditMode
     /// <summary>v1.3 북제단·남제단: 15분에 공덕 300(분당 20) · 보관 3시간 치 · 레벨마다 보관 ×1.1 (생산은 그대로).</summary>
     public class AltarTests
     {
-        [TestCase("북제단")]
-        [TestCase("남제단")]
+        [TestCase("NorthAltar")]
+        [TestCase("SouthAltar")]
         public void Altar_ProducesMerit_CapacityGrowsPerLevel(string id)
         {
             var c = PropProduction.Config.Resolve(id, null);
@@ -22,7 +22,7 @@ namespace Yoegoe.Tests.EditMode
         [Test]
         public void Mortar_Unchanged_CapacityGrowthOne()
         {
-            var c = PropProduction.Config.Resolve("떡절구", null);
+            var c = PropProduction.Config.Resolve("Mortar", null);
             Assert.AreEqual(PropProduction.BaseMeritPerMinute(c, 2) * c.MeritCapacityMinutes, PropProduction.MeritCapacity(c, 2), 0.01);
         }
     }
