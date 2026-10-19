@@ -82,7 +82,10 @@ namespace Yoegoe.Characters
 
         /// <summary>
         /// from → to 로 step 만큼 이동하되 맵 밖으로 못 나가게 한다.
-        /// 막혔으면(경계에 붙어서 거의 못 움직임) blocked=true.
+        /// 직선이 WalkArea 밖(만·반도 등 비-convex 해안선)으로 막히면, 제자리에 멈추는 대신
+        /// 막힌 경계점의 접선 방향으로 미끄러지듯 이동을 시도한다 — 시작·끝점이 둘 다 걸을 수
+        /// 있는 영역이어도 그 사이 직선이 해안선을 가로지르는 경우가 흔해서다.
+        /// 접선으로도 거의 못 움직이면(코너에 낀 경우) 그제서야 blocked=true.
         /// </summary>
         public static Vector3 MoveClamped(Vector3 from, Vector3 to, float step, out bool blocked)
         {
@@ -98,8 +101,35 @@ namespace Yoegoe.Characters
             float got = (clamped - from).magnitude;
             // 목표 방향으로 거의 못 나갔고, 아직 목표와 멀면 경계에 막힌 것
             float remain = Vector2.Distance(new Vector2(clamped.x, clamped.y), new Vector2(to.x, to.y));
-            blocked = want > 0.0001f && got < want * 0.25f && remain > 0.08f;
-            return clamped;
+            bool rawBlocked = want > 0.0001f && got < want * 0.25f && remain > 0.08f;
+
+            if (!rawBlocked || WalkArea == null)
+            {
+                blocked = rawBlocked;
+                return clamped;
+            }
+
+            Vector2 nextXY = new Vector2(next.x, next.y);
+            Vector2 edgePoint = WalkArea.ClosestPoint(nextXY);
+            Vector2 outward = nextXY - edgePoint;
+            if (outward.sqrMagnitude < 1e-6f)
+                outward = new Vector2(from.x, from.y) - edgePoint;
+            if (outward.sqrMagnitude < 1e-6f)
+            {
+                blocked = true;
+                return clamped;
+            }
+            outward.Normalize();
+            Vector2 tangent = new Vector2(-outward.y, outward.x);
+
+            Vector3 slidePlus = Clamp(Vector3.MoveTowards(from, from + (Vector3)(tangent * step), step));
+            Vector3 slideMinus = Clamp(Vector3.MoveTowards(from, from - (Vector3)(tangent * step), step));
+            float gotPlus = (slidePlus - from).magnitude;
+            float gotMinus = (slideMinus - from).magnitude;
+            float slideGot = Mathf.Max(gotPlus, gotMinus);
+
+            blocked = slideGot < step * 0.25f;
+            return blocked ? clamped : (gotPlus >= gotMinus ? slidePlus : slideMinus);
         }
     }
 }

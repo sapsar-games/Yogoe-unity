@@ -22,7 +22,7 @@ namespace Yoegoe.Characters
         public CharacterRuntimeStats Stats = new CharacterRuntimeStats();
 
         [Header("이동 (에셋 없어도 동작)")]
-        public float moveSpeed = 1.0f;
+        public float moveSpeed = 1.0f / 3f;
         [SerializeField] private SpriteRenderer spriteRenderer; // 없어도 무방, 나중에 아트 연결용
 
         private static readonly System.Collections.Generic.List<CharacterAgent> ActiveAgents

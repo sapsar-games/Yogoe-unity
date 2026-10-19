@@ -385,11 +385,28 @@ namespace Yoegoe.Characters
             if (Stats.State != ActionState.Playing) return;
 
             if (wanderTarget == null || Vector3.Distance(transform.position, wanderTarget.Value) < 0.05f)
+            {
                 wanderTarget = MapBounds.RandomPoint(transform.position.z);
+                boundaryStuckTimer = 0f;
+            }
 
-            transform.position = MapBounds.Clamp(
-                Vector3.MoveTowards(transform.position, wanderTarget.Value, MoveSpeed * dt));
+            transform.position = MapBounds.MoveClamped(
+                transform.position, wanderTarget.Value, MoveSpeed * dt, out bool blocked);
             ResolveSeparation(dt);
+
+            if (blocked)
+            {
+                boundaryStuckTimer += dt;
+                if (boundaryStuckTimer >= BoundaryStuckSeconds)
+                {
+                    boundaryStuckTimer = 0f;
+                    wanderTarget = MapBounds.RandomPoint(transform.position.z);
+                }
+            }
+            else
+            {
+                boundaryStuckTimer = 0f;
+            }
         }
 
         /// <summary>
