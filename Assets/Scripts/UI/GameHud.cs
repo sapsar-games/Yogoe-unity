@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Yoegoe.Characters;
 using Yoegoe.Core;
+using Yoegoe.Data;
 using Yoegoe.Economy;
 
 namespace Yoegoe.UI
