@@ -18,6 +18,21 @@ namespace Yoegoe.UI
     public partial class YutScreen
     {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
+        Coroutine autoPlayRoutine;
+        bool autoPlayRunning;
+        /// <summary>0이면 매치 종료까지. N이면 골인 스택이 N 이상일 때 그만하기.</summary>
+        int autoPlayStopAtStack;
+        /// <summary>true면 특수칸 내용 확인→받기/광고 2배 UI까지 간 뒤 멈춘다.</summary>
+        bool autoPlayStopAtSquareReward;
+        /// <summary>true면 도전과제 보물상자×3 안내(notice)까지 간 뒤 멈춘다.</summary>
+        bool autoPlayStopAtChallengeReward;
+        /// <summary>true면 이무기를 잡아 참 아래 대기까지 간 뒤 멈춘다.</summary>
+        bool autoPlayStopAtImugiCapture;
+        bool autoPlayImugiCaptureReached;
+        YutThrowResult? debugForcedThrow;
+        /// <summary>한 번이 아니라 매 던지기마다 같은 결과를 강제(도전 연속 모/빽도 QA).</summary>
+        YutThrowResult? debugForcedThrowRepeat;
+
         /// <summary>
         /// QA: 실제로 윷을 던지고(연출 포함) 말을 고르며 진행한다.
         /// stopAtStack &gt; 0 이면 그 수 이상 업고 골인했을 때 "그만"으로 보상 확인.
