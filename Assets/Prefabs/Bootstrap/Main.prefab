@@ -53,7 +53,7 @@ MonoBehaviour:
   overviewBackgroundSprite: {fileID: 21300000, guid: 9f44e0c25249744e487d7ce4f92b0a33, type: 3}
   playfieldSprite: {fileID: 21300000, guid: 5215ef6a9024d41f4ab9dd07fbc18cdc, type: 3}
   overviewOffset: {x: -0.05, y: -0.32}
-  hudFont: {fileID: 12800000, guid: 8e00f09198e0495f8df7aa7fe5acd23d, type: 3}
+  hudFont: {fileID: 12800000, guid: f9ebe5df8e6a495d854d415711c7f0bd, type: 3}
   waterIcon: {fileID: 21300000, guid: f245b0d861e8b4deca4320d79c23c5c1, type: 3}
   offerings:
   - {fileID: 11400000, guid: 26314678e70647f398a9913fc6d62b7e, type: 2}

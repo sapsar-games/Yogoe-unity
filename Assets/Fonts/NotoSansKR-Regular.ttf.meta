@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 8e00f09198e0495f8df7aa7fe5acd23d
+guid: f9ebe5df8e6a495d854d415711c7f0bd
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -8,9 +8,9 @@ TrueTypeFontImporter:
   characterSpacing: 0
   characterPadding: 1
   includeFontData: 1
-  fontName: DOSGothic
+  fontName: NotoSansKR-Regular
   fontNames:
-  - DOSGothic
+  - NotoSansKR-Regular
   fallbackFontReferences: []
   customCharacters:
   fontRenderingMode: 0
