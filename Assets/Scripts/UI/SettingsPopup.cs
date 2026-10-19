@@ -110,7 +110,7 @@ namespace Yoegoe.UI
             canvasGO.AddComponent<GraphicRaycaster>();
 
             root = new GameObject("Panel");
-            var rootRt = Stretch(root, canvasGO.transform);
+            var rootRt = UiRectUtils.Stretch(root, canvasGO.transform);
             var dim = root.AddComponent<Image>();
             dim.color = new Color(0f, 0f, 0f, 0.55f);
             var dimBtn = root.AddComponent<Button>();
@@ -118,7 +118,7 @@ namespace Yoegoe.UI
             dimBtn.transition = Selectable.Transition.None;
             dimBtn.onClick.AddListener(Close);
 
-            var box = MakeRect("Box", rootRt, Vector2.zero, new Vector2(760, 920));
+            var box = UiRectUtils.CreateCenteredRect("Box", rootRt, Vector2.zero, new Vector2(760, 920));
             box.gameObject.AddComponent<Image>().color = BoxColor;
             box.gameObject.AddComponent<Button>().transition = Selectable.Transition.None; // 상자 안 탭은 닫지 않게
 
@@ -132,7 +132,7 @@ namespace Yoegoe.UI
             {
                 int level = i;
                 float x = -total / 2f + w / 2f + i * (w + gap);
-                var b = MakeRect("Level" + i, box, new Vector2(x, 235), new Vector2(w, 80));
+                var b = UiRectUtils.CreateCenteredRect("Level" + i, box, new Vector2(x, 235), new Vector2(w, 80));
                 var img = b.gameObject.AddComponent<Image>();
                 img.color = ButtonOff;
                 var btn = b.gameObject.AddComponent<Button>();
@@ -154,7 +154,7 @@ namespace Yoegoe.UI
             {
                 float scale = TimeScales[i];
                 float x = -tTotal / 2f + tw / 2f + i * (tw + tgap);
-                var b = MakeRect("TimeScale" + scale, box, new Vector2(x, -25), new Vector2(tw, 72));
+                var b = UiRectUtils.CreateCenteredRect("TimeScale" + scale, box, new Vector2(x, -25), new Vector2(tw, 72));
                 var img = b.gameObject.AddComponent<Image>();
                 img.color = TimeScaleOff;
                 var btn = b.gameObject.AddComponent<Button>();
@@ -164,7 +164,7 @@ namespace Yoegoe.UI
                 timeScaleButtonImgs.Add(img);
             }
 
-            var skip = MakeRect("Skip20", box, new Vector2(0, -115), new Vector2(280, 72));
+            var skip = UiRectUtils.CreateCenteredRect("Skip20", box, new Vector2(0, -115), new Vector2(280, 72));
             var skipImg = skip.gameObject.AddComponent<Image>();
             skipImg.color = new Color(0.25f, 0.42f, 0.5f, 1f);
             var skipBtn = skip.gameObject.AddComponent<Button>();
@@ -174,7 +174,7 @@ namespace Yoegoe.UI
 
             MakeText(box, "데이터 (테스트)", 32, new Vector2(0, -185), new Vector2(700, 56));
 
-            var reset = MakeRect("Reset", box, new Vector2(-150, -260), new Vector2(260, 72));
+            var reset = UiRectUtils.CreateCenteredRect("Reset", box, new Vector2(-150, -260), new Vector2(260, 72));
             var resetImg = reset.gameObject.AddComponent<Image>();
             resetImg.color = new Color(0.55f, 0.18f, 0.16f, 0.95f);
             var resetBtn = reset.gameObject.AddComponent<Button>();
@@ -182,7 +182,7 @@ namespace Yoegoe.UI
             resetBtn.onClick.AddListener(OnResetClicked);
             MakeText(reset, "초기화", 28, Vector2.zero, new Vector2(260, 72));
 
-            var clear = MakeRect("ClearCache", box, new Vector2(150, -260), new Vector2(260, 72));
+            var clear = UiRectUtils.CreateCenteredRect("ClearCache", box, new Vector2(150, -260), new Vector2(260, 72));
             var clearImg = clear.gameObject.AddComponent<Image>();
             clearImg.color = new Color(0.35f, 0.22f, 0.45f, 0.95f);
             var clearBtn = clear.gameObject.AddComponent<Button>();
@@ -190,7 +190,7 @@ namespace Yoegoe.UI
             clearBtn.onClick.AddListener(OnClearCacheClicked);
             MakeText(clear, "캐시 날리기", 28, Vector2.zero, new Vector2(260, 72));
 
-            var ok = MakeRect("Close", box, new Vector2(0, -360), new Vector2(240, 72));
+            var ok = UiRectUtils.CreateCenteredRect("Close", box, new Vector2(0, -360), new Vector2(240, 72));
             var okImg = ok.gameObject.AddComponent<Image>();
             okImg.color = new Color(0.3f, 0.5f, 0.45f, 1f);
             var okBtn = ok.gameObject.AddComponent<Button>();
@@ -231,30 +231,9 @@ namespace Yoegoe.UI
         static extern void YogoeClearBrowserCacheAndReload();
 #endif
 
-        static RectTransform Stretch(GameObject go, Transform parent)
-        {
-            var rt = go.AddComponent<RectTransform>();
-            rt.SetParent(parent, false);
-            rt.anchorMin = Vector2.zero;
-            rt.anchorMax = Vector2.one;
-            rt.offsetMin = rt.offsetMax = Vector2.zero;
-            return rt;
-        }
-
-        static RectTransform MakeRect(string name, Transform parent, Vector2 pos, Vector2 size)
-        {
-            var go = new GameObject(name);
-            var rt = go.AddComponent<RectTransform>();
-            rt.SetParent(parent, false);
-            rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
-            rt.anchoredPosition = pos;
-            rt.sizeDelta = size;
-            return rt;
-        }
-
         Text MakeText(Transform parent, string msg, int size, Vector2 pos, Vector2 box)
         {
-            var rt = MakeRect("Text", parent, pos, box);
+            var rt = UiRectUtils.CreateCenteredRect("Text", parent, pos, box);
             var t = rt.gameObject.AddComponent<Text>();
             t.font = font;
             t.fontSize = UiFonts.Size(size);

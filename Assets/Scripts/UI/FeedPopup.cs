@@ -215,7 +215,7 @@ namespace Yoegoe.UI
                 outline.effectDistance = new Vector2(4, -4);
             }
 
-            var icon = MakeRect("Icon", go.transform, new Vector2(0, 28), new Vector2(96, 96)).gameObject.AddComponent<Image>();
+            var icon = UiRectUtils.CreateCenteredRect("Icon", go.transform, new Vector2(0, 28), new Vector2(96, 96)).gameObject.AddComponent<Image>();
             icon.raycastTarget = false;
             icon.preserveAspect = true;
             if (e.Data.icon != null) icon.sprite = e.Data.icon;
@@ -344,16 +344,6 @@ namespace Yoegoe.UI
 
         // ---------------- 동적 칸 (listContent 안) ----------------
 
-        static RectTransform MakeRect(string name, Transform parent, Vector2 pos, Vector2 size)
-        {
-            var go = new GameObject(name, typeof(RectTransform));
-            var rt = (RectTransform)go.transform;
-            rt.SetParent(parent, false);
-            rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
-            rt.anchoredPosition = pos;
-            rt.sizeDelta = size;
-            return rt;
-        }
 
         Font FontOrBuiltin()
         {
@@ -363,7 +353,7 @@ namespace Yoegoe.UI
 
         Text MakeText(Transform parent, string msg, int size, Vector2 pos, Vector2 box, Color color)
         {
-            var t = MakeRect("Text", parent, pos, box).gameObject.AddComponent<Text>();
+            var t = UiRectUtils.CreateCenteredRect("Text", parent, pos, box).gameObject.AddComponent<Text>();
             t.font = FontOrBuiltin();
             t.fontSize = UiFonts.Size(size);
             t.alignment = TextAnchor.MiddleCenter;

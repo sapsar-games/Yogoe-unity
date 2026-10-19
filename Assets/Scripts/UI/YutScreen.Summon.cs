@@ -60,7 +60,7 @@ namespace Yoegoe.UI
             CeremonyGate.Begin();
             var dimGo = new GameObject("SummonDim", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
             dimGo.transform.SetParent(root.transform, false);
-            Stretch((RectTransform)dimGo.transform);
+            UiRectUtils.Stretch((RectTransform)dimGo.transform);
             dimGo.transform.SetAsLastSibling();
             var dimImg = dimGo.GetComponent<Image>();
             dimImg.color = new Color(0f, 0f, 0.05f, 0f);

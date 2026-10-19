@@ -15,22 +15,10 @@ namespace Yoegoe.UI
             return font;
         }
 
-        /// <summary>중앙 피벗·anchoredPosition으로 세팅된 빈 RectTransform 하나 생성.</summary>
-        static RectTransform Rect(string name, Transform parent, Vector2 pos, Vector2 size)
-        {
-            var go = new GameObject(name, typeof(RectTransform));
-            var rt = (RectTransform)go.transform;
-            rt.SetParent(parent, false);
-            rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
-            rt.anchoredPosition = pos;
-            rt.sizeDelta = size;
-            return rt;
-        }
-
         /// <summary>parent 밑에 텍스트 한 줄(또는 wrap 박스)을 만든다. 클릭을 가리지 않게 raycastTarget은 꺼둠.</summary>
         Text TextIn(Transform parent, string msg, Vector2 pos, int size, Color color, FontStyle style = FontStyle.Normal, Vector2? box = null)
         {
-            var t = Rect("Text", parent, pos, box ?? new Vector2(860, 50)).gameObject.AddComponent<Text>();
+            var t = UiRectUtils.CreateCenteredRect("Text", parent, pos, box ?? new Vector2(860, 50)).gameObject.AddComponent<Text>();
             t.font = FontOrBuiltin();
             t.fontSize = UiFonts.Size(size);
             t.fontStyle = style;
@@ -50,7 +38,7 @@ namespace Yoegoe.UI
         /// <summary>목적지·요괴 선택용 큰 클릭 카드 (배경 Image + Button). 내용(텍스트)은 호출부에서 TextIn으로 따로 채운다.</summary>
         RectTransform Card(Vector2 pos, Vector2 size, Color color, System.Action onClick)
         {
-            var rt = Rect("Card", body, pos, size);
+            var rt = UiRectUtils.CreateCenteredRect("Card", body, pos, size);
             var img = rt.gameObject.AddComponent<Image>();
             img.color = color;
             var b = rt.gameObject.AddComponent<UnityEngine.UI.Button>();
@@ -63,7 +51,7 @@ namespace Yoegoe.UI
         /// <summary>라벨 텍스트까지 포함한 버튼. onClick이 null이면 비활성(회색, 못 누름)으로 그려진다.</summary>
         UnityEngine.UI.Button Button(string label, Vector2 pos, Vector2 size, Color color, System.Action onClick)
         {
-            var rt = Rect("Button", body, pos, size);
+            var rt = UiRectUtils.CreateCenteredRect("Button", body, pos, size);
             var img = rt.gameObject.AddComponent<Image>();
             img.color = color;
             var b = rt.gameObject.AddComponent<UnityEngine.UI.Button>();
@@ -77,9 +65,9 @@ namespace Yoegoe.UI
         /// <summary>보관함·기력 등에 쓰는 가로 진행바. t는 0~1로 클램프.</summary>
         void Bar(Vector2 pos, float t, Color color)
         {
-            var bg = Rect("Bar", body, pos, new Vector2(760, 26));
+            var bg = UiRectUtils.CreateCenteredRect("Bar", body, pos, new Vector2(760, 26));
             bg.gameObject.AddComponent<Image>().color = new Color(0.08f, 0.06f, 0.05f, 1f);
-            var fill = Rect("Fill", bg, Vector2.zero, Vector2.zero);
+            var fill = UiRectUtils.CreateCenteredRect("Fill", bg, Vector2.zero, Vector2.zero);
             fill.anchorMin = Vector2.zero; fill.anchorMax = new Vector2(Mathf.Clamp01(t), 1f);
             fill.offsetMin = fill.offsetMax = Vector2.zero;
             fill.gameObject.AddComponent<Image>().color = color;

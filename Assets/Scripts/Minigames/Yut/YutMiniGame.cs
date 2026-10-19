@@ -478,7 +478,7 @@ namespace Yoegoe.Minigames.Yut
             if (text == null)
             {
                 text = CreateText(button.transform, "Label", label, 38, TextAnchor.MiddleCenter);
-                Stretch(text.rectTransform);
+                UiRectUtils.Stretch(text.rectTransform);
                 text.raycastTarget = false;
             }
             text.text = label;
@@ -505,7 +505,7 @@ namespace Yoegoe.Minigames.Yut
             btn.onClick.AddListener(() => onClick?.Invoke());
 
             var text = CreateText(go.transform, "Label", label, 34, TextAnchor.MiddleCenter);
-            Stretch(text.rectTransform);
+            UiRectUtils.Stretch(text.rectTransform);
             text.raycastTarget = false;
             return btn;
         }
@@ -534,12 +534,5 @@ namespace Yoegoe.Minigames.Yut
             rt.offsetMax = new Vector2(right, top);
         }
 
-        static void Stretch(RectTransform rt)
-        {
-            rt.anchorMin = Vector2.zero;
-            rt.anchorMax = Vector2.one;
-            rt.offsetMin = Vector2.zero;
-            rt.offsetMax = Vector2.zero;
-        }
     }
 }

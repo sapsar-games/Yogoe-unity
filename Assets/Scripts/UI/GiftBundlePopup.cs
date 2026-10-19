@@ -156,12 +156,12 @@ namespace Yoegoe.UI
             canvasGO.AddComponent<GraphicRaycaster>();
 
             root = new GameObject("Panel");
-            var rootRt = Stretch(root, canvasGO.transform);
+            var rootRt = UiRectUtils.Stretch(root, canvasGO.transform);
             var dim = root.AddComponent<Image>();
             dim.color = new Color(0f, 0f, 0f, 0.55f);
 
             closedView = new GameObject("Closed");
-            Stretch(closedView, rootRt);
+            UiRectUtils.Stretch(closedView, rootRt);
             var closedBtn = closedView.AddComponent<Button>();
             closedBtn.targetGraphic = dim;
             closedBtn.onClick.AddListener(OnTapClosed);
@@ -174,19 +174,14 @@ namespace Yoegoe.UI
             MakeChestImage(box, "ClosedChest", closedChestSprite, new Vector2(0, 0), new Vector2(220, 220));
 
             openView = new GameObject("Open");
-            Stretch(openView, rootRt);
+            UiRectUtils.Stretch(openView, rootRt);
             openView.SetActive(false);
             var openBox = MakeBox(openView.transform, new Vector2(560, 580));
             MakeText(openBox, "획득!", 34, new Vector2(0, 230));
             MakeChestImage(openBox, "OpenChest", openChestSprite, new Vector2(0, 60), new Vector2(220, 220));
 
-            var iconGO = new GameObject("RewardIcon");
-            var iconRt = iconGO.AddComponent<RectTransform>();
-            iconRt.SetParent(openBox, false);
-            iconRt.anchorMin = iconRt.anchorMax = iconRt.pivot = new Vector2(0.5f, 0.5f);
-            iconRt.anchoredPosition = new Vector2(0, 70);
-            iconRt.sizeDelta = new Vector2(96, 96);
-            rewardIcon = iconGO.AddComponent<Image>();
+            var iconRt = UiRectUtils.CreateCenteredRect("RewardIcon", openBox, new Vector2(0, 70), new Vector2(96, 96));
+            rewardIcon = iconRt.gameObject.AddComponent<Image>();
             rewardIcon.preserveAspect = true;
             rewardIcon.raycastTarget = false;
 
@@ -194,12 +189,8 @@ namespace Yoegoe.UI
             rewardText.GetComponent<RectTransform>().sizeDelta = new Vector2(500, 100);
 
             // 광고/보상권으로 하나 더 (세션 1회)
-            moreBtnGO = new GameObject("BtnMore");
-            var moreRt = moreBtnGO.AddComponent<RectTransform>();
-            moreRt.SetParent(openBox, false);
-            moreRt.anchorMin = moreRt.anchorMax = moreRt.pivot = new Vector2(0.5f, 0.5f);
-            moreRt.anchoredPosition = new Vector2(0, -175);
-            moreRt.sizeDelta = new Vector2(360, 64);
+            var moreRt = UiRectUtils.CreateCenteredRect("BtnMore", openBox, new Vector2(0, -175), new Vector2(360, 64));
+            moreBtnGO = moreRt.gameObject;
             var moreImg = moreBtnGO.AddComponent<Image>();
             moreImg.color = new Color(0.55f, 0.4f, 0.2f, 1f);
             var moreBtn = moreBtnGO.AddComponent<Button>();
@@ -208,12 +199,8 @@ namespace Yoegoe.UI
             moreBtnLabel = MakeText(moreRt, "광고 보고 하나 더", 24, Vector2.zero);
             moreBtnGO.SetActive(false);
 
-            var ok = new GameObject("BtnOk");
-            var okRt = ok.AddComponent<RectTransform>();
-            okRt.SetParent(openBox, false);
-            okRt.anchorMin = okRt.anchorMax = okRt.pivot = new Vector2(0.5f, 0.5f);
-            okRt.anchoredPosition = new Vector2(0, -250);
-            okRt.sizeDelta = new Vector2(240, 64);
+            var okRt = UiRectUtils.CreateCenteredRect("BtnOk", openBox, new Vector2(0, -250), new Vector2(240, 64));
+            var ok = okRt.gameObject;
             var okImg = ok.AddComponent<Image>();
             okImg.color = new Color(0.3f, 0.5f, 0.45f, 1f);
             var okBtn = ok.AddComponent<Button>();
@@ -232,13 +219,8 @@ namespace Yoegoe.UI
 
         static void MakeChestImage(Transform parent, string name, Sprite sprite, Vector2 pos, Vector2 size)
         {
-            var go = new GameObject(name);
-            var rt = go.AddComponent<RectTransform>();
-            rt.SetParent(parent, false);
-            rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
-            rt.anchoredPosition = pos;
-            rt.sizeDelta = size;
-            var img = go.AddComponent<Image>();
+            var rt = UiRectUtils.CreateCenteredRect(name, parent, pos, size);
+            var img = rt.gameObject.AddComponent<Image>();
             img.raycastTarget = false;
             img.preserveAspect = true;
             if (sprite != null)
@@ -250,37 +232,18 @@ namespace Yoegoe.UI
                 img.color = new Color(0.72f, 0.48f, 0.22f, 1f);
         }
 
-        static RectTransform Stretch(GameObject go, Transform parent)
-        {
-            var rt = go.AddComponent<RectTransform>();
-            rt.SetParent(parent, false);
-            rt.anchorMin = Vector2.zero;
-            rt.anchorMax = Vector2.one;
-            rt.offsetMin = rt.offsetMax = Vector2.zero;
-            return rt;
-        }
-
         static RectTransform MakeBox(Transform parent, Vector2 size)
         {
-            var box = new GameObject("Box");
-            var rt = box.AddComponent<RectTransform>();
-            rt.SetParent(parent, false);
-            rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
-            rt.sizeDelta = size;
-            var bg = box.AddComponent<Image>();
+            var rt = UiRectUtils.CreateCenteredRect("Box", parent, Vector2.zero, size);
+            var bg = rt.gameObject.AddComponent<Image>();
             bg.color = new Color(0.14f, 0.1f, 0.08f, 0.98f);
             return rt;
         }
 
         Text MakeText(Transform parent, string msg, int size, Vector2 pos, Color? color = null)
         {
-            var go = new GameObject("Text");
-            var rt = go.AddComponent<RectTransform>();
-            rt.SetParent(parent, false);
-            rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
-            rt.anchoredPosition = pos;
-            rt.sizeDelta = new Vector2(500, 80);
-            var t = go.AddComponent<Text>();
+            var rt = UiRectUtils.CreateCenteredRect("Text", parent, pos, new Vector2(500, 80));
+            var t = rt.gameObject.AddComponent<Text>();
             t.font = font;
             t.fontSize = UiFonts.Size(size);
             t.alignment = TextAnchor.MiddleCenter;

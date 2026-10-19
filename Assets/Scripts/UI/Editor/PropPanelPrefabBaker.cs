@@ -4,6 +4,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 using Yoegoe.Bootstrap.EditorTools;
+using Yoegoe.UI;
 
 namespace Yoegoe.UI.EditorTools
 {
@@ -77,7 +78,7 @@ namespace Yoegoe.UI.EditorTools
             dimBtn.transition = Selectable.Transition.None;
             dimBtn.targetGraphic = dim;
 
-            var box = Rect("Box", rootRt, Vector2.zero, new Vector2(940, 1360));
+            var box = UiRectUtils.CreateCenteredRect("Box", rootRt, Vector2.zero, new Vector2(940, 1360));
             var boxImg = box.gameObject.AddComponent<Image>();
             boxImg.color = BoxColor;
             var boxBtn = box.gameObject.AddComponent<Button>();
@@ -87,14 +88,14 @@ namespace Yoegoe.UI.EditorTools
             var title = TextIn(box, font, "", new Vector2(0, 620), 44, TextColor, FontStyle.Bold, new Vector2(700, 70));
             var sub = TextIn(box, font, "", new Vector2(0, 560), 26, DimText, FontStyle.Normal, new Vector2(800, 44));
 
-            var close = Rect("Close", box, new Vector2(415, 625), new Vector2(80, 80));
+            var close = UiRectUtils.CreateCenteredRect("Close", box, new Vector2(415, 625), new Vector2(80, 80));
             var closeImg = close.gameObject.AddComponent<Image>();
             closeImg.color = new Color(0.35f, 0.27f, 0.2f);
             var closeBtn = close.gameObject.AddComponent<Button>();
             closeBtn.targetGraphic = closeImg;
             TextIn(close, font, "X", Vector2.zero, 36, TextColor, FontStyle.Bold, new Vector2(80, 80));
 
-            var body = Rect("Body", box, Vector2.zero, new Vector2(940, 1360));
+            var body = UiRectUtils.CreateCenteredRect("Body", box, Vector2.zero, new Vector2(940, 1360));
             root.SetActive(false);
 
             var so = new SerializedObject(panel);
@@ -109,20 +110,9 @@ namespace Yoegoe.UI.EditorTools
             return host;
         }
 
-        static RectTransform Rect(string name, Transform parent, Vector2 pos, Vector2 size)
-        {
-            var go = new GameObject(name, typeof(RectTransform));
-            var rt = (RectTransform)go.transform;
-            rt.SetParent(parent, false);
-            rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
-            rt.anchoredPosition = pos;
-            rt.sizeDelta = size;
-            return rt;
-        }
-
         static Text TextIn(Transform parent, Font font, string msg, Vector2 pos, int size, Color color, FontStyle style, Vector2 box)
         {
-            var t = Rect("Text", parent, pos, box).gameObject.AddComponent<Text>();
+            var t = UiRectUtils.CreateCenteredRect("Text", parent, pos, box).gameObject.AddComponent<Text>();
             t.font = font;
             t.fontSize = size;
             t.fontStyle = style;

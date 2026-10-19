@@ -178,7 +178,7 @@ namespace Yoegoe.UI
 
         void MakeGhost(SpiritPier.Spirit s, Vector2 pos, bool ready)
         {
-            var rt = Rect("Spirit" + s.Id, ghostsLayer, pos, new Vector2(180, 360));
+            var rt = UiRectUtils.CreateCenteredRect("Spirit" + s.Id, ghostsLayer, pos, new Vector2(180, 360));
             var hit = rt.gameObject.AddComponent<Image>();
             hit.color = new Color(0, 0, 0, 0);
             var btn = rt.gameObject.AddComponent<Button>();
@@ -187,7 +187,7 @@ namespace Yoegoe.UI
             int id = s.Id;
             btn.onClick.AddListener(() => { sheetSpiritId = id; BuildSheet(id); });
 
-            var body = Rect("Ghost", rt, new Vector2(0, -40), new Vector2(150, 200)).gameObject.AddComponent<Image>();
+            var body = UiRectUtils.CreateCenteredRect("Ghost", rt, new Vector2(0, -40), new Vector2(150, 200)).gameObject.AddComponent<Image>();
             body.sprite = GhostSprite();
             body.color = KindTints[(int)s.Kind];
             body.preserveAspect = true;
@@ -199,7 +199,7 @@ namespace Yoegoe.UI
                 glow.effectDistance = new Vector2(5, -5);
             }
 
-            var tag = Rect("Tag", rt, new Vector2(0, 110), new Vector2(180, 56));
+            var tag = UiRectUtils.CreateCenteredRect("Tag", rt, new Vector2(0, 110), new Vector2(180, 56));
             tag.gameObject.AddComponent<Image>().color = ready ? new Color(0.55f, 0.4f, 0.12f, 0.95f) : new Color(0.12f, 0.1f, 0.12f, 0.85f);
             TextIn(tag, DishName(s.DishId), Vector2.zero, 26, ready ? Gold : TextColor, FontStyle.Bold, new Vector2(176, 56));
             float left = s.MinutesLeft(Yoegoe.Core.TrustedTime.UtcNow);
@@ -318,16 +318,16 @@ namespace Yoegoe.UI
             Band(rt, 0.40f, 0.70f, new Color(0.55f, 0.66f, 0.72f, 1f));   // 바다
             Band(rt, 0.355f, 0.40f, new Color(0.42f, 0.29f, 0.18f, 1f));  // 선착장 판자
             Band(rt, 0f, 0.355f, new Color(0.88f, 0.84f, 0.74f, 1f));     // 마당
-            var lantern1 = Rect("Lantern", rt, Vector2.zero, new Vector2(40, 60));
+            var lantern1 = UiRectUtils.CreateCenteredRect("Lantern", rt, Vector2.zero, new Vector2(40, 60));
             Anchor(lantern1, 0.06f, 0.44f); lantern1.gameObject.AddComponent<Image>().color = new Color(0.94f, 0.64f, 0.29f, 1f);
-            var lantern2 = Rect("Lantern", rt, Vector2.zero, new Vector2(40, 60));
+            var lantern2 = UiRectUtils.CreateCenteredRect("Lantern", rt, Vector2.zero, new Vector2(40, 60));
             Anchor(lantern2, 0.94f, 0.44f); lantern2.gameObject.AddComponent<Image>().color = new Color(0.94f, 0.64f, 0.29f, 1f);
 
-            ghostsLayer = Rect("Ghosts", rt, Vector2.zero, new Vector2(1000, 400));
+            ghostsLayer = UiRectUtils.CreateCenteredRect("Ghosts", rt, Vector2.zero, new Vector2(1000, 400));
             Anchor(ghostsLayer, 0.5f, 0.52f);
 
             // 위 줄
-            var top = Rect("Top", rt, Vector2.zero, new Vector2(1080, 170));
+            var top = UiRectUtils.CreateCenteredRect("Top", rt, Vector2.zero, new Vector2(1080, 170));
             top.anchorMin = new Vector2(0, 1); top.anchorMax = new Vector2(1, 1); top.pivot = new Vector2(0.5f, 1);
             top.offsetMin = new Vector2(0, -170); top.offsetMax = Vector2.zero;
             top.gameObject.AddComponent<Image>().color = new Color(0.14f, 0.1f, 0.08f, 0.92f);
@@ -350,7 +350,7 @@ namespace Yoegoe.UI
             var dimBtn = sheet.AddComponent<Button>();
             dimBtn.transition = Selectable.Transition.None;
             dimBtn.onClick.AddListener(CloseSheet);
-            sheetBox = Rect("Box", srt, new Vector2(0, -80), new Vector2(800, 620));
+            sheetBox = UiRectUtils.CreateCenteredRect("Box", srt, new Vector2(0, -80), new Vector2(800, 620));
             sheetBox.gameObject.AddComponent<Image>().color = new Color(0.14f, 0.1f, 0.08f, 0.98f);
             sheetBox.gameObject.AddComponent<Button>().transition = Selectable.Transition.None;
             sheet.SetActive(false);
@@ -360,7 +360,7 @@ namespace Yoegoe.UI
 
         static void Band(RectTransform parent, float yMin, float yMax, Color c)
         {
-            var b = Rect("Band", parent, Vector2.zero, Vector2.zero);
+            var b = UiRectUtils.CreateCenteredRect("Band", parent, Vector2.zero, Vector2.zero);
             b.anchorMin = new Vector2(0, yMin); b.anchorMax = new Vector2(1, yMax);
             b.offsetMin = b.offsetMax = Vector2.zero;
             var img = b.gameObject.AddComponent<Image>();
@@ -374,20 +374,10 @@ namespace Yoegoe.UI
             r.anchoredPosition = Vector2.zero;
         }
 
-        static RectTransform Rect(string name, Transform parent, Vector2 pos, Vector2 size)
-        {
-            var go = new GameObject(name, typeof(RectTransform));
-            var rt = (RectTransform)go.transform;
-            rt.SetParent(parent, false);
-            rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
-            rt.anchoredPosition = pos;
-            rt.sizeDelta = size;
-            return rt;
-        }
 
         Text TextIn(Transform parent, string msg, Vector2 pos, int size, Color color, FontStyle style, Vector2 box)
         {
-            var t = Rect("Text", parent, pos, box).gameObject.AddComponent<Text>();
+            var t = UiRectUtils.CreateCenteredRect("Text", parent, pos, box).gameObject.AddComponent<Text>();
             t.font = font;
             t.fontSize = UiFonts.Size(size);
             t.fontStyle = style;
@@ -402,7 +392,7 @@ namespace Yoegoe.UI
 
         Button MakeButton(Transform parent, string label, Vector2 pos, Vector2 size, Color color, System.Action onClick)
         {
-            var rt = Rect("Button", parent, pos, size);
+            var rt = UiRectUtils.CreateCenteredRect("Button", parent, pos, size);
             var img = rt.gameObject.AddComponent<Image>();
             img.color = color;
             var b = rt.gameObject.AddComponent<Button>();

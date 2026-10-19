@@ -4,6 +4,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 using Yoegoe.Bootstrap.EditorTools;
+using Yoegoe.UI;
 
 namespace Yoegoe.UI.EditorTools
 {
@@ -80,7 +81,7 @@ namespace Yoegoe.UI.EditorTools
             dimBtn.transition = Selectable.Transition.None;
             dimBtn.targetGraphic = dim;
 
-            var box = Rect("Box", rootRt, Vector2.zero, new Vector2(920, 1380));
+            var box = UiRectUtils.CreateCenteredRect("Box", rootRt, Vector2.zero, new Vector2(920, 1380));
             var boxImg = box.gameObject.AddComponent<Image>();
             boxImg.color = BoxColor;
             var boxBtn = box.gameObject.AddComponent<Button>();
@@ -88,7 +89,7 @@ namespace Yoegoe.UI.EditorTools
             boxBtn.targetGraphic = boxImg;
 
             var title = TextIn(box, font, "먹이기", new Vector2(0, 620), 44, TextColor, FontStyle.Bold, new Vector2(760, 70));
-            var close = Rect("Close", box, new Vector2(400, 625), new Vector2(80, 80));
+            var close = UiRectUtils.CreateCenteredRect("Close", box, new Vector2(400, 625), new Vector2(80, 80));
             var closeImg = close.gameObject.AddComponent<Image>();
             closeImg.color = new Color(0.35f, 0.27f, 0.2f);
             var closeBtn = close.gameObject.AddComponent<Button>();
@@ -97,9 +98,9 @@ namespace Yoegoe.UI.EditorTools
 
             var sub = TextIn(box, font, "", new Vector2(0, 560), 26, DimText, FontStyle.Normal, new Vector2(820, 44));
 
-            var barBg = Rect("GiBar", box, new Vector2(0, 500), new Vector2(780, 30));
+            var barBg = UiRectUtils.CreateCenteredRect("GiBar", box, new Vector2(0, 500), new Vector2(780, 30));
             barBg.gameObject.AddComponent<Image>().color = new Color(0.08f, 0.06f, 0.05f, 1f);
-            var fillRt = Rect("Fill", barBg, Vector2.zero, Vector2.zero);
+            var fillRt = UiRectUtils.CreateCenteredRect("Fill", barBg, Vector2.zero, Vector2.zero);
             fillRt.anchorMin = Vector2.zero;
             fillRt.anchorMax = new Vector2(0.5f, 1f);
             fillRt.pivot = new Vector2(0, 0.5f);
@@ -108,7 +109,7 @@ namespace Yoegoe.UI.EditorTools
             giFill.color = new Color(0.45f, 0.75f, 0.4f, 1f);
             var giText = TextIn(box, font, "", new Vector2(0, 455), 26, TextColor, FontStyle.Normal, new Vector2(820, 40));
 
-            var anyRt = Rect("AnyButton", box, new Vector2(-170, 355), new Vector2(520, 120));
+            var anyRt = UiRectUtils.CreateCenteredRect("AnyButton", box, new Vector2(-170, 355), new Vector2(520, 120));
             var anyImg = anyRt.gameObject.AddComponent<Image>();
             anyImg.color = new Color(0.3f, 0.5f, 0.45f, 1f);
             var anyButton = anyRt.gameObject.AddComponent<Button>();
@@ -123,13 +124,13 @@ namespace Yoegoe.UI.EditorTools
             var statusText = TextIn(box, font, "", new Vector2(0, 262), 26, GoldColor, FontStyle.Normal, new Vector2(820, 44));
 
             // 목록 (스크롤)
-            var view = Rect("List", box, new Vector2(0, -205), new Vector2(840, 860));
+            var view = UiRectUtils.CreateCenteredRect("List", box, new Vector2(0, -205), new Vector2(840, 860));
             view.gameObject.AddComponent<Image>().color = new Color(0, 0, 0, 0.2f);
             view.gameObject.AddComponent<RectMask2D>();
             var scroll = view.gameObject.AddComponent<ScrollRect>();
             scroll.horizontal = false;
             scroll.movementType = ScrollRect.MovementType.Clamped;
-            var listContent = Rect("Content", view, Vector2.zero, Vector2.zero);
+            var listContent = UiRectUtils.CreateCenteredRect("Content", view, Vector2.zero, Vector2.zero);
             listContent.anchorMin = new Vector2(0, 1);
             listContent.anchorMax = new Vector2(1, 1);
             listContent.pivot = new Vector2(0.5f, 1);
@@ -145,7 +146,7 @@ namespace Yoegoe.UI.EditorTools
             scroll.viewport = view;
 
             var emptyText = TextIn(view, font, "", new Vector2(0, 60), 28, DimText, FontStyle.Normal, new Vector2(760, 120));
-            var kitchenRt = Rect("GoKitchenButton", view, new Vector2(0, -60), new Vector2(260, 70));
+            var kitchenRt = UiRectUtils.CreateCenteredRect("GoKitchenButton", view, new Vector2(0, -60), new Vector2(260, 70));
             var kitchenImg = kitchenRt.gameObject.AddComponent<Image>();
             kitchenImg.color = new Color(0.55f, 0.4f, 0.2f, 1f);
             var goKitchenButton = kitchenRt.gameObject.AddComponent<Button>();
@@ -181,7 +182,7 @@ namespace Yoegoe.UI.EditorTools
 
         static Button SegButton(Transform parent, Font font, string label, Vector2 pos, Vector2 size, Color color)
         {
-            var rt = Rect("SegButton", parent, pos, size);
+            var rt = UiRectUtils.CreateCenteredRect("SegButton", parent, pos, size);
             var img = rt.gameObject.AddComponent<Image>();
             img.color = color;
             var b = rt.gameObject.AddComponent<Button>();
@@ -191,20 +192,9 @@ namespace Yoegoe.UI.EditorTools
             return b;
         }
 
-        static RectTransform Rect(string name, Transform parent, Vector2 pos, Vector2 size)
-        {
-            var go = new GameObject(name, typeof(RectTransform));
-            var rt = (RectTransform)go.transform;
-            rt.SetParent(parent, false);
-            rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
-            rt.anchoredPosition = pos;
-            rt.sizeDelta = size;
-            return rt;
-        }
-
         static Text TextIn(Transform parent, Font font, string msg, Vector2 pos, int size, Color color, FontStyle style, Vector2 box)
         {
-            var t = Rect("Text", parent, pos, box).gameObject.AddComponent<Text>();
+            var t = UiRectUtils.CreateCenteredRect("Text", parent, pos, box).gameObject.AddComponent<Text>();
             t.font = font;
             t.fontSize = size;
             t.fontStyle = style;

@@ -248,7 +248,7 @@ namespace Yoegoe.UI
             canvasGO.AddComponent<GraphicRaycaster>();
 
             root = new GameObject("Panel");
-            var rootRt = Stretch(root, canvasGO.transform);
+            var rootRt = UiRectUtils.Stretch(root, canvasGO.transform);
             var dim = root.AddComponent<Image>();
             dim.color = new Color(0f, 0f, 0f, 0.55f);
 
@@ -275,53 +275,28 @@ namespace Yoegoe.UI
         Button MakeButton(Transform parent, string name, string label, Vector2 pos, Vector2 size,
             Color color, UnityEngine.Events.UnityAction onClick)
         {
-            var go = new GameObject(name);
-            var rt = go.AddComponent<RectTransform>();
-            rt.SetParent(parent, false);
-            rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
-            rt.anchoredPosition = pos;
-            rt.sizeDelta = size;
-            var img = go.AddComponent<Image>();
+            var rt = UiRectUtils.CreateCenteredRect(name, parent, pos, size);
+            var img = rt.gameObject.AddComponent<Image>();
             img.color = color;
-            var btn = go.AddComponent<Button>();
+            var btn = rt.gameObject.AddComponent<Button>();
             btn.targetGraphic = img;
             btn.onClick.AddListener(onClick);
             MakeText(rt, label, 28, Vector2.zero);
             return btn;
         }
 
-        static RectTransform Stretch(GameObject go, Transform parent)
-        {
-            var rt = go.AddComponent<RectTransform>();
-            rt.SetParent(parent, false);
-            rt.anchorMin = Vector2.zero;
-            rt.anchorMax = Vector2.one;
-            rt.offsetMin = rt.offsetMax = Vector2.zero;
-            return rt;
-        }
-
         static RectTransform MakeBox(Transform parent, Vector2 size)
         {
-            var go = new GameObject("Box");
-            var rt = go.AddComponent<RectTransform>();
-            rt.SetParent(parent, false);
-            rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
-            rt.anchoredPosition = Vector2.zero;
-            rt.sizeDelta = size;
-            var img = go.AddComponent<Image>();
+            var rt = UiRectUtils.CreateCenteredRect("Box", parent, Vector2.zero, size);
+            var img = rt.gameObject.AddComponent<Image>();
             img.color = new Color(0.16f, 0.12f, 0.1f, 0.97f);
             return rt;
         }
 
         Text MakeText(Transform parent, string msg, int size, Vector2 pos, Color? color = null)
         {
-            var go = new GameObject("Text");
-            var rt = go.AddComponent<RectTransform>();
-            rt.SetParent(parent, false);
-            rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
-            rt.anchoredPosition = pos;
-            rt.sizeDelta = new Vector2(520, 90);
-            var text = go.AddComponent<Text>();
+            var rt = UiRectUtils.CreateCenteredRect("Text", parent, pos, new Vector2(520, 90));
+            var text = rt.gameObject.AddComponent<Text>();
             text.font = font != null
                 ? font
                 : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");

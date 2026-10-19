@@ -140,7 +140,7 @@ namespace Yoegoe.Minigames.Yut
             bg.raycastTarget = false;
 
             var label = CreateText(rt, "Text", text, 20, TextAnchor.MiddleCenter);
-            Stretch(label.rectTransform);
+            UiRectUtils.Stretch(label.rectTransform);
             label.color = new Color(0.15f, 0.12f, 0.08f);
             label.raycastTarget = false;
             label.horizontalOverflow = HorizontalWrapMode.Wrap;
@@ -170,7 +170,7 @@ namespace Yoegoe.Minigames.Yut
             _playLogButton.targetGraphic = bg;
 
             var label = CreateText(go.transform, "Label", "기록", 22, TextAnchor.MiddleCenter);
-            Stretch(label.rectTransform);
+            UiRectUtils.Stretch(label.rectTransform);
             label.raycastTarget = false;
 
             _playLogButton.onClick.AddListener(TogglePlayLog);
@@ -200,7 +200,7 @@ namespace Yoegoe.Minigames.Yut
             _tokenPlusButton.targetGraphic = bg;
 
             var label = CreateText(go.transform, "Label", "+", 26, TextAnchor.MiddleCenter);
-            Stretch(label.rectTransform);
+            UiRectUtils.Stretch(label.rectTransform);
             label.raycastTarget = false;
 
             _tokenPlusButton.onClick.AddListener(() => OnBuyTokensPressed?.Invoke());

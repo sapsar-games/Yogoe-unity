@@ -362,7 +362,7 @@ namespace Yoegoe.Minigames.Yut
             {
                 img.color = ColorForYokai(pieceId);
                 var label = CreateText(img.transform, "Label", InitialOf(displayName), 28, TextAnchor.MiddleCenter);
-                Stretch(label.rectTransform);
+                UiRectUtils.Stretch(label.rectTransform);
                 label.raycastTarget = false;
             }
         }

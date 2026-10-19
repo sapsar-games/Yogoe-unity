@@ -55,7 +55,7 @@ namespace Yoegoe.UI
             var labelGO = new GameObject("Label", typeof(RectTransform));
             var labelRt = (RectTransform)labelGO.transform;
             labelRt.SetParent(btnRt, false);
-            Stretch(labelRt);
+            UiRectUtils.Stretch(labelRt);
             var labelText = labelGO.AddComponent<Text>();
             labelText.font = font;
             labelText.fontSize = UiFonts.Size(34);
@@ -98,7 +98,7 @@ namespace Yoegoe.UI
             rewardRoot = new GameObject("SquareReward", typeof(RectTransform));
             var rt = (RectTransform)rewardRoot.transform;
             rt.SetParent(parent, false);
-            Stretch(rt);
+            UiRectUtils.Stretch(rt);
             var dim = rewardRoot.AddComponent<Image>();
             dim.color = new Color(0f, 0f, 0f, 0.6f);
 
@@ -179,7 +179,7 @@ namespace Yoegoe.UI
             reviveRoot = new GameObject("Revive", typeof(RectTransform));
             var rt = (RectTransform)reviveRoot.transform;
             rt.SetParent(parent, false);
-            Stretch(rt);
+            UiRectUtils.Stretch(rt);
             var dim = reviveRoot.AddComponent<Image>();
             dim.color = new Color(0f, 0f, 0f, 0.6f);
 
@@ -235,14 +235,6 @@ namespace Yoegoe.UI
             pendingReviveYes = null;
             pendingReviveNo = null;
             action?.Invoke();
-        }
-
-        static void Stretch(RectTransform rt)
-        {
-            rt.anchorMin = Vector2.zero;
-            rt.anchorMax = Vector2.one;
-            rt.offsetMin = Vector2.zero;
-            rt.offsetMax = Vector2.zero;
         }
     }
 }
